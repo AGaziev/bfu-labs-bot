@@ -160,5 +160,5 @@ cython_debug/
 #.idea/
 
 *.xmind
-test.*
+test*
 tempCodeRunnerFile.py
