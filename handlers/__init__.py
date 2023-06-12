@@ -49,7 +49,7 @@ def setup(dp:dispatcher):
     )
 
     dp.register_message_handler(
-        teacher.end_group_add,
+        teacher.correcting_students_list,
         content_types=['document'],
         state=states.Teacher.add_group.students
     )
