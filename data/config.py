@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-token = os.getenv('BOT_TOKEN')
+bot_token = os.getenv('BOT_TOKEN')
+disk_token = os.getenv('YANDEX_DISK_TOKEN')
 
 admins = [
     433364417,  # @pheezz
