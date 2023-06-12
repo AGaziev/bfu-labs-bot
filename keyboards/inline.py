@@ -58,4 +58,25 @@ async def applying_kb():
             callback_data='apply')
     ]
 
+    for button in applying_buttons:
+        kb.insert(button)
+
+    return kb
+
+
+async def group_kb(group_id):
+    """
+    group_id - group's id from database to build a callback
+    """
+    kb = InlineKeyboardMarkup()
+    group_buttons = [
+        InlineKeyboardButton(
+            text='Добавить лабораторные',
+            callback_data=f'add_labs:{group_id}'  # 123 like test group id
+        )
+    ]
+
+    for button in group_buttons:
+        kb.insert(button)
+
     return kb
