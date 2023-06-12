@@ -10,6 +10,7 @@ from data import config
 import keyboards as kb
 from middlewares import rate_limit
 from utils import states
+from managers import GroupManager
 
 
 async def set_new_group_name(callback: types.CallbackQuery):
@@ -19,11 +20,14 @@ async def set_new_group_name(callback: types.CallbackQuery):
 
 
 async def set_new_group_students(message: types.Message, state: FSMContext):
-    await message.answer(f"Название вашей группы: {message.text}\n\n"
-                         f"Прикрепите txt файл со списком студентов в этой группе")
-    async with state.proxy() as group_data:
-        group_data["name"] = message.text
-    await states.Teacher.add_group.students.set()
+    if GroupManager.group_name_exists(message.text): # TODO: to validate type (with exist and bad names check)
+        await message.answer(f"Такое название занято, используйте другое")
+    else:
+        await message.answer(f"Название вашей группы: {message.text}\n\n"
+                             f"Прикрепите txt файл со списком студентов в этой группе")
+        async with state.proxy() as group_data:
+            group_data["name"] = message.text
+        await states.Teacher.add_group.students.set()
 
 async def end_group_add(message: types.Message, state: FSMContext):
 
