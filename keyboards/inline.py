@@ -27,3 +27,34 @@ async def menu_kb():
         text='❌Close❌', callback_data='close_menu'))
 
     return kb
+
+
+async def teacher_menu_kb():
+    kb = InlineKeyboardMarkup(row_width=2, )
+    group_buttons = [
+        # TODO: Кнопки на основе групп у преподавателя
+        InlineKeyboardButton(
+            text='Группа 1',
+            callback_data='group1name'),
+        InlineKeyboardButton(
+            text='Группа 2',
+            callback_data='group2name'),
+    ]
+
+    for button in group_buttons:
+        kb.insert(button)
+
+    kb.add(InlineKeyboardButton(
+        text='Добавить новую группу', callback_data='add_new_group'))
+
+    return kb
+
+async def applying_kb():
+    kb = InlineKeyboardMarkup()
+    applying_buttons = [
+        InlineKeyboardButton(
+            text='Принять',
+            callback_data='apply')
+    ]
+
+    return kb
