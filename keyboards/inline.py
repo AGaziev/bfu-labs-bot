@@ -33,12 +33,13 @@ async def teacher_menu_kb():
     kb = InlineKeyboardMarkup(row_width=2, )
     group_buttons = [
         # TODO: Кнопки на основе групп у преподавателя
+        # TODO: Использовать group_id в генерации callback_data
         InlineKeyboardButton(
             text='Группа 1',
-            callback_data='group1name'),
+            callback_data='group:1'),
         InlineKeyboardButton(
             text='Группа 2',
-            callback_data='group2name'),
+            callback_data='group:2'),
     ]
 
     for button in group_buttons:
