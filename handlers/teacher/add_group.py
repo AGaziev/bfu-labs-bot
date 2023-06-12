@@ -29,7 +29,6 @@ async def set_new_group_students(message: types.Message, state: FSMContext):
             group_data["name"] = message.text
         await states.Teacher.add_group.students.set()
 
-async def end_group_add(message: types.Message, state: FSMContext):
 
 async def correcting_students_list(message: types.Message, state: FSMContext):
     # add file in buffer
@@ -50,3 +49,15 @@ async def correcting_students_list(message: types.Message, state: FSMContext):
                              f"Если не сходится попробуйте снова загрузить файл со списком студентов в txt формате",
                              reply_markup=await kb.applying_kb(),
                              parse_mode="MarkdownV2")
+
+
+async def end_group_add(callback: types.CallbackQuery, state: FSMContext):
+    async with state.proxy() as group_data:
+        group_data["disk_url"], group_id = GroupManager.create_group(group_data["name"], group_data["students"])
+        group_name = escape_md(group_data['name'])
+        group_url = escape_md(group_data['disk_url'])
+        await callback.message.answer(f"Группа *{group_name}* успешно создана\n"
+                                      f"[Ссылка на группу]({group_url})",
+                                      reply_markup=await kb.group_kb(group_id),
+                                      parse_mode="MarkdownV2")
+        await state.finish()

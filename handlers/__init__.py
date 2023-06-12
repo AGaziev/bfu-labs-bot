@@ -54,3 +54,8 @@ def setup(dp:dispatcher):
         state=states.Teacher.add_group.students
     )
 
+    dp.register_callback_query_handler(
+        teacher.end_group_add,
+        state=states.Teacher.add_group.students
+    )
+
