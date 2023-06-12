@@ -8,7 +8,6 @@ from middlewares import rate_limit
 import keyboards as kb
 
 from data.config import admins
-from . import states
 
 
 @rate_limit(limit=5)
