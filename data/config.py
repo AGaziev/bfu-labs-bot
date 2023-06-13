@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from loguru import logger
 
 
 class Config:
@@ -28,13 +29,26 @@ class Config:
         return self._admins
 
     def _get_admins(self) -> list:
-        return list(map(int, os.getenv('ADMINS').split(',')))
+        try:
+            admins = list(map(int, os.getenv('ADMINS').split(',')))
+        except AttributeError:
+            logger.error("ADMINS environment variable is not set")
+            admins = []
+        finally:
+            return admins
 
     def _get_database_connection_parameters(self) -> dict:
-        return {
-            "user": os.getenv('DB_USER'),
-            "password": os.getenv('DB_USER_PASSWORD'),
-            "host": os.getenv('DB_HOST'),
-            "port": os.getenv('DB_PORT'),
-            "database": os.getenv('DB_NAME')
-        }
+        dotenv_variables = ('DB_USER', 'DB_USER_PASSWORD',
+                            'DB_HOST', 'DB_PORT', 'DB_NAME')
+        keys = ('user', 'password', 'host', 'port', 'database')
+        pairs = zip(keys, dotenv_variables)
+        parameters = {}
+        for key, dotenv_variable in pairs:
+            try:
+                parameters.update({key: os.getenv(dotenv_variable)})
+            except AttributeError:
+                logger.error(
+                    f"{dotenv_variable} environment variable is not set")
+                parameters.update({key: None})
+
+        return parameters
