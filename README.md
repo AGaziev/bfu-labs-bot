@@ -5,7 +5,7 @@
 - You need to have python 3.10 or higher, pip and venv installed
 - You need to have to install [PostgreSQL](https://www.postgresql.org/download/)
 
-# Setup
+# Setup OUTDATED. NEED TO BE UPDATED. NOW INSTEAD OF USING PIP YOU NEED TO USE POETRY
 
 > Note: if you know how to setup venv go to step 4
 
