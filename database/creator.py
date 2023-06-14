@@ -9,7 +9,7 @@ class Creator(DatabaseConnector):
 
     def __init__(self) -> None:
         super().__init__()
-        logger.info("Creator for database object was created")
+        logger.debug("Creator for database object was initialized")
 
     async def _create_table_users(self) -> None:
         query = """--sql
@@ -29,7 +29,7 @@ class Creator(DatabaseConnector):
         query = """--sql
         CREATE TABLE IF NOT EXISTS education_group (
             id SERIAL PRIMARY KEY,
-            group_name VARCHAR(55) NOT NULL,
+            group_name VARCHAR(55) NOT NULL UNIQUE,
             owner_id BIGINT NOT NULL REFERENCES users(telegram_id)
         );
         """

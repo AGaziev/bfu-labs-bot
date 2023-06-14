@@ -15,7 +15,7 @@ class DatabaseConnector(Config):
         return conn
 
     async def _execute_query(self, query: str, *args) -> list[asyncpg.Record] | bool:
-        """Executes query and returns result or None if error occured
+        """Executes query and returns result or None if error occurred
 
         Args:
             query (str): SQL query to execute
@@ -38,8 +38,8 @@ class DatabaseConnector(Config):
 
         return result
 
-    async def _execute_query_with_returning_one(self, query: str, *args) -> asyncpg.Record | bool:
-        """Executes query and returns first row of result or None if error occured
+    async def _execute_query_with_returning_one_row(self, query: str, *args) -> asyncpg.Record | bool:
+        """Executes query and returns first row of result or None if error occurred
 
         Args:
             query (str): SQL query to execute
