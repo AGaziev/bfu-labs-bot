@@ -25,17 +25,17 @@ class Config:
         return self._database_connection_parameters
 
     @property
-    def admins(self) -> list:
+    def admins(self) -> tuple:
         return self._admins
 
-    def _get_admins(self) -> list:
+    def _get_admins(self) -> tuple:
         try:
-            admins = list(map(int, os.getenv('ADMINS').split(',')))
+            admins = tuple(map(int, os.getenv('ADMINS').split(',')))
         except AttributeError:
             logger.error("ADMINS environment variable is not set")
-            admins = []
-        finally:
-            return admins
+            admins = ()
+
+        return admins
 
     def _get_database_connection_parameters(self) -> dict:
         dotenv_variables = ('DB_USER', 'DB_USER_PASSWORD',
