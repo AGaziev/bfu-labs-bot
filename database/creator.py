@@ -25,6 +25,22 @@ class Creator(DatabaseConnector):
         else:
             logger.success("Table users was created successfully")
 
+    async def _create_table_teacher(self) -> None:
+        query = """--sql
+        CREATE TABLE IF NOT EXISTS teacher (
+            telegram_id BIGINT NOT NULL REFERENCES users(telegram_id),
+            first_name VARCHAR(55) NOT NULL,
+            last_name VARCHAR(55) NOT NULL,
+            patronymic VARCHAR(55) NOT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+            PRIMARY KEY (telegram_id)
+        );
+        """
+        if await self._execute_query(query) is False:
+            logger.error("Error while creating teacher table")
+        else:
+            logger.success("Table teacher was created successfully")
+
     async def _create_table_education_group(self) -> None:
         query = """--sql
         CREATE TABLE IF NOT EXISTS education_group (
@@ -53,7 +69,7 @@ class Creator(DatabaseConnector):
             logger.success(
                 "Table education_group_members was created successfully")
 
-    async def _create_table_regitered_members(self) -> None:
+    async def _create_table_registered_members(self) -> None:
         query = """--sql
         CREATE TABLE IF NOT EXISTS registered_members (
             member_id INT REFERENCES education_group_members(member_id) PRIMARY KEY,
@@ -137,9 +153,10 @@ class Creator(DatabaseConnector):
         await self._drop_all_tables()
         logger.warning("Creating all tables in database")
         await self._create_table_users()
+        await self._create_table_teacher()
         await self._create_table_education_group()
         await self._create_table_education_group_members()
-        await self._create_table_regitered_members()
+        await self._create_table_registered_members()
         await self._create_table_lab_status_type()
         await self._create_table_lab_registry()
         await self._create_table_lab_tracker()
