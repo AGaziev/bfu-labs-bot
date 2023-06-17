@@ -1,2 +1,3 @@
-#from .imgc import get_random_cat_url
 from .states import *
+from .mailer import Mailer
+from .models import Teacher
