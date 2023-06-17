@@ -1,9 +1,14 @@
 from .database_connector import DatabaseConnector
 from loguru import logger
 from typing import Any
+from utils.models import Teacher
 
 
 class Selector(DatabaseConnector):
+    """
+    Class for selecting data from database\n
+    """
+
     def __init__(self) -> None:
         super().__init__()
         logger.debug("Selector for database object was initialized")
@@ -125,11 +130,10 @@ class Selector(DatabaseConnector):
     async def check_is_user_teacher(self, user_id: int) -> bool:
         """
         Returns:
-            bool: bool value 'is_teacher' for user_id in table users
+            bool: bool value if user_id (telegram_id column) in teacher table
         """
         query = f"""--sql
-        SELECT is_teacher FROM users
-        WHERE telegram_id = {user_id};
+        SELECT EXISTS(SELECT 1 FROM teacher WHERE telegram_id = {user_id});
         """
         result = await self._execute_query_with_returning_one_row(query)
         if result is False:
@@ -139,4 +143,88 @@ class Selector(DatabaseConnector):
         else:
             logger.success(
                 f"Checked if user is teacher successfully; user_id = {user_id}")
+            return result[0]
+
+    async def select_registered_unblocked_members_from_group(self, group_id: int) -> tuple[int, ...]:
+        query = f"""--sql
+        SELECT user_id FROM registered_members
+        WHERE member_id IN (SELECT member_id FROM education_group_members
+        WHERE group_id = {group_id})
+        AND user_id IN (SELECT telegram_id FROM users
+        WHERE is_blocked = FALSE);
+        """
+
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting registered members from group; group_id = {group_id}")
+            raise AttributeError(
+                f"Registered members not found; group_id = {group_id}")
+        else:
+            logger.success(
+                f"Selected registered members from group successfully; group_id = {group_id}")
+            return tuple([iterable[0] for iterable in result])
+
+    async def _select_group_owner_by_group_id(self, group_id: int) -> list[str]:
+        query = f"""--sql
+        SELECT first_name, last_name, patronymic FROM teachers
+        WHERE telegram_id = (SELECT owner_id FROM education_group
+        WHERE group_id = {group_id});
+        """
+
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting group owner by group_id; group_id = {group_id}")
+            raise AttributeError(
+                f"Group owner not found; group_id = {group_id}")
+        else:
+            logger.success(
+                f"Selected group owner by group_id successfully; group_id = {group_id}; owner = {result}")
+            return result
+
+    async def _select_owner_username_by_group_id(self, group_id: int) -> str:
+        query = f"""--sql
+        SELECT username FROM users
+        WHERE telegram_id = (SELECT owner_id FROM education_group
+        WHERE group_id = {group_id});
+        """
+
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting owner username by group_id; group_id = {group_id}")
+            raise AttributeError(
+                f"Owner username not found; group_id = {group_id}")
+        else:
+            logger.success(
+                f"Selected owner username by group_id successfully; group_id = {group_id}; username = {result[0]}")
+            return result[0]
+
+    async def select_teacher_by_group_id(self, group_id: int) -> Teacher:
+        """
+        Returns:
+            Teacher: Teacher object, representing teacher of group with field names:
+                first_name, last_name, patronymic, username
+        """
+        teacher = Teacher()
+        teacher.first_name, teacher.last_name, teacher.patronymic = await self._select_group_owner_by_group_id(
+            group_id)
+        teacher.username = await self._select_owner_username_by_group_id(
+            group_id)
+        return teacher
+
+    async def select_group_name_by_group_id(self, group_id: int) -> str | None:
+        query = f"""--sql
+        SELECT group_name FROM education_group
+        WHERE group_id = {group_id};
+        """
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting group_name by group_id; group_id = {group_id}")
+            return None
+        else:
+            logger.success(
+                f"Selected group_name by group_id successfully; group_id = {group_id}; group_name = {result[0]}")
             return result[0]
