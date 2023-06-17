@@ -10,7 +10,7 @@ class DatabaseConnector(Config):
 
     async def _create_connection(self) -> asyncpg.connection.Connection:
         conn = await asyncpg.connect(**self.database_connection_parameters)
-        logger.info(
+        logger.debug(
             f"Connection to {self.database_connection_parameters.get('database')} database established")
         return conn
 

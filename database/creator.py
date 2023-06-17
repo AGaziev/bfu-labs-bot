@@ -15,8 +15,8 @@ class Creator(DatabaseConnector):
         query = """--sql
         CREATE TABLE IF NOT EXISTS users (
             telegram_id BIGINT PRIMARY KEY,
-            is_teacher BOOLEAN NOT NULL DEFAULT FALSE,
             username VARCHAR(32) NOT NULL,
+            is_blocked BOOLEAN NOT NULL DEFAULT FALSE,
             created_at TIMESTAMP NOT NULL DEFAULT NOW()
         );
         """
