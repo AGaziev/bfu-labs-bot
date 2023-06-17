@@ -1,0 +1,3 @@
+from database import configure_database_tables
+
+configure_database_tables()
