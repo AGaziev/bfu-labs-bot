@@ -166,6 +166,10 @@ class Selector(DatabaseConnector):
             return tuple([iterable[0] for iterable in result])
 
     async def _select_group_owner_by_group_id(self, group_id: int) -> list[str]:
+        """
+        Returns:
+            list[str]: list of group owner first_name, last_name, patronymic
+        """
         query = f"""--sql
         SELECT first_name, last_name, patronymic FROM teachers
         WHERE telegram_id = (SELECT owner_id FROM education_group
@@ -228,3 +232,20 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Selected group_name by group_id successfully; group_id = {group_id}; group_name = {result[0]}")
             return result[0]
+
+    async def select_member_firstname_and_lastname_by_telegram_id_and_group_id(self, telegram_id: int, group_id: int) -> tuple[str, str] | None:
+        query = f"""--sql
+        SELECT first_name, last_name FROM education_group_members
+        WHERE member_id = (SELECT member_id FROM registered_members
+        WHERE user_id = {telegram_id})
+        AND group_id = {group_id};
+        """
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting member firstname and lastname by telegram_id and group_id; telegram_id = {telegram_id}; group_id = {group_id}")
+            return None
+        else:
+            logger.success(
+                f"Selected member firstname and lastname by telegram_id and group_id successfully; telegram_id = {telegram_id}; group_id = {group_id}; firstname = {result[0]}; lastname = {result[1]}")
+            return result
