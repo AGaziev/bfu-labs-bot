@@ -15,3 +15,8 @@ class GroupManager:
         on_disk = DiskManager.is_group_exists(name)
         # in_db = TODO: check if existed in db
         return on_disk  # and in_db
+
+    @staticmethod
+    def connect_student_to_group(name, id):
+        # TODO добавить запись о подключении студента в бд
+        DiskManager.create_student_folder(name)
