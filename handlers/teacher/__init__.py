@@ -1,33 +1,42 @@
-from .start import *
-from .add_group import *
+from aiogram.types import ContentType
+from loguru import logger
+from aiogram import Dispatcher
+from .add_group import set_new_group_name, set_new_group_students, correcting_students_list, end_group_add
+from .cancel_operation import cancel_operation
+from utils import states
 
-def setup(dp):
-    dp.register_message_handler(
-        login,
-        commands=['start'],
-        state=None
-        # TODO check if it from teacher
-    )
 
-    dp.register_callback_query_handler(
-        set_new_group_name,
-        text="add_new_group",
-        state=states.Teacher.start
-    )
+def setup_teacher_handlers(dp: Dispatcher):
+    try:
+        dp.register_callback_query_handler(
+            cancel_operation,
+            lambda call: call.data == 'cancel',
+            state='*'
+        )
 
-    dp.register_message_handler(
-        set_new_group_students,
-        state=states.Teacher.add_group.name
-    )
+        dp.register_callback_query_handler(
+            set_new_group_name,
+            text="add_new_group",
+            state=states.TeacherState.start
+        )
 
-    dp.register_message_handler(
-        correcting_students_list,
-        content_types=['document'],
-        state=states.Teacher.add_group.students
-    )
+        dp.register_message_handler(
+            set_new_group_students,
+            state=states.TeacherState.add_group.name
+        )
 
-    dp.register_callback_query_handler(
-        end_group_add,
-        text='apply',
-        state=states.Teacher.add_group.students
-    )
+        dp.register_message_handler(
+            correcting_students_list,
+            content_types=ContentType.DOCUMENT,
+            state=states.TeacherState.add_group.students
+        )
+
+        dp.register_callback_query_handler(
+            end_group_add,
+            text='apply',
+            state=states.TeacherState.add_group.students
+        )
+
+    except Exception as e:
+        logger.error(
+            f"Error while registering teacher handlers: {e.__class__.__name__, e}")

@@ -13,9 +13,9 @@ from utils import states
 from managers import GroupManager
 
 
-async def set_connecting_group_name(callback: types.CallbackQuery):
-    await callback.message.answer("Напишите название группы к которой хотите подключиться")
-    await callback.message.delete()
+async def set_connecting_group_name(call: types.CallbackQuery):
+    await call.message.answer("Напишите название группы к которой хотите подключиться")
+    await call.message.delete()
     await states.Student.connect_to_group.group_name.set()
 
 
@@ -49,7 +49,7 @@ async def choosing_student(message: types.Message, state: FSMContext):
         except (ValueError, KeyError):
             await message.answer("Такого номера нет, напишите еще раз число")
 
-async def end_connecting_to_group(callback: types.CallbackQuery, state: FSMContext):
+async def end_connecting_to_group(call: types.CallbackQuery, state: FSMContext):
     with state.proxy() as connecting_data:
         GroupManager.connect_student_to_group(connecting_data['student_name'], connecting_data['student_id'])
 

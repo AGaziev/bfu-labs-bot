@@ -32,3 +32,4 @@ def get_appeal(call: CallbackQuery) -> str:
         str: appeal for user
     """
     return call['from']['first_name'] if call['from']['first_name'] else call['from']['username']
+

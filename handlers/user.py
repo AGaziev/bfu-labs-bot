@@ -21,3 +21,4 @@ async def cmd_register_found_user(message: types.Message, state: FSMContext):
     # if found:
     await message.answer(f"Поздравляю с успешной регистрацией, {message.text} ")
     await state.finish()
+

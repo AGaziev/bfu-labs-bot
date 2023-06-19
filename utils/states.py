@@ -13,7 +13,7 @@ class AddGroup(StatesGroup):
     students = State()
 
 
-class Teacher(StatesGroup):
+class TeacherState(StatesGroup):
     start = State()
     add_group = AddGroup()
 
