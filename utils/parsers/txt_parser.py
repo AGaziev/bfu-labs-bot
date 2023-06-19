@@ -1,12 +1,12 @@
 from loguru import logger
+from io import BytesIO
 
 
 class TxtParser:
-    def __init__(self, filepath: str) -> None:
+    def __init__(self) -> None:
         logger.debug("TxtParser object was initialized")
-        self._filepath = filepath
 
-    def get_all_lines(self) -> list:
+    @staticmethod
+    def get_all_lines(file_io: BytesIO) -> list[str]:
         """Returns list of all lines in file"""
-        with open(self._filepath, 'r', encoding='utf-8') as file:
-            return file.readlines()
+        return file_io.read().decode("utf-8").splitlines()
