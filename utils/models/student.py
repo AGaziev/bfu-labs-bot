@@ -2,16 +2,14 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Teacher:
+class Student:
     """
-    dataclass representing a teacher
+    dataclass representing a student
         fields:
                 firstname: str
                 lastname: str
-                patronymic: str
                 username: str | None
     """
     firstname: str
     lastname: str
-    patronymic: str
     username: str | None
