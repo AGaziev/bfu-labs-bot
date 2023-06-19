@@ -249,3 +249,57 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Selected member firstname and lastname by telegram_id and group_id successfully; telegram_id = {telegram_id}; group_id = {group_id}; firstname = {result[0]}; lastname = {result[1]}")
             return result
+
+    async def select_teacher_credentials_by_telegram_id(self, telegram_id: int) -> Teacher:
+        """
+        Returns:
+            Teacher: Teacher object, representing teacher with field names:
+                first_name, last_name, patronymic, WITHOUT username
+        """
+        query = f"""--sql
+        SELECT first_name, last_name, patronymic FROM teachers
+        WHERE telegram_id = {telegram_id};
+        """
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting teacher credentials by telegram_id; telegram_id = {telegram_id}")
+            raise AttributeError(
+                f"Teacher credentials not found; telegram_id = {telegram_id}")
+        else:
+            logger.success(
+                f"Selected teacher credentials by telegram_id successfully; telegram_id = {telegram_id}; credentials = {result}")
+            teacher = Teacher()
+            teacher.firstname, teacher.lastname, teacher.patronymic = result
+            return teacher
+
+    async def select_group_ids_and_names_owned_by_telegram_id(self, telegram_id: int) -> list[tuple[int, str]]:
+        query = f"""--sql
+        SELECT group_id, group_name FROM education_group
+        WHERE owner_id = {telegram_id};
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting group ids and names owned by telegram_id; telegram_id = {telegram_id}")
+            raise AttributeError(
+                f"Groups not found; telegram_id = {telegram_id}")
+        else:
+            logger.success(
+                f"Selected group ids and names owned by telegram_id successfully; telegram_id = {telegram_id}; groups = {result}")
+            return result
+
+    async def select_telegram_id_by_username(self, username: str) -> int | None:
+        query = f"""--sql
+        SELECT telegram_id FROM users
+        WHERE username = '{username}';
+        """
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting telegram_id by username; username = {username}")
+            return None
+        else:
+            logger.success(
+                f"Selected telegram_id by username successfully; username = {username}; telegram_id = {result[0]}")
+            return result[0]
