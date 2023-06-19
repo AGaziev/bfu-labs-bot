@@ -1,6 +1,7 @@
 from .user import *
 from .admin import *
-from .teacher import *
+from .teacher import setup as setup_teacher
+from .student import setup as setup_student
 
 # DON'T TOUCH THIS IMPORT
 from loader import dispatcher
@@ -30,32 +31,6 @@ def setup(dp:dispatcher):
     #     commands=["info"],
     #     state=None)
 
-    """teacher handlers"""
-    dp.register_message_handler(
-        teacher.login,
-        commands=['start'],
-        state=None
-    )
-
-    dp.register_callback_query_handler(
-        teacher.set_new_group_name,
-        text="add_new_group",
-        state=states.Teacher.start
-    )
-
-    dp.register_message_handler(
-        teacher.set_new_group_students,
-        state=states.Teacher.add_group.name
-    )
-
-    dp.register_message_handler(
-        teacher.correcting_students_list,
-        content_types=['document'],
-        state=states.Teacher.add_group.students
-    )
-
-    dp.register_callback_query_handler(
-        teacher.end_group_add,
-        state=states.Teacher.add_group.students
-    )
+    setup_teacher(dp)
+    setup_student(dp)
 
