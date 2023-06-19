@@ -8,7 +8,7 @@ import asyncio
 
 class Mailer:
     def __init__(self) -> None:
-        from database import DatabaseManager
+        from managers import DatabaseManager
         self._database_manager = DatabaseManager()
         self._bot = bot
         self._messages_per_second_limit = 30
