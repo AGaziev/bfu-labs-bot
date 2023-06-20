@@ -1,7 +1,7 @@
 from repositories.disk import disk
 
 
-class DiskManager:
+class CloudManager:
     @classmethod
     def create_group_folder(cls, group_name: str):
         dst_path = f"/{group_name}"
