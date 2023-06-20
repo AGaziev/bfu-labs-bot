@@ -28,7 +28,7 @@ async def on_startup(dp):
 if __name__ == "__main__":
     # Launch
     from aiogram import executor
-    from handlers import dispatcher
+    from loader import dispatcher
 
     executor.start_polling(dispatcher, skip_updates=True, on_startup=on_startup)
 

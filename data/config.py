@@ -25,7 +25,7 @@ class Config:
         return self._database_connection_parameters
 
     @property
-    def admins(self) -> tuple:
+    def admins(self) -> tuple[int, ...]:
         return self._admins
 
     def _get_admins(self) -> tuple:

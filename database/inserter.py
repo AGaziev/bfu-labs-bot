@@ -32,6 +32,29 @@ class Inserter(DatabaseConnector):
             logger.success(f"Inserted into {table_name} successfully")
             return True
 
+    async def insert_new_user(self, user_id: int, username: str) -> bool:
+        """Creates new user in table 'users'
+
+        Args:
+            user_id (int): telegram id of user, can be get from message.from_user.id
+            username (str): telegram username of user, can be get from message.from_user.username
+
+        Returns:
+            bool: result of query execution
+        """
+        query = f"""--sql
+        INSERT INTO users (telegram_id, username)
+        VALUES ({user_id}, '{username}');
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(f"Error while inserting into users with {user_id}")
+            return False
+        else:
+            logger.success(
+                f"Inserted into users {user_id} with username:{username} successfully")
+            return True
+
     async def insert_new_education_group(self, group_name: str, owner_id: int) -> bool:
         """Creates new education group in table 'education_groups'
 
