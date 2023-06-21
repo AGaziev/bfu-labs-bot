@@ -1,7 +1,8 @@
 from repositories.disk import disk
+from io import BytesIO
 
 
-class DiskManager:
+class CloudDriveManager:
     @classmethod
     def create_group_folder(cls, group_name: str):
         dst_path = f"/{group_name}"
@@ -16,9 +17,9 @@ class DiskManager:
         return dst_path
 
     @staticmethod
-    def add_lab_to_group_folder(group_name: str, lab_path: str, lab_name: str):
+    def add_lab_to_group_folder(group_name: str, lab_path_or_io_file: str | BytesIO, lab_name: str):
         dst_path = f"/{group_name}/Лабораторные/{lab_name}"
-        disk.upload(lab_path, dst_path)
+        disk.upload(lab_path_or_io_file, dst_path)
         return dst_path
 
     @staticmethod

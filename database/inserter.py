@@ -55,7 +55,7 @@ class Inserter(DatabaseConnector):
                 f"Inserted into users {user_id} with username:{username} successfully")
             return True
 
-    async def insert_new_education_group(self, group_name: str, owner_id: int) -> bool:
+    async def insert_new_education_group(self, group_name: str, owner_id: int, cloud_folder_link: str) -> bool:
         """Creates new education group in table 'education_groups'
 
         Args:
@@ -66,8 +66,8 @@ class Inserter(DatabaseConnector):
             bool: result of query execution
         """
         query = f"""--sql
-        INSERT INTO education_groups (group_name, owner_id)
-        VALUES ('{group_name}', {owner_id});
+        INSERT INTO education_groups (group_name, owner_id, cloud_folder_link)
+        VALUES ('{group_name}', {owner_id}, '{cloud_folder_link}');
         """
         result = await self._execute_query(query)
         if result is False:

@@ -46,7 +46,8 @@ class Creator(DatabaseConnector):
         CREATE TABLE IF NOT EXISTS education_group (
             id SERIAL PRIMARY KEY,
             group_name VARCHAR(55) NOT NULL UNIQUE,
-            owner_id BIGINT NOT NULL REFERENCES users(telegram_id)
+            owner_id BIGINT NOT NULL REFERENCES users(telegram_id),
+            cloud_folder_link TEXT NOT NULL
         );
         """
         if await self._execute_query(query) is False:
