@@ -30,6 +30,5 @@ if __name__ == "__main__":
     from aiogram import executor
     from loader import dispatcher
 
-    executor.start_polling(dispatcher, skip_updates=True, on_startup=on_startup)
-
-
+    executor.start_polling(dispatcher, skip_updates=True,
+                           on_startup=on_startup)

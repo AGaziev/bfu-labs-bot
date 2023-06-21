@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+from managers import database_manager
 
 async def menu_kb() -> InlineKeyboardMarkup:
     """returns inline keyboard with menu items"""
@@ -53,24 +53,19 @@ async def teacher_menu_kb() -> InlineKeyboardMarkup:
 
     return kb
 
-async def student_menu_kb()->InlineKeyboardMarkup:
+async def student_menu_kb(telegram_id:int)->InlineKeyboardMarkup:
+    # TODO: Кнопки на основе групп у студента
+    # TODO: Использовать group_id в генерации callback_data
+    #TODO: Клавиатура с группами, к которым присоединен студент будет в другой функции
     kb = InlineKeyboardMarkup(row_width=2, )
-    group_buttons = [
-        # TODO: Кнопки на основе групп у студента
-        # TODO: Использовать group_id в генерации callback_data
-        InlineKeyboardButton(
-            text='Группа 1',
-            callback_data='group:1'),
-        InlineKeyboardButton(
-            text='Группа 2',
-            callback_data='group:2'),
-    ]
+    if await database_manager.check_is_user_joined_any_education_group(telegram_id=telegram_id):
+        kb.insert(InlineKeyboardButton(
+            text='Мои лабы',
+            callback_data=f'my_labs_user_id_{telegram_id}'),)
 
-    for button in group_buttons:
-        kb.insert(button)
-
-    kb.add(InlineKeyboardButton(
-        text='Подключиться к новой группе', callback_data='connect_to_group'))
+    kb.insert(InlineKeyboardButton(
+            text='Подключиться к новой группе',
+            callback_data='connect_to_group'),)
 
     return kb
 

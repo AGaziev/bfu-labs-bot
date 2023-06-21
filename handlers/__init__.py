@@ -1,7 +1,7 @@
 from aiogram import Dispatcher
 
 from .user import cmd_start
-from .admin import *
+from .admin import cmd_info, show_admin_commands, invite_user_to_register_as_teacher
 from .teacher import setup_teacher_handlers
 from .student import setup_student_handlers
 # DON'T TOUCH THIS IMPORT

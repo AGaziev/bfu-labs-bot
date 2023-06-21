@@ -16,10 +16,13 @@ class AddGroup(StatesGroup):
 class TeacherState(StatesGroup):
     start = State()
     add_group = AddGroup()
+    add_new_lab = State()
+
 
 class ConnectGroup(StatesGroup):
     group_name = State()
     choose_name = State()
+
 
 class Student(StatesGroup):
     start = State()

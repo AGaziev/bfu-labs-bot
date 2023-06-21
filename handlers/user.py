@@ -14,7 +14,10 @@ from managers import database_manager
 
 @rate_limit(limit=3)
 async def cmd_start(message: types.Message, state: FSMContext):
-    await state.finish()
+    if state:
+        await state.finish()
+    await database_manager.update_user_is_blocked_field_by_user_id(user_id=message.from_user.id,
+                                                                   is_blocked=False)
     if message.from_user.id not in configuration.admins:
 
         if not await database_manager.check_is_user_exist(user_id=message.from_user.id):
@@ -23,7 +26,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
             logger.info(
                 f"New user {message.from_user.full_name} with id {message.from_user.id} was added to database")
             await message.reply(f"Привет,{hbold(message.from_user.full_name)}!\nЭто бот для проверки лабораторных работ",
-                                reply_markup=await kb.student_menu_kb(),
+                                reply_markup=await kb.student_menu_kb(telegram_id=message.from_user.id),
                                 parse_mode=types.ParseMode.HTML)
 
         elif await database_manager.check_is_user_teacher(user_id=message.from_user.id):
@@ -35,7 +38,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
         else:
             await message.reply(f"С возвращением, {hbold(message.from_user.full_name)}",
-                                reply_markup=await kb.student_menu_kb(),
+                                reply_markup=await kb.student_menu_kb(telegram_id=message.from_user.id),
                                 parse_mode=types.ParseMode.HTML)
             logger.info(
                 f"Student {message.from_user.full_name} with id {message.from_user.id} was returned")

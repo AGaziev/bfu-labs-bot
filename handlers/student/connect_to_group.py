@@ -20,7 +20,7 @@ async def set_connecting_group_name(call: types.CallbackQuery):
 
 
 async def show_student_list_of_group(message: types.Message, state: FSMContext):
-    if GroupManager.group_name_exists(message.text):
+    if GroupManager.group_name_exists(name=message.text.upper()):
         with state.proxy() as connecting_data:
             # TODO достаем список студентов этой группы + их id (НЕПОДКЛЮЧЕННЫХ ЕЩЕ)
             connecting_data["students"] = {
@@ -52,4 +52,5 @@ async def choosing_student(message: types.Message, state: FSMContext):
 async def end_connecting_to_group(call: types.CallbackQuery, state: FSMContext):
     with state.proxy() as connecting_data:
         GroupManager.connect_student_to_group(connecting_data['student_name'], connecting_data['student_id'])
+        await call.message.answer(f"Вы подключены к группе {connecting_data['group_name']}")
 
