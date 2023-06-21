@@ -68,8 +68,11 @@
    ```ini
    BOT_TOKEN = 'your bot token'
 
+   #Yandex Cloud Drive token
+   YANDEX_DISK_TOKEN = 'yandex_disk_token'
+
    #name of your database
-   DB_NAME = 'your database name'
+   DB_NAME = 'bfu_lab_bot'
    #database user
    DB_USER = 'postgres'
    #database user's password
@@ -78,6 +81,9 @@
    DB_HOST = 'localhost'
    #database port, default 5432
    DB_PORT = '5432'
+
+   #admin's telegram id
+   ADMINS = "123456,"
    ```
 
 6. Configure your database<br/>
