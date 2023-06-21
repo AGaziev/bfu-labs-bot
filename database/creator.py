@@ -31,7 +31,7 @@ class Creator(DatabaseConnector):
             telegram_id BIGINT NOT NULL REFERENCES users(telegram_id),
             first_name VARCHAR(55) NOT NULL,
             last_name VARCHAR(55) NOT NULL,
-            patronymic VARCHAR(55) NOT NULL,
+            patronymic VARCHAR(55),
             created_at TIMESTAMP NOT NULL DEFAULT NOW(),
             PRIMARY KEY (telegram_id)
         );

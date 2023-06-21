@@ -113,3 +113,27 @@ class Inserter(DatabaseConnector):
             members (list[tuple[str,str]]): list of tuples with first and last names of members
         """
         ...
+
+    async def insert_new_teacher(self, telegram_id: int, first_name: str, last_name: str, patronymic: str | None = None) -> bool:
+        """Creates new teacher in table 'teachers'
+            Args:
+                telegram_id (int): telegram id of teacher, can be get from message.from_user.id
+                first_name (str): first name of teacher
+                last_name (str): last name of teacher
+                patronymic (str|None): patronymic of teacher, can be None if teacher doesn't have it
+            Returns:
+                bool: result of query execution
+        """
+        query = f"""--sql
+        INSERT INTO teachers (telegram_id, first_name, last_name, patronymic)
+        VALUES ({telegram_id}, '{first_name}', '{last_name}', '{patronymic}');
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while inserting into teachers with {telegram_id}, {first_name}, {last_name}, {patronymic}")
+            return False
+        else:
+            logger.success(
+                f"Inserted into teachers {telegram_id}, {first_name}, {last_name}, {patronymic} successfully")
+            return True
