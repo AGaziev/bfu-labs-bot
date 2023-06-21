@@ -30,7 +30,8 @@ class Config:
 
     def _get_admins(self) -> tuple:
         try:
-            admins = tuple(map(int, os.getenv('ADMINS').split(',')))
+            admins = tuple(map(int, [telegram_id for telegram_id in os.getenv(
+                'ADMINS').split(',') if telegram_id != '']))
         except AttributeError:
             logger.error("ADMINS environment variable is not set")
             admins = ()

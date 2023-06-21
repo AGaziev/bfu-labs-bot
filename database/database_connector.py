@@ -38,7 +38,7 @@ class DatabaseConnector(Config):
 
         return result
 
-    async def _execute_query_with_returning_one_row(self, query: str, *args) -> asyncpg.Record | bool:
+    async def _execute_query_with_returning_one_row(self, query: str, *args) -> asyncpg.Record | bool | None:
         """Executes query and returns first row of result or None if error occurred
 
         Args:

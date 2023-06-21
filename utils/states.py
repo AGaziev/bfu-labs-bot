@@ -4,8 +4,9 @@
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-class registrator(StatesGroup):
-    name = State()
+class Registration(StatesGroup):
+    input_credentials = State()
+    confirmation = State()
 
 
 class AddGroup(StatesGroup):
@@ -14,6 +15,7 @@ class AddGroup(StatesGroup):
 
 
 class TeacherState(StatesGroup):
+    registration = Registration()
     start = State()
     add_group = AddGroup()
     add_new_lab = State()

@@ -63,7 +63,7 @@ async def correcting_students_list(message: types.Message, state: FSMContext):
                              f"Первые 5 студентов из группы:\n"
                              f"{hitalic(first_five_students)}\n\n"
                              f"Если не сходится попробуйте снова загрузить файл со списком студентов в txt формате",
-                             reply_markup=await kb.applying_kb(),
+                             reply_markup=await kb.confirmation_kb(),
                              parse_mode="HTML")
 
 

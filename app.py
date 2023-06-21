@@ -1,4 +1,5 @@
 from aiogram import executor
+from loguru import logger
 
 
 async def set_commands(dp):
@@ -24,6 +25,7 @@ async def on_startup(dp):
 
     logger.add(f'logs/{time.strftime("%Y-%m-%d__%H-%M")}.log',
                level='DEBUG', rotation='500 MB', compression='zip')
+    logger.success("[BOT STARTED SUCCESSFULLY]")
 
 if __name__ == "__main__":
     # Launch

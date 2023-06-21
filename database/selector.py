@@ -295,7 +295,7 @@ class Selector(DatabaseConnector):
         WHERE username = '{username}';
         """
         result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        if result in (False, None):
             logger.error(
                 f"Error while selecting telegram_id by username; username = {username}")
             return None

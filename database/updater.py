@@ -23,15 +23,16 @@ class Updater(DatabaseConnector):
             bool: True if user was updated successfully, False otherwise
         """
         query = f"""--sql
-        UPDATE user_data
+        UPDATE users
         SET is_blocked = {is_blocked}
         WHERE telegram_id = {user_id};
         """
         result = await self._execute_query(query)
         if result is False:
             logger.error(
-                f"Error while updating user_data with user_id = {user_id}")
+                logger.error(f"Error while updating users.is_blocked with {is_blocked} for user_id = {user_id}"))
             return False
         else:
-            logger.success("Updated user_data successfully")
+            logger.success(
+                f"Updated users.is_blocked with {is_blocked} for user_id = {user_id} successfully")
             return True

@@ -125,7 +125,7 @@ class Inserter(DatabaseConnector):
                 bool: result of query execution
         """
         query = f"""--sql
-        INSERT INTO teachers (telegram_id, first_name, last_name, patronymic)
+        INSERT INTO teacher (telegram_id, first_name, last_name, patronymic)
         VALUES ({telegram_id}, '{first_name}', '{last_name}', '{patronymic}');
         """
         result = await self._execute_query(query)

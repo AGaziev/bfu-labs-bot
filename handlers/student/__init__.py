@@ -25,6 +25,6 @@ def setup_student_handlers(dp: Dispatcher):
 
     dp.register_callback_query_handler(
         end_connecting_to_group,
-        text='apply',
+        text='confirm',
         state=states.Student.connect_to_group.choose_name
     )

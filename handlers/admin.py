@@ -1,6 +1,8 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.utils.exceptions import MessageNotModified, BotBlocked
+from aiogram.utils.exceptions import BotBlocked, ChatIdIsEmpty
+from aiogram.utils.markdown import hbold
+
 from loguru import logger
 
 from data import configuration
@@ -28,7 +30,7 @@ async def cmd_info(message: types.Message):
 
 @rate_limit(limit=3)
 @is_user_admin
-async def show_admin_commands(message: types.Message):
+async def show_admin_commands(message: types.Message, state: FSMContext):
     commands = """/info - информация о сообщении
 /invite_teacher <username or user_id> - пригласить пользователя зарегистрироваться как преподаватель"""
     await message.answer(commands)
@@ -36,7 +38,7 @@ async def show_admin_commands(message: types.Message):
 
 @rate_limit(limit=3)
 @is_user_admin
-async def invite_user_to_register_as_teacher(message: types.Message):
+async def invite_user_to_register_as_teacher(message: types.Message, state: FSMContext):
     try:
         username_or_user_id = message.text.split()[1]
 
@@ -57,12 +59,17 @@ async def send_invitation_message_to_user(username_or_user_id: str) -> bool:
         user_id = await database_manager.select_telegram_id_by_username(username=username_or_user_id)
 
     try:
-        await bot.send_message(chat_id=user_id, text="Вы были приглашены стать преподавателем.",
+        await bot.send_message(chat_id=user_id, text=f"Вы были приглашены стать преподавателем.\nВведите необходисмые данные после нажатия на кнопку {hbold('Зарегистрироваться')}",
+                               parse_mode=types.ParseMode.HTML,
                                reply_markup=await kb.register_as_teacher_kb())
 
     except BotBlocked:
         logger.warning(
             f"User {user_id} blocked bot or he doesn't start bot yet")
+        return False
+
+    except ChatIdIsEmpty:
+        logger.warning(f"User with username {username_or_user_id} doesn't exist")
         return False
 
     else:

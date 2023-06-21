@@ -5,7 +5,7 @@ from aiogram.utils.markdown import hbold, hitalic, hlink
 import keyboards as kb
 from middlewares import rate_limit
 from utils import states
-from managers import GroupManager, database_manager, CloudDriveManager
+from managers import GroupManager, database_manager
 
 
 @rate_limit(limit=3)

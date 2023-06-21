@@ -45,7 +45,7 @@ async def choosing_student(message: types.Message, state: FSMContext):
             connecting_data['student_name'] = name
             connecting_data['student_id'] = student_id
             await message.answer(f"Вы {name}?\n"
-                                 f"Если нет, то напишите еще раз число", reply_markup=await kb.applying_kb())
+                                 f"Если нет, то напишите еще раз число", reply_markup=await kb.confirmation_kb())
         except (ValueError, KeyError):
             await message.answer("Такого номера нет, напишите еще раз число")
 

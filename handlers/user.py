@@ -18,18 +18,20 @@ async def cmd_start(message: types.Message, state: FSMContext):
         await state.finish()
     await database_manager.update_user_is_blocked_field_by_user_id(user_id=message.from_user.id,
                                                                    is_blocked=False)
+
+    if not await database_manager.check_is_user_exist(user_id=message.from_user.id):
+        await database_manager.insert_new_user(user_id=message.from_user.id,
+                                               username=message.from_user.username)
+        logger.info(
+            f"New user {message.from_user.full_name} with id {message.from_user.id} was added to database")
+
     if message.from_user.id not in configuration.admins:
 
-        if not await database_manager.check_is_user_exist(user_id=message.from_user.id):
-            await database_manager.insert_new_user(user_id=message.from_user.id,
-                                                   username=message.from_user.username)
-            logger.info(
-                f"New user {message.from_user.full_name} with id {message.from_user.id} was added to database")
-            await message.reply(f"Привет,{hbold(message.from_user.full_name)}!\nЭто бот для проверки лабораторных работ",
-                                reply_markup=await kb.student_menu_kb(telegram_id=message.from_user.id),
-                                parse_mode=types.ParseMode.HTML)
+        await message.reply(f"Привет, {hbold(message.from_user.full_name)}!\nЭто бот для проверки лабораторных работ",
+                            reply_markup=await kb.student_menu_kb(telegram_id=message.from_user.id),
+                            parse_mode=types.ParseMode.HTML)
 
-        elif await database_manager.check_is_user_teacher(user_id=message.from_user.id):
+        if await database_manager.check_is_user_teacher(user_id=message.from_user.id):
             await message.reply(f"С возвращением, {hbold(message.from_user.full_name)}",
                                 reply_markup=await kb.teacher_menu_kb(),
                                 parse_mode=types.ParseMode.HTML)
@@ -44,7 +46,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 f"Student {message.from_user.full_name} with id {message.from_user.id} was returned")
 
     else:
-        await message.answer(f"С возвращением, администратор {hbold(message.from_user.username or message.from_user.full_name)}",
+        await message.answer(f"С возвращением, администратор {hbold(message.from_user.full_name)}",
                              parse_mode=types.ParseMode.HTML)
         logger.info(
             f"Admin {message.from_user.full_name} with id {message.from_user.id} was returned")

@@ -69,12 +69,12 @@ async def student_menu_kb(telegram_id:int)->InlineKeyboardMarkup:
 
     return kb
 
-async def applying_kb()->InlineKeyboardMarkup:
+async def confirmation_kb()->InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup()
 
     kb.insert(InlineKeyboardButton(
-        text='Принять',
-        callback_data='apply'))
+        text='✅Подтвердить',
+        callback_data='confirm'))
 
     return kb
 
@@ -118,5 +118,13 @@ async def register_as_teacher_kb() -> InlineKeyboardMarkup:
     kb.insert(InlineKeyboardButton(
         text='Зарегистрироваться',
         callback_data='register_as_teacher'),)
+
+    return kb
+
+async def confirmation_teacher_credentials()->InlineKeyboardMarkup:
+    kb = await confirmation_kb()
+    kb.insert(InlineKeyboardButton(
+        text='❌Ввести заново',
+        callback_data='change_teacher_credentials'))
 
     return kb
