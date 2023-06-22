@@ -14,7 +14,7 @@ from utils.parsers import TxtParser
 @rate_limit(limit=3)
 async def set_new_group_name(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Напишите название вашей новой группы")
-    await callback.message.edit_reply_markup()
+    # await callback.message.edit_reply_markup() # TODO: Нужно?
     await states.TeacherState.add_group.name.set()
 
 
@@ -27,7 +27,7 @@ async def set_new_group_students(message: types.Message, state: FSMContext):
     if owner_credentials.patronymic:
         repository_name += f"_{owner_credentials.patronymic}"
 
-    if GroupManager.group_name_exists(repository_name):
+    if await GroupManager.group_name_exists(repository_name):
         await message.answer(f"Название {hbold(repository_name)} уже занято, попробуйте другое", reply_markup=await kb.cancel_kb())
     else:
         await message.answer(f"Название вашей группы: {hbold(repository_name)}\n\n"
@@ -69,8 +69,8 @@ async def correcting_students_list(message: types.Message, state: FSMContext):
 
 async def end_group_add(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as group_data:
-        group_data["disk_url"], group_id = GroupManager.create_group(
-            group_data["name"], group_data["students"])
+        group_data["cloud_drive_url"], group_id = await GroupManager.create_group(
+            group_data["name"], group_data["students"], callback.from_user.id)
         group_name = group_data['name']
         group_url = group_data['cloud_drive_url']
         await callback.message.answer(f"Группа {hbold(group_name)} успешно создана\n"
