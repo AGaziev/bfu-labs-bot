@@ -90,11 +90,11 @@ class Selector(DatabaseConnector):
         result = await self._execute_query_with_returning_one_row(query)
         if result is False:
             logger.error(
-                f"Error while selecting from education_groups with group_name = {group_name}")
+                f"Error while selecting from education_group with group_name = {group_name}")
             return None
         else:
             logger.success(
-                f"Selected group_id from education_groups successfully; group_name = {group_name} with id = {result[0]}")
+                f"Selected group_id from education_group successfully; group_name = {group_name} with id = {result[0]}")
             return result[0]
 
     async def select_group_name_by_group_id(self, group_id: int) -> str | None:
@@ -105,11 +105,11 @@ class Selector(DatabaseConnector):
         result = await self._execute_query_with_returning_one_row(query)
         if result is False:
             logger.error(
-                f"Error while selecting from education_groups with group_id = {group_id}")
+                f"Error while selecting from education_group with group_id = {group_id}")
             return None
         else:
             logger.success(
-                f"Selected group_name from education_groups successfully; group_id = {group_id} with name = {result[0]}")
+                f"Selected group_name from education_group successfully; group_id = {group_id} with name = {result[0]}")
             return result[0]
 
     async def select_group_owner_id_by_group_id(self, group_id: int) -> int | None:
@@ -120,11 +120,11 @@ class Selector(DatabaseConnector):
         result = await self._execute_query_with_returning_one_row(query)
         if result is False:
             logger.error(
-                f"Error while selecting from education_groups with group_id = {group_id}")
+                f"Error while selecting from education_group with group_id = {group_id}")
             return None
         else:
             logger.success(
-                f"Selected group_owner_id from education_groups successfully; group_id = {group_id} with id = {result[0]}")
+                f"Selected group_owner_id from education_group successfully; group_id = {group_id} with id = {result[0]}")
             return result[0]
 
     async def check_is_user_teacher(self, user_id: int) -> bool:
@@ -147,7 +147,7 @@ class Selector(DatabaseConnector):
 
     async def select_registered_unblocked_members_from_group(self, group_id: int) -> tuple[int, ...]:
         query = f"""--sql
-        SELECT user_id FROM registered_members
+        SELECT member_id FROM registered_members
         WHERE member_id IN (SELECT member_id FROM education_group_members
         WHERE group_id = {group_id})
         AND user_id IN (SELECT telegram_id FROM users
@@ -171,7 +171,7 @@ class Selector(DatabaseConnector):
             list[str]: list of group owner first_name, last_name, patronymic
         """
         query = f"""--sql
-        SELECT first_name, last_name, patronymic FROM teachers
+        SELECT first_name, last_name, patronymic FROM teacher
         WHERE telegram_id = (SELECT owner_id FROM education_group
         WHERE group_id = {group_id});
         """
