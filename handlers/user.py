@@ -37,6 +37,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                                 parse_mode=types.ParseMode.HTML)
             logger.info(
                 f"Teacher {message.from_user.full_name} with id {message.from_user.id} was returned")
+            await states.TeacherState.start.set()
 
         else:
             await message.reply(f"С возвращением, {hbold(message.from_user.full_name)}",
@@ -44,6 +45,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                                 parse_mode=types.ParseMode.HTML)
             logger.info(
                 f"Student {message.from_user.full_name} with id {message.from_user.id} was returned")
+            await states.Student.start.set()
 
     else:
         await message.answer(f"С возвращением, администратор {hbold(message.from_user.full_name)}",
