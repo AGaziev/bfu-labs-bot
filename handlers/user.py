@@ -27,9 +27,9 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
     if message.from_user.id not in configuration.admins:
 
-        await message.reply(f"Привет, {hbold(message.from_user.full_name)}!\nЭто бот для проверки лабораторных работ",
-                            reply_markup=await kb.student_menu_kb(telegram_id=message.from_user.id),
-                            parse_mode=types.ParseMode.HTML)
+        # await message.reply(f"Привет, {hbold(message.from_user.full_name)}!\nЭто бот для проверки лабораторных работ",
+        #                     reply_markup=await kb.student_menu_kb(telegram_id=message.from_user.id),
+        #                     parse_mode=types.ParseMode.HTML)
 
         if await database_manager.check_is_user_teacher(user_id=message.from_user.id):
             await message.reply(f"С возвращением, {hbold(message.from_user.full_name)}",
