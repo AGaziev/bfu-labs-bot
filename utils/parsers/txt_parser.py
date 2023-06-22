@@ -12,4 +12,3 @@ class TxtParser:
         """Returns list of all lines in file"""
         encoding = chardet.detect(file_io.getvalue())["encoding"]
         return file_io.getvalue().decode(encoding).splitlines()
-
