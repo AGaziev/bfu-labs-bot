@@ -10,6 +10,6 @@ class Student:
                 lastname: str
                 username: str | None
     """
-    firstname: str
-    lastname: str
-    username: str | None
+    firstname: str = ''
+    lastname: str = ''
+    username: str | None = None
