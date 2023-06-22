@@ -1,8 +1,8 @@
 from aiogram import Dispatcher
+from loguru import logger
 
 from .connect_to_group import set_connecting_group_name, show_student_list_of_group, choosing_student, end_connecting_to_group
 from utils import states
-from loguru import logger
 
 
 def setup_student_handlers(dp: Dispatcher):
@@ -28,3 +28,5 @@ def setup_student_handlers(dp: Dispatcher):
         text='confirm',
         state=states.Student.connect_to_group.choose_name
     )
+
+    logger.info('Student handlers are successfully registered')

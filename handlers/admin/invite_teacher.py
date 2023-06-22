@@ -5,35 +5,12 @@ from aiogram.utils.markdown import hbold
 
 from loguru import logger
 
-from data import configuration
 import keyboards as kb
 from middlewares import rate_limit
 
 from loader import bot
 from managers import database_manager
-
-
-def is_user_admin(func):
-    async def wrapped(message: types.Message, state: FSMContext):
-        if message.from_user.id in configuration.admins:
-            await func(message, state)
-        else:
-            await message.answer("You don't have permission to use this command.")
-    return wrapped
-
-
-@rate_limit(limit=3)
-@is_user_admin
-async def cmd_info(message: types.Message):
-    await message.reply(message)
-
-
-@rate_limit(limit=3)
-@is_user_admin
-async def show_admin_commands(message: types.Message, state: FSMContext):
-    commands = """/info - информация о сообщении
-/invite_teacher <username or user_id> - пригласить пользователя зарегистрироваться как преподаватель"""
-    await message.answer(commands)
+from .is_admin_wrapper import is_user_admin
 
 
 @rate_limit(limit=3)
@@ -69,7 +46,8 @@ async def send_invitation_message_to_user(username_or_user_id: str) -> bool:
         return False
 
     except ChatIdIsEmpty:
-        logger.warning(f"User with username {username_or_user_id} doesn't exist")
+        logger.warning(
+            f"User with username {username_or_user_id} doesn't exist")
         return False
 
     else:

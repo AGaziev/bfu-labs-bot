@@ -49,6 +49,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
     else:
         await message.answer(f"С возвращением, администратор {hbold(message.from_user.full_name)}",
+                             reply_markup=await kb.admin_menu_kb(),
                              parse_mode=types.ParseMode.HTML)
         logger.info(
             f"Admin {message.from_user.full_name} with id {message.from_user.id} was returned")

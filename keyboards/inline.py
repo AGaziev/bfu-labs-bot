@@ -128,3 +128,20 @@ async def confirmation_teacher_credentials()->InlineKeyboardMarkup:
         callback_data='change_teacher_credentials'))
 
     return kb
+
+async def admin_menu_kb()->InlineKeyboardMarkup:
+    kb = InlineKeyboardMarkup(row_width=1, )
+
+    buttons = [
+        InlineKeyboardButton(
+            text='Войти как студент',
+            callback_data='admin_mimic_a_student'),
+        InlineKeyboardButton(
+            text='Войти как преподаватель',
+            callback_data='admin_mimic_a_teacher'),
+    ]
+
+    for button in buttons:
+        kb.insert(button)
+
+    return kb
