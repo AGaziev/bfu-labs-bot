@@ -13,7 +13,7 @@ class GroupManager:
         await database_manager.insert_new_education_group(
             group_name=name,
             owner_id=teacher_id,
-            folder_url=folder_url)
+            cloud_folder_link=folder_url)
         group_id = await database_manager.select_group_id_by_group_name(group_name=name)
         return folder_url, group_id
 
