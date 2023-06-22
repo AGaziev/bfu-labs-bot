@@ -66,7 +66,7 @@ class Inserter(DatabaseConnector):
             bool: result of query execution
         """
         query = f"""--sql
-        INSERT INTO education_groups (group_name, owner_id, cloud_folder_link)
+        INSERT INTO education_group (group_name, owner_id, cloud_folder_link)
         VALUES ('{group_name}', {owner_id}, '{cloud_folder_link}');
         """
         result = await self._execute_query(query)
