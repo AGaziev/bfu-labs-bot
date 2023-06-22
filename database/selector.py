@@ -84,7 +84,7 @@ class Selector(DatabaseConnector):
 
     async def select_group_id_by_group_name(self, group_name: str) -> int | None:
         query = f"""--sql
-        SELECT group_id FROM education_group
+        SELECT id FROM education_group
         WHERE group_name = '{group_name}';
         """
         result = await self._execute_query_with_returning_one_row(query)
