@@ -60,8 +60,7 @@ class Creator(DatabaseConnector):
         CREATE TABLE IF NOT EXISTS education_group_members (
             member_id SERIAL PRIMARY KEY,
             group_id INT NOT NULL REFERENCES education_group(id),
-            first_name VARCHAR(55) NOT NULL,
-            last_name VARCHAR(55) NOT NULL
+            credentials VARCHAR(255) NOT NULL
         );
         """
         if await self._execute_query(query) is False:

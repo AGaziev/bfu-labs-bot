@@ -79,40 +79,51 @@ class Inserter(DatabaseConnector):
                 f"Inserted into education_groups {group_name} with owner:{owner_id} successfully")
             return True
 
-    async def insert_one_member_into_education_group(self, group_id: int, first_name: str, last_name: str) -> bool:
+    async def insert_one_member_into_education_group(self, group_id: int, credentials: str) -> bool:
         """Adds one member into group
 
         Args:
             group_id (int): id of group to add member
-            first_name (str): first name of member
-            last_name (str): last name of member
+            credentials (str): credentials of member in format 'firstname lastname' or 'firstname lastname patronymic'
 
         Returns:
             bool: result of query execution
         """
 
         query = f"""--sql
-        INSERT INTO education_group_members (group_id, first_name, last_name)
-        VALUES ({group_id}, '{first_name}', '{last_name}');
+        INSERT INTO education_group_members (group_id, credentials)
+        VALUES ({group_id}, '{credentials}');
         """
         result = await self._execute_query(query)
         if result is False:
             logger.error(
-                f"Error while inserting into members with {group_id}, {first_name}, {last_name}")
+                f"Error while inserting into members with {group_id}, {credentials}")
             return False
         else:
             logger.success(
-                f"Inserted into members {group_id}, {first_name}, {last_name} successfully")
+                f"Inserted into members {group_id}, {credentials} successfully")
             return True
 
-    async def insert_many_members_into_education_group(self, group_id: int, members: list[tuple[str, str]]) -> bool:
+    async def insert_many_members_into_education_group(self, group_id: int, members: list[str]) -> bool:
         """Adds many members into group
 
         Args:
             group_id (int): id of group to add members
-            members (list[tuple[str,str]]): list of tuples with first and last names of members
+            members (list[str]): list of members in format 'firstname lastname' or 'firstname lastname patronymic'
         """
-        ...
+        query = f"""--sql
+        INSERT INTO education_group_members (group_id, credentials)
+        VALUES {', '.join([f"({group_id}, '{member}')" for member in members])};
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while inserting into members with {group_id}, {members}")
+            return False
+        else:
+            logger.success(
+                f"Inserted into members group_id:{group_id}, members:{members} successfully")
+            return True
 
     async def insert_new_teacher(self, telegram_id: int, first_name: str, last_name: str, patronymic: str | None = None) -> bool:
         """Creates new teacher in table 'teachers'
