@@ -257,7 +257,7 @@ class Selector(DatabaseConnector):
                 first_name, last_name, patronymic, WITHOUT username
         """
         query = f"""--sql
-        SELECT first_name, last_name, patronymic FROM teachers
+        SELECT first_name, last_name, patronymic FROM teacher
         WHERE telegram_id = {telegram_id};
         """
         result = await self._execute_query_with_returning_one_row(query)
