@@ -18,7 +18,7 @@ def setup_teacher_handlers(dp: Dispatcher):
 
     dp.register_callback_query_handler(
         set_new_group_name,
-        text="add_new_group",
+        text="create_new_group",
         state=states.TeacherState.start
     )
 

@@ -28,10 +28,12 @@ async def set_new_group_students(message: types.Message, state: FSMContext):
         repository_name += f"_{owner_credentials.patronymic}"
 
     if await GroupManager.group_name_exists(repository_name):
-        await message.answer(f"Название {hbold(repository_name)} уже занято, попробуйте другое", reply_markup=await kb.cancel_kb())
+        await message.answer(f"Название {hbold(repository_name)} уже занято, попробуйте другое",
+                             reply_markup=await kb.cancel_kb(), parse_mode=types.ParseMode.HTML, )
     else:
         await message.answer(f"Название вашей группы: {hbold(repository_name)}\n\n"
-                             f"Прикрепите txt файл со списком студентов в этой группе", reply_markup=await kb.cancel_kb(), parse_mode="HTML")
+                             f"Прикрепите txt файл со списком студентов в этой группе",
+                             reply_markup=await kb.cancel_kb(), parse_mode=types.ParseMode.HTML)
         async with state.proxy() as group_data:
             group_data["name"] = repository_name
         await states.TeacherState.add_group.students.set()
