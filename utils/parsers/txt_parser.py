@@ -1,5 +1,6 @@
 from loguru import logger
 from io import BytesIO
+import chardet
 
 
 class TxtParser:
@@ -9,4 +10,6 @@ class TxtParser:
     @staticmethod
     def get_all_lines(file_io: BytesIO) -> list[str]:
         """Returns list of all lines in file"""
-        return file_io.getvalue().decode("utf-8").splitlines()
+        encoding = chardet.detect(file_io.getvalue())["encoding"]
+        return file_io.getvalue().decode(encoding).splitlines()
+
