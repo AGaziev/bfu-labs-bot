@@ -22,7 +22,11 @@ class GroupManager:
         on_disk = CloudManager.is_group_exists(name)
         in_database = await database_manager.check_is_group_exists_by_group_name(
             group_name=name)
-        return on_disk or in_database
+        print(in_database, on_disk)
+        # restore cloud folder
+        if in_database and not on_disk:
+            CloudManager.create_group_folder(name)
+        return on_disk and in_database
 
     @staticmethod
     def connect_student_to_group(name: str, id: int) -> bool:
