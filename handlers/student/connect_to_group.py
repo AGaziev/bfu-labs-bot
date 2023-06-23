@@ -20,8 +20,9 @@ async def set_connecting_group_name(call: types.CallbackQuery):
 
 
 async def show_student_list_of_group(message: types.Message, state: FSMContext):
-    if await GroupManager.is_group_name_exists(name=message.text.upper()):
-        with state.proxy() as connecting_data:
+    if await GroupManager.is_group_name_exists(name=message.text):
+        async with state.proxy() as connecting_data:
+            # GroupManager.get_unregistered_users_of_group(group_id=test)
             # TODO достаем список студентов этой группы + их id (НЕПОДКЛЮЧЕННЫХ ЕЩЕ)
             connecting_data["students"] = {
                 112: "Газиев Алан",
@@ -38,7 +39,7 @@ async def show_student_list_of_group(message: types.Message, state: FSMContext):
 
 
 async def choosing_student(message: types.Message, state: FSMContext):
-    with state.proxy() as connecting_data:
+    async with state.proxy() as connecting_data:
         try:
             student_id = int(message.text)
             name = connecting_data['students'][student_id]
@@ -49,8 +50,8 @@ async def choosing_student(message: types.Message, state: FSMContext):
         except (ValueError, KeyError):
             await message.answer("Такого номера нет, напишите еще раз число")
 
+
 async def end_connecting_to_group(call: types.CallbackQuery, state: FSMContext):
-    with state.proxy() as connecting_data:
+    async with state.proxy() as connecting_data:
         GroupManager.connect_student_to_group(connecting_data['student_name'], connecting_data['student_id'])
         await call.message.answer(f"Вы подключены к группе {connecting_data['group_name']}")
-
