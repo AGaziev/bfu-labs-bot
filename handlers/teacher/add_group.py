@@ -25,7 +25,7 @@ async def set_new_group_students(message: types.Message, state: FSMContext):
     if owner_credentials.patronymic:
         repository_name += f"_{owner_credentials.patronymic}"
 
-    if await GroupManager.group_name_exists(repository_name):
+    if await GroupManager.is_group_name_exists(repository_name):
         await message.answer(f"Название {hbold(repository_name)} уже занято, попробуйте другое",
                              reply_markup=await kb.cancel_kb(), parse_mode=types.ParseMode.HTML, )
     else:

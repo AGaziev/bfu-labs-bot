@@ -18,7 +18,7 @@ class GroupManager:
         return folder_url, group_id
 
     @staticmethod
-    async def group_name_exists(name: str):
+    async def is_group_name_exists(name: str):
         on_disk = CloudManager.is_group_exists(name)
         in_database = await database_manager.check_is_group_exists_by_group_name(
             group_name=name)
