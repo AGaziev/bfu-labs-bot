@@ -148,3 +148,28 @@ class Inserter(DatabaseConnector):
             logger.success(
                 f"Inserted into teachers {telegram_id}, {first_name}, {last_name}, {patronymic} successfully")
             return True
+
+    async def insert_one_registered_user(self, member_id: int, telegram_id: str) -> bool:
+        """Adds one member into group
+
+        Args:
+            group_id (int): id of group to add member
+            credentials (str): credentials of member in format 'firstname lastname' or 'firstname lastname patronymic'
+
+        Returns:
+            bool: result of query execution
+        """
+
+        query = f"""--sql
+        INSERT INTO registered_members (member_id, telegram_id)
+        VALUES ({member_id}, '{telegram_id}');
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while inserting into registered members with {member_id}, {telegram_id}")
+            return False
+        else:
+            logger.success(
+                f"Inserted into registered members {member_id}, {telegram_id} successfully")
+            return True

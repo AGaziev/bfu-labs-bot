@@ -49,5 +49,8 @@ async def choosing_student(message: types.Message, state: FSMContext):
 
 async def end_connecting_to_group(call: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as connecting_data:
-        GroupManager.connect_student_to_group(connecting_data['student_name'], connecting_data['student_id'])
+        await GroupManager.connect_student_to_group(connecting_data['group_name'],
+                                              connecting_data['student_name'],
+                                              connecting_data['student_id'],
+                                              call.from_user.id)
         await call.message.answer(f"Вы подключены к группе {connecting_data['group_name']}")

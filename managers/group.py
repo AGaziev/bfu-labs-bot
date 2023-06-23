@@ -29,11 +29,10 @@ class GroupManager:
         return on_disk and in_database
 
     @staticmethod
-    def connect_student_to_group(name: str, id: int) -> bool:
-        # TODO добавить запись о подключении студента в бд
+    async def connect_student_to_group(group_name: str,student_name: str, member_id: int, telegram_id) -> bool:
         try:
-            CloudManager.create_student_folder(name)
-            ...
+            CloudManager.create_student_folder(group_name, student_name)
+            await database_manager.insert_one_registered_user(member_id, telegram_id)
         except Exception as e:
             # TODO: handle specific exceptions
             logger.error(e)
