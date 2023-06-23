@@ -41,7 +41,8 @@ class GroupManager:
         return True
 
     @staticmethod
-    def get_unregistered_users_of_group(group_id):
-        # TODO получить всех незарегистрированных пользователей из бд из группы с айди group_id
-        pass
+    async def get_unregistered_users_of_group(group_name):
+        unregistered_users = await database_manager.select_unregistered_users_from_group(group_name=group_name)
+        return {i: creds for i,creds in unregistered_users}
+
 

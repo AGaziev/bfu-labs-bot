@@ -22,15 +22,10 @@ async def set_connecting_group_name(call: types.CallbackQuery):
 async def show_student_list_of_group(message: types.Message, state: FSMContext):
     if await GroupManager.is_group_name_exists(name=message.text):
         async with state.proxy() as connecting_data:
-            # GroupManager.get_unregistered_users_of_group(group_id=test)
-            # TODO достаем список студентов этой группы + их id (НЕПОДКЛЮЧЕННЫХ ЕЩЕ)
-            connecting_data["students"] = {
-                112: "Газиев Алан",
-                413: "Вебер Дмитрий",
-                125: "Ягубков Даниил"
-            }
+            connecting_data["group_name"] = message.text
+            connecting_data["students"] = \
+                await GroupManager.get_unregistered_users_of_group(group_name=message.text)
             # формируем список можно будет переделать потом красиво и понятно
-            # {id}. {name surname}
             await message.answer("\n".join([f"{i}. {s}" for i, s in connecting_data["students"].items()]))
             await message.answer("Выберите из списка введя число перед вашим ФИО")
             await states.Student.connect_to_group.choose_name.set()

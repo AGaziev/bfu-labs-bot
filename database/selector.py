@@ -333,3 +333,25 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Checked is group exists by group_name successfully; group_name = {group_name}; result = {result[0]}")
             return result[0]
+
+
+    async def select_unregistered_users_from_group(self, group_name: str) -> list:
+        group_id = await self.select_group_id_by_group_name(group_name)
+
+        query = f"""--sql
+        SELECT education_group_members.member_id as id, credentials 
+        FROM education_group_members
+        LEFT JOIN registered_members
+            ON education_group_members.member_id = registered_members.member_id
+        WHERE group_id = {group_id} AND telegram_id IS NULL
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting unregistered members from group; group_name = {group_name}")
+            return None
+        else:
+            logger.success(
+                f"Selected unregistered users successfully; group_name = {group_name}; result = {result}")
+            return result
+
