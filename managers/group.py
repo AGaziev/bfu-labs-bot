@@ -39,3 +39,9 @@ class GroupManager:
             logger.error(e)
             return False
         return True
+
+    @staticmethod
+    def get_unregistered_users_of_group(group_id):
+        # TODO получить всех незарегистрированных пользователей из бд из группы с айди group_id
+        pass
+
