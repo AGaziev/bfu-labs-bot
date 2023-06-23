@@ -55,8 +55,8 @@ async def teacher_menu_kb() -> InlineKeyboardMarkup:
 
 async def student_menu_kb(telegram_id:int)->InlineKeyboardMarkup:
     # TODO: Кнопки на основе групп у студента
-    # TODO: Использовать group_id в генерации callback_data
-    #TODO: Клавиатура с группами, к которым присоединен студент будет в другой функции
+    #  Использовать group_id в генерации callback_data
+    #  Клавиатура с группами, к которым присоединен студент будет в другой функции
     kb = InlineKeyboardMarkup(row_width=2, )
     if await database_manager.check_is_user_joined_any_education_group(telegram_id=telegram_id):
         kb.insert(InlineKeyboardButton(
