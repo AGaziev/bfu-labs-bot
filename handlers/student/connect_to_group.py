@@ -49,6 +49,7 @@ async def choosing_student(message: types.Message, state: FSMContext):
                                  f"Если нет, то напишите еще раз число", reply_markup=await kb.confirmation_kb())
         except (ValueError, KeyError):
             await message.answer("Такого номера нет, напишите еще раз число")
+            await message.answer("\n".join([f"{i}. {s}" for i, s in connecting_data["students"].items()]))
 
 
 async def end_connecting_to_group(call: types.CallbackQuery, state: FSMContext):
