@@ -16,4 +16,4 @@ async def show_my_groups(call: types.CallbackQuery, state: FSMContext):
         await call.message.answer("У вас нет групп, создайте новую", reply_markup=await kb.teacher_kb())
         return
 
-    await call.message.edit_text("Отображаю ваши группы", reply_markup=await kb.get_groups_kb(groups=groups))
+    await call.message.edit_text("Отображаю ваши группы", reply_markup=await kb.get_groups_kb(group_names_and_ids=groups))

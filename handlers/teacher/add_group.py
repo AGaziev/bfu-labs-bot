@@ -2,7 +2,6 @@ from io import BytesIO
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.utils.exceptions import MessageNotModified
 from aiogram.utils.markdown import hbold, hitalic, hlink
 import keyboards as kb
 from middlewares import rate_limit
@@ -13,8 +12,7 @@ from utils.parsers import TxtParser
 
 @rate_limit(limit=3)
 async def set_new_group_name(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.edit_text("Напишите название вашей новой группы")
-    # await callback.message.edit_reply_markup() # TODO: Нужно?
+    await callback.message.edit_text("Напишите название вашей новой группы", reply_markup=await kb.cancel_kb())
     await states.TeacherState.add_group.name.set()
 
 

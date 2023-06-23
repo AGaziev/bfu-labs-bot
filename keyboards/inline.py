@@ -45,7 +45,7 @@ async def teacher_menu_kb() -> InlineKeyboardMarkup:
             callback_data='create_new_group'),
         InlineKeyboardButton(
             text='📃Посмотреть все группы',
-            callback_data='show_all_groups'),
+            callback_data='teacher_show_my_groups'),
     ]
 
     for button in group_buttons:

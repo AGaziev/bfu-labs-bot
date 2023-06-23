@@ -100,7 +100,7 @@ class Selector(DatabaseConnector):
     async def select_group_name_by_group_id(self, group_id: int) -> str | None:
         query = f"""--sql
         SELECT group_name FROM education_group
-        WHERE group_id = {group_id};
+        WHERE id = {group_id};
         """
         result = await self._execute_query_with_returning_one_row(query)
         if result is False:
@@ -115,7 +115,7 @@ class Selector(DatabaseConnector):
     async def select_group_owner_id_by_group_id(self, group_id: int) -> int | None:
         query = f"""--sql
         SELECT owner_id FROM education_group
-        WHERE group_id = {group_id};
+        WHERE id = {group_id};
         """
         result = await self._execute_query_with_returning_one_row(query)
         if result is False:
@@ -173,7 +173,7 @@ class Selector(DatabaseConnector):
         query = f"""--sql
         SELECT first_name, last_name, patronymic FROM teacher
         WHERE telegram_id = (SELECT owner_id FROM education_group
-        WHERE group_id = {group_id});
+        WHERE id = {group_id});
         """
 
         result = await self._execute_query_with_returning_one_row(query)
@@ -191,7 +191,7 @@ class Selector(DatabaseConnector):
         query = f"""--sql
         SELECT username FROM users
         WHERE telegram_id = (SELECT owner_id FROM education_group
-        WHERE group_id = {group_id});
+        WHERE id = {group_id});
         """
 
         result = await self._execute_query_with_returning_one_row(query)
@@ -221,7 +221,7 @@ class Selector(DatabaseConnector):
     async def select_group_name_by_group_id(self, group_id: int) -> str | None:
         query = f"""--sql
         SELECT group_name FROM education_group
-        WHERE group_id = {group_id};
+        WHERE id = {group_id};
         """
         result = await self._execute_query_with_returning_one_row(query)
         if result is False:
@@ -275,7 +275,7 @@ class Selector(DatabaseConnector):
 
     async def select_group_ids_and_names_owned_by_telegram_id(self, telegram_id: int) -> list[tuple[int, str]]:
         query = f"""--sql
-        SELECT group_id, group_name FROM education_group
+        SELECT id, group_name FROM education_group
         WHERE owner_id = {telegram_id};
         """
         result = await self._execute_query(query)
