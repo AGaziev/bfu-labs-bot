@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
 from managers import database_manager
+from utils.callbacks import group_callback, show_callback
 
 
 async def menu_kb() -> InlineKeyboardMarkup:
@@ -61,10 +62,10 @@ async def teacher_menu_kb() -> InlineKeyboardMarkup:
 
 async def student_menu_kb(telegram_id: int) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=2, )
-    if await database_manager.get_student_groups_names_with_id(telegram_id=telegram_id):
+    if await database_manager.select_student_groups_names_with_id(telegram_id=telegram_id):
         kb.insert(InlineKeyboardButton(
             text='👥Мои группы',
-            callback_data=f'show_groups:student'), )
+            callback_data=show_callback.new(data_type="group", user_type="student")), )
 
     kb.insert(InlineKeyboardButton(
         text='➕Подключиться к новой группе',
@@ -104,7 +105,6 @@ async def group_kb(group_id) -> InlineKeyboardMarkup:
 async def get_groups_kb(group_names_and_ids: list[tuple[int, str]], type: str) -> InlineKeyboardMarkup:
     """returns inline keyboard with groups"""
     # TODO: rewrite this function, add navigation arrows buttons to avoiding long list of groups
-    group_callback = CallbackData("group", "group_id", "type")
     kb = InlineKeyboardMarkup(row_width=1, )
     if group_names_and_ids:
         group_buttons = [
