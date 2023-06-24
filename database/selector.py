@@ -304,7 +304,7 @@ class Selector(DatabaseConnector):
                 f"Selected telegram_id by username successfully; username = {username}; telegram_id = {result[0]}")
             return result[0]
 
-    async def get_student_groups_names_with_id(self, telegram_id: int) -> bool:
+    async def select_student_groups_names_with_id(self, telegram_id: int) -> bool:
         query = f"""--sql
         SELECT group_id, eg.group_name FROM registered_members rm
         LEFT JOIN education_group_members egm ON rm.member_id = egm.member_id
