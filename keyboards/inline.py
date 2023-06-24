@@ -1,9 +1,12 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.callback_data import CallbackData
+
 from managers import database_manager
+
 
 async def menu_kb() -> InlineKeyboardMarkup:
     """returns inline keyboard with menu items"""
-    kb = InlineKeyboardMarkup(row_width=2,)
+    kb = InlineKeyboardMarkup(row_width=2, )
     buttons = [
         InlineKeyboardButton(
             text='Search',
@@ -21,21 +24,23 @@ async def menu_kb() -> InlineKeyboardMarkup:
 
     kb.add(InlineKeyboardButton(
         text='Help',
-        callback_data='help'),)
+        callback_data='help'), )
 
     kb.add(InlineKeyboardButton(
         text='❌Close❌', callback_data='close_menu'))
 
     return kb
 
+
 async def cancel_kb() -> InlineKeyboardMarkup:
     """returns inline keyboard with menu items"""
-    kb = InlineKeyboardMarkup(row_width=1,)
+    kb = InlineKeyboardMarkup(row_width=1, )
     kb.insert(InlineKeyboardButton(
-            text='❌Отмена❌',
-            callback_data='cancel'),)
+        text='❌Отмена❌',
+        callback_data='cancel'), )
 
     return kb
+
 
 async def teacher_menu_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=1, )
@@ -98,14 +103,16 @@ async def group_kb(group_id) -> InlineKeyboardMarkup:
 
 async def get_groups_kb(group_names_and_ids: list[tuple[int, str]], type: str) -> InlineKeyboardMarkup:
     """returns inline keyboard with groups"""
-    #TODO: rewrite this function, add navigation arrows buttons to avoiding long list of groups
-    kb = InlineKeyboardMarkup(row_width=1,)
-    group_buttons = [
-        InlineKeyboardButton(
-            text=f'{group_name}',
-            callback_data=f'group:{group_id}')  # 123 like test group id
-        for group_id, group_name in group_names_and_ids
-    ]
+    # TODO: rewrite this function, add navigation arrows buttons to avoiding long list of groups
+    group_callback = CallbackData("group", "group_id", "type")
+    kb = InlineKeyboardMarkup(row_width=1, )
+    if group_names_and_ids:
+        group_buttons = [
+            InlineKeyboardButton(
+                text=f'{group_name} +d {group_callback.new(group_id=group_id, type=type)}',
+                callback_data=group_callback.new(group_id=group_id, type=type))
+            for group_id, group_name in group_names_and_ids
+        ]
 
         for button in group_buttons:
             kb.insert(button)
