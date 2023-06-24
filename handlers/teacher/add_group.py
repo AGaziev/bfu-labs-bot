@@ -18,7 +18,6 @@ async def set_new_group_name(callback: types.CallbackQuery, state: FSMContext):
 
 @rate_limit(limit=3)
 async def set_new_group_students(message: types.Message, state: FSMContext):
-    # TODO: to validate type (with exist and bad names check)
     group_name = message.text.upper()
     owner_credentials = await database_manager.select_teacher_credentials_by_telegram_id(telegram_id=message.from_user.id)
     repository_name = f"{group_name}_{owner_credentials.firstname}_{owner_credentials.lastname}"
@@ -46,11 +45,6 @@ async def correcting_students_list(message: types.Message, state: FSMContext):
     match message.document.file_name.split(".")[-1]:
         case "txt":
             students = TxtParser.get_all_lines(file_in_io)
-        # TODO: add csv, xlsx parsers
-        # case "csv":
-        #     ...
-        # case "xlsx":
-        #     ...
         case _:
             await message.answer("Неверный формат файла, попробуйте снова", reply_markup=await kb.cancel_kb())
             return

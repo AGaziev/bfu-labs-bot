@@ -53,23 +53,22 @@ async def teacher_menu_kb() -> InlineKeyboardMarkup:
 
     return kb
 
-async def student_menu_kb(telegram_id:int)->InlineKeyboardMarkup:
-    # TODO: Кнопки на основе групп у студента
-    #  Использовать group_id в генерации callback_data
-    #  Клавиатура с группами, к которым присоединен студент будет в другой функции
+
+async def student_menu_kb(telegram_id: int) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=2, )
-    if await database_manager.check_is_user_joined_any_education_group(telegram_id=telegram_id):
+    if await database_manager.get_student_groups_names_with_id(telegram_id=telegram_id):
         kb.insert(InlineKeyboardButton(
-            text='📃Мои лабы',
-            callback_data=f'my_labs_user_id_{telegram_id}'),)
+            text='👥Мои группы',
+            callback_data=f'show_groups:student'), )
 
     kb.insert(InlineKeyboardButton(
-            text='➕Подключиться к новой группе',
-            callback_data='connect_to_group'),)
+        text='➕Подключиться к новой группе',
+        callback_data='connect_to_group'), )
 
     return kb
 
-async def confirmation_kb()->InlineKeyboardMarkup:
+
+async def confirmation_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup()
 
     kb.insert(InlineKeyboardButton(
@@ -79,7 +78,7 @@ async def confirmation_kb()->InlineKeyboardMarkup:
     return kb
 
 
-async def group_kb(group_id)->InlineKeyboardMarkup:
+async def group_kb(group_id) -> InlineKeyboardMarkup:
     """
     group_id - group's id from database to build a callback
     """
@@ -96,7 +95,8 @@ async def group_kb(group_id)->InlineKeyboardMarkup:
 
     return kb
 
-async def get_groups_kb(group_names_and_ids: list[tuple[int,str]]) -> InlineKeyboardMarkup:
+
+async def get_groups_kb(group_names_and_ids: list[tuple[int, str]], type: str) -> InlineKeyboardMarkup:
     """returns inline keyboard with groups"""
     #TODO: rewrite this function, add navigation arrows buttons to avoiding long list of groups
     kb = InlineKeyboardMarkup(row_width=1,)
@@ -107,21 +107,23 @@ async def get_groups_kb(group_names_and_ids: list[tuple[int,str]]) -> InlineKeyb
         for group_id, group_name in group_names_and_ids
     ]
 
-    for button in group_buttons:
-        kb.insert(button)
+        for button in group_buttons:
+            kb.insert(button)
 
     return kb
+
 
 async def register_as_teacher_kb() -> InlineKeyboardMarkup:
     """returns inline keyboard with register as teacher button"""
-    kb = InlineKeyboardMarkup(row_width=1,)
+    kb = InlineKeyboardMarkup(row_width=1, )
     kb.insert(InlineKeyboardButton(
         text='Зарегистрироваться',
-        callback_data='register_as_teacher'),)
+        callback_data='register_as_teacher'), )
 
     return kb
 
-async def confirmation_teacher_credentials()->InlineKeyboardMarkup:
+
+async def confirmation_teacher_credentials() -> InlineKeyboardMarkup:
     kb = await confirmation_kb()
     kb.insert(InlineKeyboardButton(
         text='❌Ввести заново',
@@ -129,7 +131,8 @@ async def confirmation_teacher_credentials()->InlineKeyboardMarkup:
 
     return kb
 
-async def admin_menu_kb()->InlineKeyboardMarkup:
+
+async def admin_menu_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=1, )
 
     buttons = [
