@@ -46,4 +46,7 @@ class GroupManager:
         unregistered_users = await database_manager.select_unregistered_users_from_group(group_name=group_name)
         return {i: creds for i,creds in unregistered_users}
 
-
+    @staticmethod
+    async def get_groups_for_student(telegram_id):
+        student_groups = await database_manager.select_student_groups_names_with_id(telegram_id)
+        return student_groups
