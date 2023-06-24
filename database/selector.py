@@ -304,20 +304,22 @@ class Selector(DatabaseConnector):
                 f"Selected telegram_id by username successfully; username = {username}; telegram_id = {result[0]}")
             return result[0]
 
-    async def check_is_user_joined_any_education_group(self, telegram_id: int) -> bool:
+    async def get_student_groups_names_with_id(self, telegram_id: int) -> bool:
         query = f"""--sql
-        SELECT EXISTS(SELECT * FROM registered_members
-        WHERE telegram_id = {telegram_id});
+        SELECT group_id, eg.group_name FROM registered_members rm
+        LEFT JOIN education_group_members egm ON rm.member_id = egm.member_id
+        LEFT JOIN education_group eg ON egm.group_id = eg.id
+        WHERE telegram_id={telegram_id};
         """
         result = await self._execute_query_with_returning_one_row(query)
         if result is False:
             logger.error(
-                f"Error while checking is user joined any education group; telegram_id = {telegram_id}")
-            return False
+                f"Error while selecting user groups with id; telegram_id = {telegram_id}")
+            return []
         else:
             logger.success(
-                f"Checked is user joined any education group successfully; telegram_id = {telegram_id}; result = {result[0]}")
-            return result[0]
+                f"Selected user groups with id successfully; telegram_id = {telegram_id}; result = {result}")
+            return result
 
     async def check_is_group_exists_by_group_name(self, group_name: str) -> bool:
         query = f"""--sql
