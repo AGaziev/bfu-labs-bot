@@ -311,7 +311,7 @@ class Selector(DatabaseConnector):
         LEFT JOIN education_group eg ON egm.group_id = eg.id
         WHERE telegram_id={telegram_id};
         """
-        result = await self._execute_query_with_returning_one_row(query)
+        result = await self._execute_query(query)
         if result is False:
             logger.error(
                 f"Error while selecting user groups with id; telegram_id = {telegram_id}")
