@@ -54,3 +54,4 @@ async def end_connecting_to_group(call: types.CallbackQuery, state: FSMContext):
                                               connecting_data['student_id'],
                                               call.from_user.id)
         await call.message.answer(f"Вы подключены к группе {connecting_data['group_name']}")
+        await state.finish()
