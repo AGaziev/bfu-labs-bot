@@ -15,6 +15,8 @@ class GroupManager:
             owner_id=teacher_id,
             cloud_folder_link=folder_url)
         group_id = await database_manager.select_group_id_by_group_name(group_name=name)
+        await database_manager.insert_many_members_into_education_group(group_id=group_id,
+                                                                        members=students)
         return folder_url, group_id
 
     @staticmethod

@@ -77,5 +77,4 @@ async def end_group_add(callback: types.CallbackQuery, state: FSMContext):
                                       f"{hlink('Ссылка на группу', group_url)}",
                                       reply_markup=await kb.group_kb(group_id),
                                       parse_mode="HTML")
-        await database_manager.insert_many_members_into_education_group(group_id=group_id, members=group_data["students"])
         await state.finish()
