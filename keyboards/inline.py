@@ -195,3 +195,26 @@ async def cloud_link_to_lab_kb(url: str) -> InlineKeyboardMarkup:
         url=url),)
 
     return kb
+
+
+async def sample_files_with_cancel_button_kb() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardMarkup(row_width=3, )
+    buttons = [
+        InlineKeyboardButton(
+            text='📄TXT пример',
+            callback_data='sample:txt'),
+        InlineKeyboardButton(
+            text='📄CSV пример',
+            callback_data='sample:csv'),
+        InlineKeyboardButton(
+            text='📄XLSX пример',
+            callback_data='sample:xlsx'),
+    ]
+    for button in buttons:
+        kb.insert(button)
+
+    kb.add(InlineKeyboardButton(
+        text='❌Отмена',
+        callback_data='cancel'),)
+
+    return kb

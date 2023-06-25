@@ -68,7 +68,6 @@ class Mailer:
         Returns:
             str: notification message
         """
-        print(teacher)
         group_name = await self._database_manager.select_group_name_by_group_id(group_id=group_id)
         teacher_credentials_part = f'''Преподаватель {hitalic(teacher.firstname)} {hitalic(teacher.lastname)} {hitalic(teacher.patronymic if teacher.patronymic else '')}\n'''
         description_part = f'''добавил новую лабораторную работу "{hcode(description)}"\n'''

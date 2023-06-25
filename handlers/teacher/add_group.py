@@ -8,6 +8,7 @@ from middlewares import rate_limit
 from utils import states
 from managers import GroupManager, database_manager
 from utils.parsers import TxtParser
+from utils.samples_gerenator import SamplesGenerator
 
 
 @rate_limit(limit=3)
@@ -31,10 +32,32 @@ async def set_new_group_students(message: types.Message, state: FSMContext, user
     else:
         await message.answer(f"Название вашей группы: {hbold(repository_name)}\n\n"
                              f"Прикрепите txt файл со списком студентов в этой группе",
-                             reply_markup=await kb.cancel_kb(), parse_mode=types.ParseMode.HTML)
+                             reply_markup=await kb.sample_files_with_cancel_button_kb(), parse_mode=types.ParseMode.HTML)
         async with state.proxy() as group_data:
             group_data["name"] = repository_name
         await states.TeacherState.add_group.students.set()
+
+
+@rate_limit(limit=3)
+async def send_file_sample(call: types.CallbackQuery, state: FSMContext):
+    extention = call.data.split(":")[-1]
+    match extention:
+        case "txt":
+            file_ = SamplesGenerator.get_students_list_txt_example()
+        case "csv":
+            file_ = SamplesGenerator.get_students_list_csv_example()
+        case "xlsx":
+            file_ = SamplesGenerator.get_students_list_xlsx_example()
+        case _:
+            await call.message.edit_text("Неверный формат файла, попробуйте снова", reply_markup=await kb.cancel_kb())
+            return
+
+    input_file = types.InputFile(
+        file_, filename=f"sample.{extention}")
+
+    await call.message.answer_document(document=input_file,
+                                       caption=f"Пример {hbold(extention.upper())} файла со списком студентов",
+                                       parse_mode=types.ParseMode.HTML)
 
 
 @rate_limit(limit=3)

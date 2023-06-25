@@ -26,7 +26,6 @@ class GroupManager:
         on_disk = CloudManager.is_group_exists(name)
         in_database = await database_manager.check_is_group_exists_by_group_name(
             group_name=name)
-        print(in_database, on_disk)
         # restore cloud folder
         if in_database and not on_disk:
             CloudManager.create_group_folder(name)

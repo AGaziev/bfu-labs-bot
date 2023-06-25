@@ -4,7 +4,7 @@ from aiogram import Dispatcher
 from loguru import logger
 
 from utils import states
-from .add_group import set_new_group_name, set_new_group_students, correcting_students_list, change_stundents_list_to_new_file, end_group_add
+from .add_group import set_new_group_name, set_new_group_students, correcting_students_list, change_stundents_list_to_new_file, end_group_add, send_file_sample
 from .cancel_operation import cancel_operation
 from .register import register_as_teacher, confirm_teacher_credentials, confirm_credentials_and_write_to_database, change_teacher_credentials
 from .show_my_groups import show_my_groups
@@ -28,6 +28,12 @@ def setup_teacher_handlers(dp: Dispatcher):
     dp.register_message_handler(
         set_new_group_students,
         state=states.TeacherState.add_group.name
+    )
+
+    dp.register_callback_query_handler(
+        send_file_sample,
+        lambda call: call.data.startswith('sample'),
+        state=states.TeacherState.add_group.students
     )
 
     dp.register_message_handler(
