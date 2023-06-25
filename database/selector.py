@@ -381,3 +381,27 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Selected student's labs with status in group successfully; group_name = {group_id}, telegram_id={telegram_id}; result = {result}")
             return result
+
+
+    async def select_undone_group_labs_for_student(self, group_id: str, telegram_id) -> list[tuple[int, str]] | None:
+        query = f"""--sql
+        SELECT *
+        FROM lab_registry
+        WHERE group_id = {group_id}
+        AND id NOT IN (SELECT lab_id
+                       FROM lab_tracker
+                       WHERE group_id = {group_id}
+                       AND member_id = (SELECT member_id
+                                        FROM registered_members
+                                        WHERE telegram_id = {telegram_id}
+                                        AND group_id = {group_id}))
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting undone group's labs for student; group_name = {group_id}, telegram_id={telegram_id}")
+            return None
+        else:
+            logger.success(
+                f"Selected undone group's labs for student successfully; group_name = {group_id}, telegram_id={telegram_id}; result = {result}")
+            return result
