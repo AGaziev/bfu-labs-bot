@@ -45,3 +45,12 @@ class CloudManager:
     @classmethod
     def is_group_exists(cls, group_name: str):
         return cloud_drive.exists(f"/{group_name}")
+
+    @staticmethod
+    def get_files_by_link(links: tuple):
+        files = []
+        for link in links:
+            file = BytesIO()
+            cloud_drive.download_public(link, file)
+            files.append(file)
+        return files
