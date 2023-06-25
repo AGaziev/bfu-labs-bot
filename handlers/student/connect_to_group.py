@@ -15,7 +15,7 @@ async def set_connecting_group_name(call: types.CallbackQuery):
 
 
 async def show_student_list_of_group(message: types.Message, state: FSMContext):
-    if await GroupManager.is_group_name_exists(name=message.text):
+    if await GroupManager.is_group_name_exists(name=message.text) and not await GroupManager.is_student_already_connected(telegram_id=message.from_user.id):
         async with state.proxy() as connecting_data:
             connecting_data["group_name"] = message.text
             connecting_data["students"] = \

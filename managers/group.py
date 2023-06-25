@@ -51,3 +51,8 @@ class GroupManager:
     async def get_groups_for_student(telegram_id):
         student_groups = await database_manager.select_student_groups_names_with_id(telegram_id)
         return student_groups
+
+    @staticmethod
+    def is_student_already_connected(telegram_id, group_id):
+        users_in_group = database_manager.select_registered_members_from_group(group_id, is_blocked=Blocked.ANY)
+        return telegram_id in users_in_group
