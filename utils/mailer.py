@@ -2,6 +2,7 @@ from loguru import logger
 from loader import bot
 from aiogram.utils.exceptions import BotBlocked
 from utils.models import Teacher
+from utils.enums import Blocked
 from aiogram.utils.markdown import hitalic, hlink
 import asyncio
 
@@ -21,7 +22,7 @@ class Mailer:
 
         except BotBlocked:
             logger.error(f"User {user_id} blocked bot")
-            self._database_manager.update_user_is_blocked_field_by_user_id(
+            await self._database_manager.update_user_is_blocked_field_by_user_id(
                 user_id=user_id, is_blocked=True)
 
         else:
