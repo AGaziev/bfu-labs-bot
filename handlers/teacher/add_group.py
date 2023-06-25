@@ -17,8 +17,9 @@ async def set_new_group_name(callback: types.CallbackQuery, state: FSMContext):
 
 
 @rate_limit(limit=3)
-async def set_new_group_students(message: types.Message, state: FSMContext):
-    group_name = message.text.upper()
+async def set_new_group_students(message: types.Message, state: FSMContext, user_id: int = None):
+    # TODO: to validate type (with exist and bad names check)
+    group_name = message.text.upper().replace(' ', '_')
     owner_credentials = await database_manager.select_teacher_credentials_by_telegram_id(telegram_id=message.from_user.id)
     repository_name = f"{group_name}_{owner_credentials.firstname}_{owner_credentials.lastname}"
     if owner_credentials.patronymic:
@@ -56,19 +57,27 @@ async def correcting_students_list(message: types.Message, state: FSMContext):
         await message.answer(f"Название вашей группы: {hbold(group_name)}\n\n"
                              f"Первые 5 студентов из группы:\n"
                              f"{hitalic(first_five_students)}\n\n"
-                             f"Если не сходится попробуйте снова загрузить файл со списком студентов в txt формате",
-                             reply_markup=await kb.confirmation_kb(),
+                             f"Все верно?",
+                             reply_markup=await kb.yes_no_kb(),
                              parse_mode="HTML")
+        await states.TeacherState.add_group.confirm.set()
 
 
-async def end_group_add(callback: types.CallbackQuery, state: FSMContext):
+async def change_stundents_list_to_new_file(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text("Прикрепите txt файл со списком студентов в этой группе",
+                                     reply_markup=await kb.cancel_kb(), parse_mode=types.ParseMode.HTML)
+    await states.TeacherState.add_group.students.set()
+
+
+async def end_group_add(call: types.CallbackQuery, state: FSMContext):
+    await call.message.delete()
     async with state.proxy() as group_data:
         group_data["cloud_drive_url"], group_id = await GroupManager.create_group(
-            group_data["name"], group_data["students"], callback.from_user.id)
+            group_data["name"], group_data["students"], call.from_user.id)
         group_name = group_data['name']
         group_url = group_data['cloud_drive_url']
-        await callback.message.answer(f"Группа {hbold(group_name)} успешно создана\n"
-                                      f"{hlink('Ссылка на группу', group_url)}",
-                                      reply_markup=await kb.group_kb(group_id),
-                                      parse_mode="HTML")
+        await call.message.answer(f"Группа {hbold(group_name)} успешно создана\n"
+                                  f"{hlink('Ссылка на группу', group_url)}",
+                                  reply_markup=await kb.teacher_group_menu_kb(group_id),
+                                  parse_mode="HTML")
         await state.finish()

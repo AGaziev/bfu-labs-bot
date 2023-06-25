@@ -133,7 +133,8 @@ class Creator(DatabaseConnector):
         """
         tables = ('lab_tracker', 'lab_registry', 'lab_status_type',
                   'registered_members', 'education_group_members',
-                  'education_group', 'users')
+                  'education_group', 'teacher', 'users')
+
         logger.warning("Dropping all tables from database")
 
         for table in tables:

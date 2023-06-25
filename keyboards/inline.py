@@ -37,8 +37,8 @@ async def cancel_kb() -> InlineKeyboardMarkup:
     """returns inline keyboard with menu items"""
     kb = InlineKeyboardMarkup(row_width=1, )
     kb.insert(InlineKeyboardButton(
-        text='❌Отмена❌',
-        callback_data='cancel'), )
+        text='❌Отмена',
+        callback_data='cancel'),)
 
     return kb
 
@@ -84,7 +84,7 @@ async def confirmation_kb() -> InlineKeyboardMarkup:
     return kb
 
 
-async def group_kb(group_id) -> InlineKeyboardMarkup:
+async def teacher_group_menu_kb(group_id) -> InlineKeyboardMarkup:
     """
     group_id - group's id from database to build a callback
     """
@@ -92,7 +92,7 @@ async def group_kb(group_id) -> InlineKeyboardMarkup:
     group_buttons = [
         InlineKeyboardButton(
             text='➕Добавить лабораторную работу',
-            callback_data=f'add_labs:{group_id}'  # 123 like test group id
+            callback_data=f'add_lab:{group_id}'  # 123 like test group id
         )
     ]
 
@@ -102,15 +102,20 @@ async def group_kb(group_id) -> InlineKeyboardMarkup:
     return kb
 
 
-async def get_groups_kb(group_names_and_ids: list[tuple[int, str]], type: str) -> InlineKeyboardMarkup:
-    """returns inline keyboard with groups"""
+async def get_groups_kb(group_names_and_ids: list[tuple[int, str]], role: str) -> InlineKeyboardMarkup:
+    """returns inline keyboard with groups
+
+    Args:
+        group_names_and_ids: list of tuples with group's id and name
+        role: str - student or teacher
+    """
     # TODO: rewrite this function, add navigation arrows buttons to avoiding long list of groups
     kb = InlineKeyboardMarkup(row_width=1, )
     if group_names_and_ids:
         group_buttons = [
             InlineKeyboardButton(
-                text=f'{group_name} +d {group_callback.new(group_id=group_id, type=type)}',
-                callback_data=group_callback.new(group_id=group_id, type=type))
+                text=f'{group_name}',
+                callback_data=group_callback.new(group_id=group_id, role=role))
             for group_id, group_name in group_names_and_ids
         ]
 
@@ -153,5 +158,31 @@ async def admin_menu_kb() -> InlineKeyboardMarkup:
 
     for button in buttons:
         kb.insert(button)
+
+    return kb
+
+
+async def yes_no_kb() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardMarkup(row_width=2, )
+    buttons = [
+        InlineKeyboardButton(
+            text='✅Да',
+            callback_data='yes'),
+        InlineKeyboardButton(
+            text='❌Нет',
+            callback_data='no'),
+    ]
+
+    for button in buttons:
+        kb.insert(button)
+
+    return kb
+
+
+async def changed_mind_kb() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardMarkup(row_width=1, )
+    kb.insert(InlineKeyboardButton(
+        text='❌Я передумал',
+        callback_data='changed_mind'),)
 
     return kb

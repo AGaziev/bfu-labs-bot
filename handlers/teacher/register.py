@@ -66,7 +66,7 @@ async def notify_admins_about_teacher_registration_success(telegram_id: int, use
     for admin_id in configuration.admins:
         try:
             await bot.send_message(chat_id=admin_id,
-                                text=f"Преподаватель с telegram_id: {hcode(telegram_id)}{', '+hlink(title=username, url='t.me/'+username) if username else ''} зарегистрировался",
+                                text=f"Преподаватель с telegram_id: {hcode(telegram_id)}{', '+hlink(title=username, url='t.me/'+username) if username else ''} зарегистрировался как учитель",
                                 parse_mode=types.ParseMode.HTML)
         except BotBlocked:
             logger.warning(f"Admin with telegram_id: {admin_id} blocked bot")

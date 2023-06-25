@@ -4,10 +4,12 @@ from aiogram import Dispatcher
 from loguru import logger
 
 from utils import states
-from .add_group import set_new_group_name, set_new_group_students, correcting_students_list, end_group_add
+from .add_group import set_new_group_name, set_new_group_students, correcting_students_list, change_stundents_list_to_new_file, end_group_add
 from .cancel_operation import cancel_operation
 from .register import register_as_teacher, confirm_teacher_credentials, confirm_credentials_and_write_to_database, change_teacher_credentials
 from .show_my_groups import show_my_groups
+from .group_menu import teacher_group_menu
+from .add_new_lab import wait_for_lab_conditions_file, ask_for_filename_to_change, wait_for_new_filename, upload_file_to_cloud_drive, change_filename
 
 
 def setup_teacher_handlers(dp: Dispatcher):
@@ -36,8 +38,14 @@ def setup_teacher_handlers(dp: Dispatcher):
 
     dp.register_callback_query_handler(
         end_group_add,
-        text='confirm',
-        state=states.TeacherState.add_group.students
+        lambda call: call.data == 'yes',
+        state=states.TeacherState.add_group.confirm
+    )
+
+    dp.register_callback_query_handler(
+        change_stundents_list_to_new_file,
+        lambda call: call.data == 'no',
+        state=states.TeacherState.add_group.confirm
     )
 
     dp.register_callback_query_handler(
@@ -68,6 +76,54 @@ def setup_teacher_handlers(dp: Dispatcher):
         confirm_credentials_and_write_to_database,
         lambda call: call.data == 'confirm',
         state=states.TeacherState.registration.confirmation
+    )
+
+    dp.register_callback_query_handler(
+        show_my_groups,
+        lambda call: call.data == 'teacher_show_my_groups',
+        state=states.TeacherState.start
+    )
+
+    dp.register_callback_query_handler(
+        teacher_group_menu,
+        lambda call: call.data.startswith('group:'),
+        state=states.TeacherState.show_my_groups
+    )
+
+    dp.register_callback_query_handler(
+        wait_for_lab_conditions_file,
+        lambda call: call.data.startswith('add_lab'),
+        state=states.TeacherState.group_menu
+    )
+
+    dp.register_message_handler(
+        ask_for_filename_to_change,
+        content_types=ContentType.DOCUMENT,
+        state=states.TeacherState.add_lab.upload_lab_file
+    )
+
+    dp.register_callback_query_handler(
+        wait_for_new_filename,
+        lambda call: call.data == 'no',
+        state=states.TeacherState.add_lab.ask_for_filename_to_change
+    )
+
+    dp.register_message_handler(
+        change_filename,
+        content_types=ContentType.TEXT,
+        state=states.TeacherState.add_lab.wait_for_new_filename
+    )
+
+    dp.register_callback_query_handler(
+        upload_file_to_cloud_drive,
+        lambda call: call.data == 'changed_mind',
+        state=states.TeacherState.add_lab.wait_for_new_filename
+    )
+
+    dp.register_callback_query_handler(
+        upload_file_to_cloud_drive,
+        lambda call: call.data == 'yes',
+        state=states.TeacherState.add_lab.ask_for_filename_to_change
     )
 
     logger.info('Teacher handlers are successfully registered')

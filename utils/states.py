@@ -12,13 +12,22 @@ class Registration(StatesGroup):
 class AddGroup(StatesGroup):
     name = State()
     students = State()
+    confirm = State()
+
+
+class AddLab(StatesGroup):
+    upload_lab_file = State()
+    ask_for_filename_to_change = State()
+    wait_for_new_filename = State()
 
 
 class TeacherState(StatesGroup):
     registration = Registration()
     start = State()
     add_group = AddGroup()
-    add_new_lab = State()
+    show_my_groups = State()
+    group_menu = State()
+    add_lab = AddLab()
 
 
 class ConnectGroup(StatesGroup):
