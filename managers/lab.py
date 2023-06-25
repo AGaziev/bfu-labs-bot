@@ -8,7 +8,7 @@ from .db import database_manager
 
 class LabManager:
     @staticmethod
-    def get_student_lab_stats(group_id, telegram_id) -> ([dict], [dict]):
+    async def get_student_lab_stats(group_id, telegram_id) -> ([dict], [dict]):
         lab_statistic = await database_manager.select_students_labs_with_status_in_group(group_id, telegram_id)
         accepted_labs = []
         not_done_labs = []
