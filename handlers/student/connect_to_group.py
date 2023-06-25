@@ -15,16 +15,18 @@ async def set_connecting_group_name(call: types.CallbackQuery):
 
 
 async def show_student_list_of_group(message: types.Message, state: FSMContext):
-    if await GroupManager.is_group_name_exists(name=message.text) and not await GroupManager.is_student_already_connected(telegram_id=message.from_user.id):
-        async with state.proxy() as connecting_data:
-            connecting_data["group_name"] = message.text
-            connecting_data["students"] = \
-                await GroupManager.get_unregistered_users_of_group(group_name=message.text)
-            # формируем список можно будет переделать потом красиво и понятно
-            await message.answer(Formatter.list_of_students(connecting_data["students"]))
-            await message.answer("Выберите из списка введя число перед вашим ФИО",
-                                 reply_markup=await kb.cancel_kb())
-            await states.Student.connect_to_group.choose_name.set()
+    if await GroupManager.is_group_name_exists(name=message.text):
+        group_id = await GroupManager.get_group_id_by_name(name=message.text)
+        if not await GroupManager.is_student_already_connected(telegram_id=message.from_user.id, group_id=group_id):
+            async with state.proxy() as connecting_data:
+                connecting_data["group_name"] = message.text
+                connecting_data["students"] = \
+                    await GroupManager.get_unregistered_users_of_group(group_name=message.text)
+                # формируем список можно будет переделать потом красиво и понятно
+                await message.answer(Formatter.list_of_students(connecting_data["students"]))
+                await message.answer("Выберите из списка введя число перед вашим ФИО",
+                                    reply_markup=await kb.cancel_kb())
+                await states.Student.connect_to_group.choose_name.set()
     else:
         await message.answer("Такой группы нет, уточните у преподавателя и напишите название еще раз",
                              reply_markup=await kb.cancel_kb())

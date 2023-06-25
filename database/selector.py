@@ -152,21 +152,20 @@ class Selector(DatabaseConnector):
         WHERE member_id IN (SELECT member_id FROM education_group_members
         WHERE group_id = {group_id})
         AND telegram_id IN (SELECT telegram_id FROM users
-        WHERE is_blocked = {is_blocked});
+        WHERE is_blocked IN ({is_blocked.value}));
         """
 
         result = await self._execute_query(query)
         if result is False:
             logger.error(
                 f"Error while selecting registered members from group; group_id = {group_id}")
-            raise AttributeError(
-                f"Registered members not found; group_id = {group_id}")
+            return tuple()
         else:
             logger.success(
                 f"Selected registered members from group successfully; group_id = {group_id}")
             return tuple([iterable[0] for iterable in result])
 
-    async def _select_group_owner_by_group_id(self, group_id: int) -> list[str]:
+    async def _select_group_owner_by_group_id(self, group_id: int) -> tuple[str]:
         """
         Returns:
             list[str]: list of group owner first_name, last_name, patronymic
@@ -186,7 +185,7 @@ class Selector(DatabaseConnector):
         else:
             logger.success(
                 f"Selected group owner by group_id successfully; group_id = {group_id}; owner = {result}")
-            return result
+            return result[0], result[1], result[2] if len(result) == 3 else None
 
     async def _select_owner_username_by_group_id(self, group_id: int) -> str:
         query = f"""--sql
@@ -213,7 +212,7 @@ class Selector(DatabaseConnector):
                 first_name, last_name, patronymic, username
         """
         teacher = Teacher()
-        teacher.first_name, teacher.last_name, teacher.patronymic = await self._select_group_owner_by_group_id(
+        teacher.firstname, teacher.lastname, teacher.patronymic = await self._select_group_owner_by_group_id(
             group_id)
         teacher.username = await self._select_owner_username_by_group_id(
             group_id)

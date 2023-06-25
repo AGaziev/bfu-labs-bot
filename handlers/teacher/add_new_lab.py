@@ -65,9 +65,13 @@ async def upload_file_to_cloud_drive(call:types.CallbackQuery, state: FSMContext
     await call.message.edit_text(f"Загружаю файл {hbold(filename)} на облачный диск",
                                  reply_markup= None,
                                  parse_mode=types.ParseMode.HTML)
+
     lab_url = CloudManager.add_lab_to_group_folder(group_name=group_name, lab_path_or_file=io_file, lab_name=filename)
-    await GroupManager.add_lab_to_db_and_notify_students(group_name=group_name,
-                                                         lab_name=filename.split('.')[0] if '.' in filename else filename,
-                                                         lab_url=lab_url)
+    group_id = await database_manager.select_group_id_by_group_name(group_name=group_name)
+
     await call.message.answer(f"Файл {hbold(filename)} успешно загружен на облачный диск\n{hlink('Ссылка на файл', url=lab_url)}",
                               parse_mode=types.ParseMode.HTML)
+
+    await GroupManager.add_lab_to_db_and_notify_students(group_id=group_id,
+                                                         lab_name=filename.split('.')[0] if '.' in filename else filename,
+                                                         lab_link=lab_url)

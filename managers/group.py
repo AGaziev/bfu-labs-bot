@@ -67,7 +67,7 @@ class GroupManager:
 
     @staticmethod
     async def add_lab_to_db(group_id: int, lab_name: str, lab_link: str):
-        if await database_manager.insert_new_lab_link(group_id=group_id, lab_description=lab_name, lab_link=lab_link):
+        if await database_manager.insert_new_lab_link(group_id=group_id, lab_description=lab_name, cloud_link=lab_link):
             logger.success(f"Added lab {lab_name} to group {group_id}")
         else:
             logger.error(

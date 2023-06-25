@@ -3,22 +3,27 @@ from loader import bot
 from aiogram.utils.exceptions import BotBlocked
 from utils.models import Teacher
 from utils.enums import Blocked
-from aiogram.utils.markdown import hitalic, hlink
+from aiogram.utils.markdown import hitalic, hbold, hcode
+import keyboards as kb
 import asyncio
 
 
 class Mailer:
     def __init__(self) -> None:
         from managers import DatabaseManager
+
         self._database_manager = DatabaseManager()
         self._bot = bot
         self._messages_per_second_limit = 30
         logger.debug("Mailer object was initialized")
 
-    async def _send_message(self, user_id: int, message: str) -> None:
+    async def _send_message(self, user_id: int, message: str, url_to_lab: str) -> None:
         """Sends message to user"""
         try:
-            await self._bot.send_message(user_id, message)
+            await self._bot.send_message(user_id, message,
+                                         reply_markup=await kb.cloud_link_to_lab_kb(
+                                             url=url_to_lab),
+                                         parse_mode="HTML")
 
         except BotBlocked:
             logger.error(f"User {user_id} blocked bot")
@@ -49,7 +54,7 @@ class Mailer:
         message = await self._create_notification_message(teacher=teacher, description=description,
                                                           link_to_lab=link_to_lab, group_id=group_id)
 
-        await self._start_mailing(users_to_send_notification=users_to_send_notification, message=message)
+        await self._start_mailing(users_to_send_notification=users_to_send_notification, message=message, url_to_lab=link_to_lab)
         return True
 
     async def _create_notification_message(self, teacher: Teacher, description: str, link_to_lab: str, group_id: int) -> str:
@@ -63,16 +68,17 @@ class Mailer:
         Returns:
             str: notification message
         """
+        print(teacher)
         group_name = await self._database_manager.select_group_name_by_group_id(group_id=group_id)
-        teacher_credentials_part = f'''Преподаватель {hitalic(teacher.firstname, teacher.lastname, teacher.patronymic if teacher.patronymic else '')}\n'''
-        group_name_and_description_part = f'''добавил новую лабораторную работу "{description}" для группы "{group_name}"\n'''
-        link_to_lab_part = f'''{hlink("ССЫЛКА", link_to_lab)} на лабораторную работу'''
+        teacher_credentials_part = f'''Преподаватель {hitalic(teacher.firstname)} {hitalic(teacher.lastname)} {hitalic(teacher.patronymic if teacher.patronymic else '')}\n'''
+        description_part = f'''добавил новую лабораторную работу "{hcode(description)}"\n'''
+        group_name_part = f'''для группы "{hbold(group_name)}"\n\n'''
 
         message = teacher_credentials_part + \
-            group_name_and_description_part + link_to_lab_part
+            description_part + group_name_part
         return message
 
-    async def _start_mailing(self, users_to_send_notification: tuple[int, ...], message: str) -> None:
+    async def _start_mailing(self, users_to_send_notification: tuple[int, ...], message: str, url_to_lab: str) -> None:
         """Starts mailing to users
 
         Args:
@@ -86,6 +92,6 @@ class Mailer:
                 await asyncio.sleep(1)
                 messages_before_sleep = 0
 
-            await self._send_message(user_id=user_id, message=message)
+            await self._send_message(user_id=user_id, message=message, url_to_lab=url_to_lab)
             messages_before_sleep += 1
         logger.success("Mailing was finished successfully")

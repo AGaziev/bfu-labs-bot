@@ -186,3 +186,12 @@ async def changed_mind_kb() -> InlineKeyboardMarkup:
         callback_data='changed_mind'),)
 
     return kb
+
+
+async def cloud_link_to_lab_kb(url: str) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardMarkup(row_width=1, )
+    kb.insert(InlineKeyboardButton(
+        text='🔗Ссылка на облако',
+        url=url),)
+
+    return kb

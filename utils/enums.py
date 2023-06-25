@@ -4,4 +4,4 @@ import enum
 class Blocked(enum.Enum):
     FALSE = 'FALSE'
     TRUE = 'TRUE'
-    ANY = 'ANY(TRUE, FALSE)'
+    ANY = 'TRUE, FALSE'
