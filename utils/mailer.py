@@ -36,7 +36,8 @@ class Mailer:
             description (str): user's description, it can be deadline or something else
             link_to_lab (str): link to lab on cloud storage
         """
-        users_to_send_notification = await self._database_manager.select_registered_unblocked_members_from_group(group_id=group_id)
+        users_to_send_notification = await self._database_manager.select_registered_members_from_group(
+            group_id=group_id, is_blocked=Blocked.FALSE)
         teacher = await self._database_manager.select_teacher_by_group_id(group_id=group_id)
 
         if not users_to_send_notification:
