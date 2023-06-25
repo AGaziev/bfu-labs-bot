@@ -36,6 +36,10 @@ class GroupManager:
         return await database_manager.select_group_id_by_group_name(group_name=name)
 
     @staticmethod
+    async def get_group_name_by_id(id_: int):
+        return await database_manager.select_group_name_by_group_id(group_id=id_)
+
+    @staticmethod
     async def connect_student_to_group(group_name: str, student_name: str, member_id: int, telegram_id) -> bool:
         try:
             CloudManager.create_student_folder(group_name, student_name)
