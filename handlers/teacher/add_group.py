@@ -40,8 +40,8 @@ async def set_new_group_students(message: types.Message, state: FSMContext, user
 
 @rate_limit(limit=3)
 async def send_file_sample(call: types.CallbackQuery, state: FSMContext):
-    extention = call.data.split(":")[-1]
-    match extention:
+    extension = call.data.split(":")[-1]
+    match extension:
         case "txt":
             file_ = SamplesGenerator.get_students_list_txt_example()
         case "csv":
@@ -53,10 +53,10 @@ async def send_file_sample(call: types.CallbackQuery, state: FSMContext):
             return
 
     input_file = types.InputFile(
-        file_, filename=f"sample.{extention}")
+        file_, filename=f"sample.{extension}")
 
     await call.message.answer_document(document=input_file,
-                                       caption=f"Пример {hbold(extention.upper())} файла со списком студентов",
+                                       caption=f"Пример {hbold(extension.upper())} файла со списком студентов",
                                        parse_mode=types.ParseMode.HTML)
 
 
