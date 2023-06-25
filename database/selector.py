@@ -2,6 +2,7 @@ from .database_connector import DatabaseConnector
 from loguru import logger
 from typing import Any
 from utils.models import Teacher
+from utils.enums import Blocked
 
 
 class Selector(DatabaseConnector):
@@ -145,13 +146,13 @@ class Selector(DatabaseConnector):
                 f"Checked if user is teacher successfully; user_id = {user_id}")
             return result[0]
 
-    async def select_registered_unblocked_members_from_group(self, group_id: int) -> tuple[int, ...]:
+    async def select_registered_members_from_group(self, group_id: int, is_blocked: Blocked) -> tuple[int, ...]:
         query = f"""--sql
-        SELECT member_id FROM registered_members
+        SELECT telegram_id FROM registered_members
         WHERE member_id IN (SELECT member_id FROM education_group_members
         WHERE group_id = {group_id})
-        AND user_id IN (SELECT telegram_id FROM users
-        WHERE is_blocked = FALSE);
+        AND telegram_id IN (SELECT telegram_id FROM users
+        WHERE is_blocked = {is_blocked});
         """
 
         result = await self._execute_query(query)
