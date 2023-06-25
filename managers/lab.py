@@ -18,3 +18,10 @@ class LabManager:
             else:
                 not_done_labs.append(lab_info)
         return (accepted_labs, not_done_labs)
+
+    @staticmethod
+    async def get_student_undone_labs_files(group_id, telegram_id):
+        undone_labs = await database_manager.select_undone_group_labs_for_student(group_id, telegram_id)
+        links = {lab['descr']:lab["cloud_link"] for lab in undone_labs}
+        files = CloudManager.get_files_by_link(links)
+        return files
