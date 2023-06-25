@@ -1,6 +1,7 @@
 from loguru import logger
 
 from utils.enums import Blocked
+from utils.mailer import Mailer
 from .cloud import CloudManager
 from .db import database_manager
 
@@ -57,3 +58,22 @@ class GroupManager:
         users_in_group = await database_manager.select_registered_members_from_group(
             group_id, is_blocked=Blocked.ANY)
         return telegram_id in users_in_group
+
+    @staticmethod
+    async def add_lab_to_db(group_id: int, lab_name: str, lab_link: str):
+        if await database_manager.insert_new_lab_link(group_id=group_id, lab_description=lab_name, lab_link=lab_link):
+            logger.success(f"Added lab {lab_name} to group {group_id}")
+        else:
+            logger.error(
+                f"Error while adding lab {lab_name} to group {group_id}")
+
+    @staticmethod
+    async def notify_group_member_about_new_lab(group_id: int, lab_name: str, link_to_lab: str):
+        mailer = Mailer()
+        await mailer.send_notification_to_education_group(
+            group_id=group_id, description=lab_name, link_to_lab=link_to_lab)
+
+    @staticmethod
+    async def add_lab_to_db_and_notify_students(group_id: int, lab_name: str, lab_link: str):
+        await GroupManager.add_lab_to_db(group_id, lab_name, lab_link)
+        await GroupManager.notify_group_member_about_new_lab(group_id, lab_name, lab_link)

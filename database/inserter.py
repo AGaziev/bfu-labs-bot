@@ -173,3 +173,29 @@ class Inserter(DatabaseConnector):
             logger.success(
                 f"Inserted into registered members {member_id}, {telegram_id} successfully")
             return True
+
+    async def insert_new_lab_link(self, group_id: int, lab_description: str, cloud_link: str) -> bool:
+        """Inserts new lab link into table 'lab_registry'
+
+        Args:
+            group_id (int): group id in database
+            lab_description (str): any text, in our case it is lab filename
+            cloud_link (str): link to file on cloud storage
+
+        Returns:
+            bool: result of query execution
+        """
+        # lab_number = get labs count for current group + 1
+        query = f"""--sql
+        INSERT INTO lab_registry (group_id, lab_description, cloud_link, lab_number)
+        VALUES ({group_id}, '{lab_description}', '{cloud_link}', (SELECT COUNT(*) FROM lab_registry WHERE group_id = {group_id}) + 1);
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while inserting into lab_registry with {group_id}, {lab_description}, {cloud_link}")
+            return False
+        else:
+            logger.success(
+                f"Inserted into lab_registry {group_id}, {lab_description}, {cloud_link} successfully")
+            return True

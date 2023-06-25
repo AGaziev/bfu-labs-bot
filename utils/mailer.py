@@ -29,7 +29,7 @@ class Mailer:
             logger.debug(
                 f"Message {message:50}... was sent to user:[{user_id}]")
 
-    async def _send_notification_to_education_group(self, group_id: int, description: str, link_to_lab: str) -> bool:
+    async def send_notification_to_education_group(self, group_id: int, description: str, link_to_lab: str) -> bool:
         """Sends message to education group
 
         Args:
@@ -65,21 +65,21 @@ class Mailer:
         """
         group_name = await self._database_manager.select_group_name_by_group_id(group_id=group_id)
         teacher_credentials_part = f'''Преподаватель {hitalic(teacher.firstname, teacher.lastname, teacher.patronymic if teacher.patronymic else '')}\n'''
-        group_name_part = f'''добавил новую лабораторную работу для группы "{group_name}"\n'''
+        group_name_and_description_part = f'''добавил новую лабораторную работу "{description}" для группы "{group_name}"\n'''
         link_to_lab_part = f'''{hlink("ССЫЛКА", link_to_lab)} на лабораторную работу'''
-        description_part = f'''\n\n Cообщение от преподавателя:\n{description}''' if description else ''
 
-        message = teacher_credentials_part + group_name_part + \
-            link_to_lab_part + description_part
+        message = teacher_credentials_part + \
+            group_name_and_description_part + link_to_lab_part
         return message
 
-    async def _start_mailing(self, users_to_send_notification: tuple[int], message: str) -> None:
+    async def _start_mailing(self, users_to_send_notification: tuple[int, ...], message: str) -> None:
         """Starts mailing to users
 
         Args:
             users_to_send_notification (list): list of users to send notification
             message (str): message to send
         """
+        logger.warning("Mailing was started")
         messages_before_sleep = 0
         for user_id in users_to_send_notification:
             if messages_before_sleep == self._messages_per_second_limit:
