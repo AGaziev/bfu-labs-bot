@@ -44,17 +44,17 @@ class GroupManager:
         return True
 
     @staticmethod
-    async def get_unregistered_users_of_group(group_name):
+    async def get_unregistered_users_of_group(group_name:str):
         unregistered_users = await database_manager.select_unregistered_users_from_group(group_name=group_name)
         return {i: credentials for i, credentials in unregistered_users}
 
     @staticmethod
-    async def get_groups_for_student(telegram_id):
+    async def get_groups_for_student(telegram_id:int):
         student_groups = await database_manager.select_student_groups_names_with_id(telegram_id)
         return student_groups
 
     @staticmethod
-    async def is_student_already_connected(telegram_id, group_id):
+    async def is_student_already_connected(telegram_id:int, group_id:int):
         users_in_group = await database_manager.select_registered_members_from_group(
             group_id, is_blocked=Blocked.ANY)
         return telegram_id in users_in_group
