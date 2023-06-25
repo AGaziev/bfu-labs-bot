@@ -337,7 +337,7 @@ class Selector(DatabaseConnector):
                 f"Checked is group exists by group_name successfully; group_name = {group_name}; result = {result[0]}")
             return result[0]
 
-    async def select_unregistered_users_from_group(self, group_name: str) -> list:
+    async def select_unregistered_users_from_group(self, group_name: str) -> list[tuple[int, str]] | None:
         group_id = await self.select_group_id_by_group_name(group_name)
 
         query = f"""--sql
@@ -354,5 +354,5 @@ class Selector(DatabaseConnector):
             return None
         else:
             logger.success(
-                f"Selected unregistered users successfully; group_name = {group_name}; result = {result}")
+                f"Selected unregistered members from group successfully; group_name = {group_name}; result = {result}")
             return result
