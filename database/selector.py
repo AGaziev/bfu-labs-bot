@@ -355,3 +355,28 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Selected unregistered members from group successfully; group_name = {group_name}; result = {result}")
             return result
+
+    async def select_students_labs_with_status_in_group(self, group_name: str, telegram_id) -> list[tuple[int, str]] | None:
+        group_id = await self.select_group_id_by_group_name(group_name)
+
+        query = f"""--sql
+        SELECT lab_id as id,
+               lab_number as number,
+               lab_description descr,
+               coalesce(status_id, 'Не сдано') -- Если status_id null (не сдано) получаем "Не сдано"
+        FROM lab_registry lb
+        LEFT JOIN lab_tracker lt ON lb.id = lt.lab_id
+        WHERE group_id = {group_id}
+        AND member_id = (SELECT member_id
+                         FROM registered_members
+                         WHERE group_id = {group_id} AND telegram_id = {telegram_id})
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting student's labs with status in group; group_name = {group_name}, telegram_id={telegram_id}")
+            return None
+        else:
+            logger.success(
+                f"Selected student's labs with status in group successfully; group_name = {group_name}, telegram_id={telegram_id}; result = {result}")
+            return result
