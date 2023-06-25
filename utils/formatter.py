@@ -19,8 +19,9 @@ class Formatter:
         {id}.{descr}
         """
         accepted, not_done = len(lab_stats[0]), len(lab_stats[1])
-        result = f"{accepted}/{not_done}\n"
-        for lab in lab_stats:
-            if lab["status"] == "Не сдано":
-                result += f"{lab['number']}. {lab['descr']}\n"
+        if accepted + not_done == 0:
+            return "Лабораторных еще нет :("
+        result = f"{accepted}/{not_done + accepted}\n"
+        for lab in lab_stats[1]:
+            result += f"{lab['number']}. {lab['descr']}\n"
         return result
