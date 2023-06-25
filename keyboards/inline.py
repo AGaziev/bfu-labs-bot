@@ -65,7 +65,7 @@ async def student_menu_kb(telegram_id: int) -> InlineKeyboardMarkup:
     if await database_manager.select_student_groups_names_with_id(telegram_id=telegram_id):
         kb.insert(InlineKeyboardButton(
             text='👥Мои группы',
-            callback_data=show_callback.new(data_type="group", user_type="student")), )
+            callback_data=show_callback.new(data_type="group", user_role="student")), )
 
     kb.insert(InlineKeyboardButton(
         text='➕Подключиться к новой группе',
@@ -110,11 +110,11 @@ async def student_group_menu_kb(group_id) -> InlineKeyboardMarkup:
         InlineKeyboardButton(
             text='➕Отправить лабораторную работу',
             callback_data=add_lab_callback.new(group_id=group_id, user_role="student")
-        )
-        # InlineKeyboardButton(
-        #     text='📈Фидбек по лабораторным'
-        # )
-        # Сданы не сданы крч
+        ),
+        InlineKeyboardButton(
+            text='📚Файлы лабораторных',
+            callback_data=show_callback.new(data_type="lab", user_role="student")
+        ),
     ]
 
     for button in group_buttons:
