@@ -1,7 +1,7 @@
 from .database_connector import DatabaseConnector
 from loguru import logger
 from typing import Any
-from utils.models import Teacher
+import utils.models as models
 from utils.enums import Blocked
 
 
@@ -205,13 +205,13 @@ class Selector(DatabaseConnector):
                 f"Selected owner username by group_id successfully; group_id = {group_id}; username = {result[0]}")
             return result[0]
 
-    async def select_teacher_by_group_id(self, group_id: int) -> Teacher:
+    async def select_teacher_by_group_id(self, group_id: int) -> models.Teacher:
         """
         Returns:
             Teacher: Teacher object, representing teacher of group with field names:
                 first_name, last_name, patronymic, username
         """
-        teacher = Teacher()
+        teacher = models.Teacher()
         teacher.firstname, teacher.lastname, teacher.patronymic = await self._select_group_owner_by_group_id(
             group_id)
         teacher.username = await self._select_owner_username_by_group_id(
@@ -250,7 +250,7 @@ class Selector(DatabaseConnector):
                 f"Selected member firstname and lastname by telegram_id and group_id successfully; telegram_id = {telegram_id}; group_id = {group_id}; firstname = {result[0]}; lastname = {result[1]}")
             return result
 
-    async def select_teacher_credentials_by_telegram_id(self, telegram_id: int) -> Teacher:
+    async def select_teacher_credentials_by_telegram_id(self, telegram_id: int) -> models.Teacher:
         """
         Returns:
             Teacher: Teacher object, representing teacher with field names:
@@ -269,7 +269,7 @@ class Selector(DatabaseConnector):
         else:
             logger.success(
                 f"Selected teacher credentials by telegram_id successfully; telegram_id = {telegram_id}; credentials = {result}")
-            teacher = Teacher()
+            teacher = models.Teacher()
             teacher.firstname, teacher.lastname, teacher.patronymic = result
             return teacher
 

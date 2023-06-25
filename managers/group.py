@@ -1,7 +1,7 @@
 from loguru import logger
 
 from utils.enums import Blocked
-from utils.mailer import Mailer
+import utils.mailer as mailing
 from .cloud import CloudManager
 from .db import database_manager
 
@@ -74,7 +74,7 @@ class GroupManager:
 
     @staticmethod
     async def notify_group_member_about_new_lab(group_id: int, lab_name: str, link_to_lab: str):
-        mailer = Mailer()
+        mailer = mailing.Mailer()
         await mailer.send_notification_to_education_group(
             group_id=group_id, description=lab_name, link_to_lab=link_to_lab)
 

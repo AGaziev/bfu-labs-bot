@@ -164,11 +164,3 @@ class Creator(DatabaseConnector):
         logger.warning("Finished recreating all tables in database")
 
 
-def configure_database_tables() -> None:
-    import asyncio
-    creator = Creator()
-    asyncio.run(creator.recreate_all_tables())
-
-
-if __name__ == "__main__":
-    configure_database_tables()
