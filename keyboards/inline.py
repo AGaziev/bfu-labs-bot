@@ -154,6 +154,9 @@ async def admin_menu_kb() -> InlineKeyboardMarkup:
         InlineKeyboardButton(
             text='Войти как преподаватель',
             callback_data='admin_mimic_a_teacher'),
+        InlineKeyboardButton(
+            text='Команды администратора',
+            callback_data='admin_commands'),
     ]
 
     for button in buttons:
