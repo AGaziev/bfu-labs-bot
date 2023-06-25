@@ -33,6 +33,10 @@ class GroupManager:
         return on_disk and in_database
 
     @staticmethod
+    async def get_group_id_by_name(name: str):
+        return await database_manager.select_group_id_by_group_name(group_name=name)
+
+    @staticmethod
     async def connect_student_to_group(group_name: str, student_name: str, member_id: int, telegram_id) -> bool:
         try:
             CloudManager.create_student_folder(group_name, student_name)
@@ -44,17 +48,19 @@ class GroupManager:
         return True
 
     @staticmethod
-    async def get_unregistered_users_of_group(group_name:str):
+    async def get_unregistered_users_of_group(group_name: str):
         unregistered_users = await database_manager.select_unregistered_users_from_group(group_name=group_name)
-        return {i: credentials for i, credentials in unregistered_users}
+        ids_and_credentials = {record[0]: record[1]
+                               for record in unregistered_users}
+        return ids_and_credentials
 
     @staticmethod
-    async def get_groups_for_student(telegram_id:int):
+    async def get_groups_for_student(telegram_id: int):
         student_groups = await database_manager.select_student_groups_names_with_id(telegram_id)
         return student_groups
 
     @staticmethod
-    async def is_student_already_connected(telegram_id:int, group_id:int):
+    async def is_student_already_connected(telegram_id: int, group_id: int):
         users_in_group = await database_manager.select_registered_members_from_group(
             group_id, is_blocked=Blocked.ANY)
         return telegram_id in users_in_group
