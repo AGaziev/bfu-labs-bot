@@ -47,7 +47,7 @@ class CloudManager:
         return cloud_drive.exists(f"/{group_name}")
 
     @staticmethod
-    def get_files_by_link(links: tuple):
+    def get_files_by_link(links: tuple[str]):
         files = []
         for link in links:
             file_ = BytesIO()
