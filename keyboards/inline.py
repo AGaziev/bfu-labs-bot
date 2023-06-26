@@ -43,16 +43,17 @@ async def cancel_kb() -> InlineKeyboardMarkup:
     return kb
 
 
-async def teacher_menu_kb() -> InlineKeyboardMarkup:
+async def teacher_menu_kb(show_all_groups_button: bool = True) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=1, )
     group_buttons = [
         InlineKeyboardButton(
             text='➕Создать новую группу',
             callback_data='create_new_group'),
-        InlineKeyboardButton(
-            text='📃Посмотреть все группы',
-            callback_data='teacher_show_my_groups'),
     ]
+    if show_all_groups_button:
+        group_buttons.append(InlineKeyboardButton(
+            text='📃Посмотреть все группы',
+            callback_data='teacher_show_my_groups'))
 
     for button in group_buttons:
         kb.insert(button)
@@ -88,11 +89,21 @@ async def teacher_group_menu_kb(group_id) -> InlineKeyboardMarkup:
     """
     group_id - group's id from database to build a callback
     """
-    kb = InlineKeyboardMarkup()
+    kb = InlineKeyboardMarkup(row_width=1,)
     group_buttons = [
         InlineKeyboardButton(
             text='➕Добавить лабораторную работу',
-            callback_data=add_lab_callback.new(group_id=group_id, user_role="teacher")
+            callback_data=add_lab_callback.new(
+                group_id=group_id, user_role="teacher")
+        ),
+        InlineKeyboardButton(
+            text='📚Проверить лабораторные',
+            callback_data=show_callback.new(
+                data_type="lab", user_role="teacher")
+        ),
+        InlineKeyboardButton(
+            text='📃Переименовать группу',
+            callback_data='rename_group'
         )
     ]
 
@@ -100,6 +111,7 @@ async def teacher_group_menu_kb(group_id) -> InlineKeyboardMarkup:
         kb.insert(button)
 
     return kb
+
 
 async def student_group_menu_kb(group_id) -> InlineKeyboardMarkup:
     """
@@ -109,11 +121,13 @@ async def student_group_menu_kb(group_id) -> InlineKeyboardMarkup:
     group_buttons = [
         InlineKeyboardButton(
             text='➕Отправить лабораторную работу',
-            callback_data=add_lab_callback.new(group_id=group_id, user_role="student")
+            callback_data=add_lab_callback.new(
+                group_id=group_id, user_role="student")
         ),
         InlineKeyboardButton(
             text='📚Файлы лабораторных',
-            callback_data=show_callback.new(data_type="lab", user_role="student")
+            callback_data=show_callback.new(
+                data_type="lab", user_role="student")
         ),
     ]
 

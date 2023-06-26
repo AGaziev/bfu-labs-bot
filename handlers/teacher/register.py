@@ -55,6 +55,7 @@ async def confirm_credentials_and_write_to_database(call: types.CallbackQuery, s
                                           patronymic=credentials[2] if len(credentials) == 3 else None)
     await call.message.edit_text("Вы успешно зарегистрированы", reply_markup=await kb.teacher_menu_kb())
     await state.finish()
+    await states.TeacherState.start.set()
 
     await notify_admins_about_teacher_registration_success(telegram_id=call.from_user.id,
                                                            username = call.from_user.username if call.from_user.username else None)

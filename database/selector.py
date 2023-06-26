@@ -356,14 +356,14 @@ class Selector(DatabaseConnector):
                 f"Selected unregistered members from group successfully; group_name = {group_name}; result = {result}")
             return result
 
-    async def select_students_labs_with_status_in_group(self, group_id: str, telegram_id) -> list[tuple[int, str]] | None:
+    async def select_students_labs_with_status_in_group(self, group_id: str, telegram_id: int) -> list[tuple[int, str]] | None:
         query = f"""--sql
         SELECT lab_id as id,
                lab_number as number,
                lab_description descr,
                coalesce((SELECT status_name
                          FROM lab_status_type
-                         WHERE id=lt.status_id), 
+                         WHERE id=lt.status_id),
                          'Не сдано') -- Если status_id null (не сдано) получаем "Не сдано"
         FROM lab_registry lb
         LEFT JOIN lab_tracker lt ON lb.id = lt.lab_id
@@ -382,8 +382,7 @@ class Selector(DatabaseConnector):
                 f"Selected student's labs with status in group successfully; group_name = {group_id}, telegram_id={telegram_id}; result = {result}")
             return result
 
-
-    async def select_undone_group_labs_for_student(self, group_id: str, telegram_id) -> list[tuple[int, str]] | None:
+    async def select_undone_group_labs_for_student(self, group_id: str, telegram_id: int) -> list[tuple[int, str]] | None:
         query = f"""--sql
         SELECT *
         FROM lab_registry
@@ -405,3 +404,72 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Selected undone group's labs for student successfully; group_name = {group_id}, telegram_id={telegram_id}; result = {result}")
             return result
+
+    async def select_lab_condition_files_from_group(self, group_id: int) -> list[tuple[int, str, str]]:
+        """selects lab id, lab description (file name) and cloud link to file by group_id
+        Args:
+            group_id (int): group id in database
+
+        Returns:
+            list[tuple[int,str,str]]: list[tuple[lab_id:int, lab_description:str, cloud_link:str]]
+        """
+        query = f"""--sql
+        SELECT id, lab_description, cloud_link
+        FROM lab_registry
+        WHERE group_id = {group_id}
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting lab condition files from group; group_id = {group_id}")
+            return []
+        else:
+            logger.success(
+                f"Selected lab condition files from group successfully; group_id = {group_id}; result = {result}")
+            return result
+
+    async def select_labs_with_status_count_from_group(self, group_id: int, status: str) -> int:
+        """selects count of labs with status from group
+
+            Args:
+                group_id (int): group id in database
+                status (str): status name in table lab_status_type
+
+            Returns:
+                int: count of labs with status from group
+        """
+        query = f"""--sql
+        SELECT COUNT(*)
+        FROM lab_tracker
+        WHERE member_id IN (SELECT member_id
+                            FROM education_group_members
+                            WHERE group_id = {group_id})
+        AND status_id = (SELECT id
+                        FROM lab_status_type
+                        WHERE status_name = '{status}');
+        """
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting passed labs count from group; group_id = {group_id}")
+            return 0
+        else:
+            logger.success(
+                f"Selected passed labs count from group successfully; group_id = {group_id}; result = {result[0]}")
+            return result[0]
+
+    async def select_all_labs_count_from_group(self, group_id: int) -> int:
+        query = f"""--sql
+        SELECT COUNT(*)
+        FROM lab_registry
+        WHERE group_id = {group_id};
+        """
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting all labs count from group; group_id = {group_id}")
+            return 0
+        else:
+            logger.success(
+                f"Selected all labs count from group successfully; group_id = {group_id}; result = {result[0]}")
+            return result[0]

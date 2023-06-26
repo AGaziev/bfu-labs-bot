@@ -18,7 +18,8 @@ class Filler(DatabaseConnector):
             if await self._execute_query(query, status) is False:
                 logger.error("Error while filling lab_status_type table")
             else:
-                logger.success("Table lab_status_type was filled successfully")
+                logger.success(
+                    f"Table lab_status_type was filled successfully with status: {status}")
 
     async def fill_necessarily_tables(self) -> None:
         logger.warning("Start filling neccecery tables")

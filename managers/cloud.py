@@ -50,7 +50,7 @@ class CloudManager:
     def get_files_by_link(links: tuple):
         files = []
         for link in links:
-            file = BytesIO()
-            cloud_drive.download_public(link, file)
-            files.append(file)
+            file_ = BytesIO()
+            cloud_drive.download_public(link, file_)
+            files.append(file_)
         return files

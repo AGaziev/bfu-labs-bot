@@ -2,6 +2,7 @@ from loguru import logger
 
 from utils.enums import Blocked
 import utils.mailer as mailing
+from utils.models import GroupInfo
 from .cloud import CloudManager
 from .db import database_manager
 
@@ -22,7 +23,7 @@ class GroupManager:
         return folder_url, group_id
 
     @staticmethod
-    async def is_group_name_exists(name: str):
+    async def is_group_name_exists(name: str) -> bool:
         on_disk = CloudManager.is_group_exists(name)
         in_database = await database_manager.check_is_group_exists_by_group_name(
             group_name=name)
@@ -36,8 +37,8 @@ class GroupManager:
         return await database_manager.select_group_id_by_group_name(group_name=name)
 
     @staticmethod
-    async def get_group_name_by_id(id_: int):
-        return await database_manager.select_group_name_by_group_id(group_id=id_)
+    async def get_group_name_by_id(group_id: int):
+        return await database_manager.select_group_name_by_group_id(group_id=group_id)
 
     @staticmethod
     async def connect_student_to_group(group_name: str, student_name: str, member_id: int, telegram_id) -> bool:
@@ -51,19 +52,19 @@ class GroupManager:
         return True
 
     @staticmethod
-    async def get_unregistered_users_of_group(group_name: str):
+    async def get_unregistered_users_of_group(group_name: str) -> dict[int, str]:
         unregistered_users = await database_manager.select_unregistered_users_from_group(group_name=group_name)
         ids_and_credentials = {record[0]: record[1]
                                for record in unregistered_users}
         return ids_and_credentials
 
     @staticmethod
-    async def get_groups_for_student(telegram_id: int):
+    async def get_groups_for_student(telegram_id: int) -> list[tuple[int, str]]:
         student_groups = await database_manager.select_student_groups_names_with_id(telegram_id)
         return student_groups
 
     @staticmethod
-    async def is_student_already_connected(telegram_id: int, group_id: int):
+    async def is_student_already_connected(telegram_id: int, group_id: int) -> bool:
         users_in_group = await database_manager.select_registered_members_from_group(
             group_id, is_blocked=Blocked.ANY)
         return telegram_id in users_in_group
@@ -86,3 +87,45 @@ class GroupManager:
     async def add_lab_to_db_and_notify_students(group_id: int, lab_name: str, lab_link: str):
         await GroupManager.add_lab_to_db(group_id, lab_name, lab_link)
         await GroupManager.notify_group_member_about_new_lab(group_id, lab_name, lab_link)
+
+    @staticmethod
+    async def get_count_of_registered_members_from_group(group_id: int):
+        members = await database_manager.select_registered_members_from_group(group_id=group_id, is_blocked=Blocked.ANY)
+        return len(members)
+
+    @staticmethod
+    async def get_count_of_unregistered_members_from_group(group_name: str):
+        members = await database_manager.select_unregistered_users_from_group(group_name=group_name)
+        return len(members)
+
+    @staticmethod
+    async def select_lab_condition_files_count_from_group(group_id: int):
+        files = await database_manager.select_lab_condition_files_from_group(group_id=group_id)
+        return len(files)
+
+    @staticmethod
+    async def select_students_labs_statuses_count_from_group(group_id: int) -> tuple[int, int, int, int]:
+        """
+        Args:
+            group_id (int): group id in database
+
+        Returns:
+            tuple[int, int, int, int]: passed, rejected, not checked, labs at all
+        """
+        passed = await database_manager.select_labs_with_status_count_from_group(group_id=group_id, status='Сдано')
+        rejected = await database_manager.select_labs_with_status_count_from_group(group_id=group_id, status='Отклонено')
+        not_checked = await database_manager.select_labs_with_status_count_from_group(group_id=group_id, status='Не проверено')
+        labs_at_all = await database_manager.select_all_labs_count_from_group(group_id=group_id)
+
+        return passed, rejected, not_checked, labs_at_all
+
+    @staticmethod
+    async def get_group_info(group_id: int, group_name: str):
+        group_info = GroupInfo()
+        group_info.registered_members_count = await GroupManager.get_count_of_registered_members_from_group(group_id=group_id)
+        group_info.unregistered_members_count = await GroupManager.get_count_of_unregistered_members_from_group(group_name=group_name)
+        group_info.students_at_all = group_info.registered_members_count + \
+            group_info.unregistered_members_count
+        group_info.labs_condition_files_count = await GroupManager.select_lab_condition_files_count_from_group(group_id=group_id)
+        group_info.passed_labs_count, group_info.rejected_labs_count, group_info.not_checked_labs_count, group_info.labs_at_all = await GroupManager.select_students_labs_statuses_count_from_group(group_id=group_id)
+        return group_info
