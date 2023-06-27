@@ -25,8 +25,6 @@ class LabManager:
     async def get_student_undone_labs(group_id: int, telegram_id: int):
         undone_labs = await database_manager.select_undone_group_labs_for_student(group_id, telegram_id)
         links = tuple([lab["cloud_link"] for lab in undone_labs])
-        # FIXME: зачем словарь, если ты не используешь его ключи, а в функции get_files_by_link
-        # качаешь файлы по значениям словаря? в тайпхинте вообще tuple..
         files, filenames = CloudManager.get_files_by_link(links)
         return zip(files, filenames)
 
