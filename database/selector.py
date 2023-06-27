@@ -462,8 +462,10 @@ class Selector(DatabaseConnector):
     async def select_all_labs_count_from_group(self, group_id: int) -> int:
         query = f"""--sql
         SELECT COUNT(*)
-        FROM lab_registry
-        WHERE group_id = {group_id};
+        FROM lab_tracker
+        WHERE member_id IN (SELECT member_id
+                            FROM education_group_members
+                            WHERE group_id = {group_id});
         """
         resutracker = await self._execute_query_with_returning_one_row(query)
         if resutracker is False:

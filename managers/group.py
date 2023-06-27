@@ -84,7 +84,7 @@ class GroupManager:
             group_id=group_id, description=lab_name, link_to_lab=link_to_lab)
 
     @staticmethod
-    async def add_lab_to_db_and_notify_students(group_id: int, lab_name: str, lab_link: str, lab_path:str):
+    async def add_lab_to_db_and_notify_students(group_id: int, lab_name: str, lab_link: str, lab_path: str):
         await GroupManager.add_lab_to_db(group_id, lab_name, lab_path)
         await GroupManager.notify_group_member_about_new_lab(group_id, lab_name, lab_link)
 
@@ -126,7 +126,7 @@ class GroupManager:
         group_info.unregistered_members_count = await GroupManager.get_count_of_unregistered_members_from_group(group_name=group_name)
         group_info.students_at_all = group_info.registered_members_count + \
             group_info.unregistered_members_count
-        group_info.labs_condition_files_count = await GroupManager.select_lab_condition_files_count_from_group(group_id=group_id)
+        group_info.lab_condition_files_count = await GroupManager.select_lab_condition_files_count_from_group(group_id=group_id)
         group_info.passed_labs_count, group_info.rejected_labs_count, group_info.not_checked_labs_count, group_info.labs_at_all = await GroupManager.select_students_labs_statuses_count_from_group(group_id=group_id)
         return group_info
 
