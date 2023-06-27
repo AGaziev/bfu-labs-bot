@@ -21,7 +21,7 @@ class CloudManager:
         dst_path = f"/{group_name}/Лабораторные/{lab_name}"
         cloud_drive.upload(lab_path_or_file, dst_path, overwrite=True)
         cloud_drive.publish(dst_path)
-        return cloud_drive.get_meta(dst_path).public_url
+        return dst_path
 
     @staticmethod
     def add_lab_from_student(group_name: str, student_name: str, lab_path_or_file: str | BytesIO, lab_name: str):
@@ -47,10 +47,25 @@ class CloudManager:
         return cloud_drive.exists(f"/{group_name}")
 
     @staticmethod
-    def get_files_by_link(links: tuple[str]):
-        files = []
-        for link in links:
+    def get_files_by_link(paths: tuple[str]) -> tuple[list[BytesIO], list[str]]:
+        files: list[BytesIO] = []
+        filenames: list[str] = []
+        for path in paths:
             file_ = BytesIO()
-            cloud_drive.download_public(link, file_)
+            cloud_drive.download(path, file_)
             files.append(file_)
-        return files
+
+            filename = CloudManager.get_filename_by_path(path)
+            filenames.append(filename)
+
+        return files, filenames
+
+    @staticmethod
+    def get_file_by_link(link: str) -> BytesIO:
+        file_ = BytesIO()
+        cloud_drive.download_public(link, file_)
+        return file_
+
+    @staticmethod
+    def get_filename_by_path(path: str):
+        return path.split("/")[-1]
