@@ -604,3 +604,73 @@ class Selector(DatabaseConnector):
             lab.cloud_link = result[0][3]
             lab.credentials = result[0][4]
             return lab
+
+    async def is_exist_next_unchecked_lab_in_group(self, lab_id: int) -> bool:
+        """checks if next unchecked lab exists in group
+
+        Args:
+            lab_id (int): current lab id in database
+
+        Returns:
+            bool: True if exists, False if not
+        """
+        query = f"""--sql
+        SELECT EXISTS(
+            SELECT tracker.id
+            FROM lab_tracker tracker
+            LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
+            WHERE tracker.group_id = (SELECT group_id
+                                    FROM lab_tracker
+                                    WHERE id = {lab_id})
+            AND tracker.status_id = (SELECT id
+                                    FROM lab_status_type
+                                    WHERE status_name = 'Не проверено')
+            AND tracker.id > {lab_id}
+            ORDER BY tracker.id ASC
+            LIMIT 1);
+        """
+
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while checking if next unchecked lab exists in group; lab_id = {lab_id}")
+            return False
+        else:
+            logger.success(
+                f"Checked if next unchecked lab exists in group successfully; lab_id = {lab_id}; result = {result[0]}")
+            return result[0]
+
+    async def is_exist_previous_unchecked_lab_in_group(self, lab_id: int) -> bool:
+        """checks if previous unchecked lab exists in group
+
+        Args:
+            lab_id (int): current lab id in database
+
+        Returns:
+            bool: True if exists, False if not
+        """
+        query = f"""--sql
+        SELECT EXISTS(
+            SELECT tracker.id
+            FROM lab_tracker tracker
+            LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
+            WHERE tracker.group_id = (SELECT group_id
+                                    FROM lab_tracker
+                                    WHERE id = {lab_id})
+            AND tracker.status_id = (SELECT id
+                                    FROM lab_status_type
+                                    WHERE status_name = 'Не проверено')
+            AND tracker.id < {lab_id}
+            ORDER BY tracker.id ASC
+            LIMIT 1);
+        """
+
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while checking if previous unchecked lab exists in group; lab_id = {lab_id}")
+            return False
+        else:
+            logger.success(
+                f"Checked if previous unchecked lab exists in group successfully; lab_id = {lab_id}; result = {result[0]}")
+            return result[0]

@@ -61,10 +61,11 @@ class CloudManager:
         return files, filenames
 
     @staticmethod
-    def get_file_by_link(link: str) -> BytesIO:
+    def get_file_by_link(path: str) -> tuple[BytesIO, str]:
         file_ = BytesIO()
-        cloud_drive.download_public(link, file_)
-        return file_
+        cloud_drive.download(path, file_)
+        filename = CloudManager.get_filename_by_path(path)
+        return file_, filename
 
     @staticmethod
     def get_filename_by_path(path: str):

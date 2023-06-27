@@ -29,3 +29,13 @@ class LabManager:
         # качаешь файлы по значениям словаря? в тайпхинте вообще tuple..
         files, filenames = CloudManager.get_files_by_link(links)
         return zip(files, filenames)
+
+    @staticmethod
+    async def accept_laboratory_work(lab_id: int):
+        # TODO: update lab status in database and send notification to student
+        ...
+
+    @staticmethod
+    async def reject_laboratory_work(lab_id: int):
+        # TODO: update lab status in database and send notification to student
+        ...
