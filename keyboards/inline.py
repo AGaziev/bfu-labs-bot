@@ -99,7 +99,7 @@ async def teacher_group_menu_kb(group_id) -> InlineKeyboardMarkup:
         InlineKeyboardButton(
             text='📚Проверить лабораторные',
             callback_data=show_callback.new(
-                data_type="lab", user_role="teacher")
+                data_type="labs", user_role="teacher")
         ),
         InlineKeyboardButton(
             text='📃Переименовать группу',

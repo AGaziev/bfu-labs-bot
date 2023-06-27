@@ -2,7 +2,7 @@ from loguru import logger
 
 from utils.enums import Blocked
 import utils.mailer as mailing
-from utils.models import GroupInfo
+from utils.models import GroupInfo, LaboratoryWork
 from .cloud import CloudManager
 from .db import database_manager
 
@@ -84,8 +84,8 @@ class GroupManager:
             group_id=group_id, description=lab_name, link_to_lab=link_to_lab)
 
     @staticmethod
-    async def add_lab_to_db_and_notify_students(group_id: int, lab_name: str, lab_link: str):
-        await GroupManager.add_lab_to_db(group_id, lab_name, lab_link)
+    async def add_lab_to_db_and_notify_students(group_id: int, lab_name: str, lab_link: str, lab_path:str):
+        await GroupManager.add_lab_to_db(group_id, lab_name, lab_path)
         await GroupManager.notify_group_member_about_new_lab(group_id, lab_name, lab_link)
 
     @staticmethod
@@ -129,3 +129,15 @@ class GroupManager:
         group_info.labs_condition_files_count = await GroupManager.select_lab_condition_files_count_from_group(group_id=group_id)
         group_info.passed_labs_count, group_info.rejected_labs_count, group_info.not_checked_labs_count, group_info.labs_at_all = await GroupManager.select_students_labs_statuses_count_from_group(group_id=group_id)
         return group_info
+
+    @staticmethod
+    async def get_first_not_checked_lab_in_group(group_id: int) -> LaboratoryWork:
+        return await database_manager.select_first_unchecked_lab_in_group(group_id=group_id)
+
+    @staticmethod
+    async def get_next_not_checked_lab_in_group(group_id: int, current_lab_id: int) -> LaboratoryWork:
+        return await database_manager.select_next_unchecked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
+
+    @staticmethod
+    async def get_previous_not_checked_lab_in_group(group_id: int, current_lab_id: int) -> LaboratoryWork:
+        return await database_manager.select_previous_unchecked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)

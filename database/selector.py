@@ -25,20 +25,20 @@ class Selector(DatabaseConnector):
             value (str): value of column to select from
 
         Returns:
-            Any: result of query execution
+            Any: resutracker of query execution
         """
         query = f"""--sql
         SELECT * FROM {table_name}
         WHERE {column_name} = '{value}';
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting from {table_name} with {column_name} = {value}")
             return None
         else:
             logger.success(f"Selected from {table_name} successfully")
-            return result[0]
+            return resutracker[0]
 
     async def select_all_rows_from_table(self, table_name: str, column_name: str, value: str) -> Any:
         """
@@ -51,20 +51,20 @@ class Selector(DatabaseConnector):
             value (str): value of column to select from
 
         Returns:
-            Any: result of query execution
+            Any: resutracker of query execution
         """
         query = f"""--sql
         SELECT * FROM {table_name}
         WHERE {column_name} = '{value}';
         """
-        result = await self._execute_query(query)
-        if result is False:
+        resutracker = await self._execute_query(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting from {table_name} with {column_name} = {value}")
             return None
         else:
             logger.success(f"Selected from {table_name} successfully")
-            return result
+            return resutracker
 
     async def check_is_user_exist(self, user_id: int) -> bool:
         """
@@ -73,60 +73,60 @@ class Selector(DatabaseConnector):
         query = f"""--sql
         SELECT EXISTS(SELECT 1 FROM users WHERE telegram_id = {user_id});
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while checking if user exists; user_id = {user_id}")
             return False
         else:
             logger.success(
                 f"Checked if user exists successfully; user_id = {user_id}")
-            return result[0]
+            return resutracker[0]
 
     async def select_group_id_by_group_name(self, group_name: str) -> int | None:
         query = f"""--sql
         SELECT id FROM education_group
         WHERE group_name = '{group_name}';
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting from education_group with group_name = {group_name}")
             return None
         else:
             logger.success(
-                f"Selected group_id from education_group successfully; group_name = {group_name} with id = {result[0]}")
-            return result[0]
+                f"Selected group_id from education_group successfully; group_name = {group_name} with id = {resutracker[0]}")
+            return resutracker[0]
 
     async def select_group_name_by_group_id(self, group_id: int) -> str | None:
         query = f"""--sql
         SELECT group_name FROM education_group
         WHERE id = {group_id};
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting from education_group with group_id = {group_id}")
             return None
         else:
             logger.success(
-                f"Selected group_name from education_group successfully; group_id = {group_id} with name = {result[0]}")
-            return result[0]
+                f"Selected group_name from education_group successfully; group_id = {group_id} with name = {resutracker[0]}")
+            return resutracker[0]
 
     async def select_group_owner_id_by_group_id(self, group_id: int) -> int | None:
         query = f"""--sql
         SELECT owner_id FROM education_group
         WHERE id = {group_id};
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting from education_group with group_id = {group_id}")
             return None
         else:
             logger.success(
-                f"Selected group_owner_id from education_group successfully; group_id = {group_id} with id = {result[0]}")
-            return result[0]
+                f"Selected group_owner_id from education_group successfully; group_id = {group_id} with id = {resutracker[0]}")
+            return resutracker[0]
 
     async def check_is_user_teacher(self, user_id: int) -> bool:
         """
@@ -136,15 +136,15 @@ class Selector(DatabaseConnector):
         query = f"""--sql
         SELECT EXISTS(SELECT 1 FROM teacher WHERE telegram_id = {user_id});
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while checking if user is teacher; user_id = {user_id}")
             return False
         else:
             logger.success(
                 f"Checked if user is teacher successfully; user_id = {user_id}")
-            return result[0]
+            return resutracker[0]
 
     async def select_registered_members_from_group(self, group_id: int, is_blocked: Blocked) -> tuple[int, ...]:
         query = f"""--sql
@@ -155,15 +155,15 @@ class Selector(DatabaseConnector):
         WHERE is_blocked IN ({is_blocked.value}));
         """
 
-        result = await self._execute_query(query)
-        if result is False:
+        resutracker = await self._execute_query(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting registered members from group; group_id = {group_id}")
             return tuple()
         else:
             logger.success(
                 f"Selected registered members from group successfully; group_id = {group_id}")
-            return tuple([iterable[0] for iterable in result])
+            return tuple([iterable[0] for iterable in resutracker])
 
     async def _select_group_owner_by_group_id(self, group_id: int) -> tuple[str]:
         """
@@ -176,16 +176,16 @@ class Selector(DatabaseConnector):
         WHERE id = {group_id});
         """
 
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting group owner by group_id; group_id = {group_id}")
             raise AttributeError(
                 f"Group owner not found; group_id = {group_id}")
         else:
             logger.success(
-                f"Selected group owner by group_id successfully; group_id = {group_id}; owner = {result}")
-            return result[0], result[1], result[2] if len(result) == 3 else None
+                f"Selected group owner by group_id successfully; group_id = {group_id}; owner = {resutracker}")
+            return resutracker[0], resutracker[1], resutracker[2] if len(resutracker) == 3 else None
 
     async def _select_owner_username_by_group_id(self, group_id: int) -> str:
         query = f"""--sql
@@ -194,16 +194,16 @@ class Selector(DatabaseConnector):
         WHERE id = {group_id});
         """
 
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting owner username by group_id; group_id = {group_id}")
             raise AttributeError(
                 f"Owner username not found; group_id = {group_id}")
         else:
             logger.success(
-                f"Selected owner username by group_id successfully; group_id = {group_id}; username = {result[0]}")
-            return result[0]
+                f"Selected owner username by group_id successfully; group_id = {group_id}; username = {resutracker[0]}")
+            return resutracker[0]
 
     async def select_teacher_by_group_id(self, group_id: int) -> models.Teacher:
         """
@@ -223,15 +223,15 @@ class Selector(DatabaseConnector):
         SELECT group_name FROM education_group
         WHERE id = {group_id};
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting group_name by group_id; group_id = {group_id}")
             return None
         else:
             logger.success(
-                f"Selected group_name by group_id successfully; group_id = {group_id}; group_name = {result[0]}")
-            return result[0]
+                f"Selected group_name by group_id successfully; group_id = {group_id}; group_name = {resutracker[0]}")
+            return resutracker[0]
 
     async def select_member_firstname_and_lastname_by_telegram_id_and_group_id(self, telegram_id: int, group_id: int) -> tuple[str, str] | None:
         query = f"""--sql
@@ -240,15 +240,15 @@ class Selector(DatabaseConnector):
         WHERE user_id = {telegram_id})
         AND group_id = {group_id};
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting member firstname and lastname by telegram_id and group_id; telegram_id = {telegram_id}; group_id = {group_id}")
             return None
         else:
             logger.success(
-                f"Selected member firstname and lastname by telegram_id and group_id successfully; telegram_id = {telegram_id}; group_id = {group_id}; firstname = {result[0]}; lastname = {result[1]}")
-            return result
+                f"Selected member firstname and lastname by telegram_id and group_id successfully; telegram_id = {telegram_id}; group_id = {group_id}; firstname = {resutracker[0]}; lastname = {resutracker[1]}")
+            return resutracker
 
     async def select_teacher_credentials_by_telegram_id(self, telegram_id: int) -> models.Teacher:
         """
@@ -260,17 +260,17 @@ class Selector(DatabaseConnector):
         SELECT first_name, last_name, patronymic FROM teacher
         WHERE telegram_id = {telegram_id};
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting teacher credentials by telegram_id; telegram_id = {telegram_id}")
             raise AttributeError(
                 f"Teacher credentials not found; telegram_id = {telegram_id}")
         else:
             logger.success(
-                f"Selected teacher credentials by telegram_id successfully; telegram_id = {telegram_id}; credentials = {result}")
+                f"Selected teacher credentials by telegram_id successfully; telegram_id = {telegram_id}; credentials = {resutracker}")
             teacher = models.Teacher()
-            teacher.firstname, teacher.lastname, teacher.patronymic = result
+            teacher.firstname, teacher.lastname, teacher.patronymic = resutracker
             return teacher
 
     async def select_group_ids_and_names_owned_by_telegram_id(self, telegram_id: int) -> list[tuple[int, str]]:
@@ -278,31 +278,31 @@ class Selector(DatabaseConnector):
         SELECT id, group_name FROM education_group
         WHERE owner_id = {telegram_id};
         """
-        result = await self._execute_query(query)
-        if result is False:
+        resutracker = await self._execute_query(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting group ids and names owned by telegram_id; telegram_id = {telegram_id}")
             raise AttributeError(
                 f"Groups not found; telegram_id = {telegram_id}")
         else:
             logger.success(
-                f"Selected group ids and names owned by telegram_id successfully; telegram_id = {telegram_id}; groups = {result}")
-            return result
+                f"Selected group ids and names owned by telegram_id successfully; telegram_id = {telegram_id}; groups = {resutracker}")
+            return resutracker
 
     async def select_telegram_id_by_username(self, username: str) -> int | None:
         query = f"""--sql
         SELECT telegram_id FROM users
         WHERE username = '{username}';
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result in (False, None):
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker in (False, None):
             logger.error(
                 f"Error while selecting telegram_id by username; username = {username}")
             return None
         else:
             logger.success(
-                f"Selected telegram_id by username successfully; username = {username}; telegram_id = {result[0]}")
-            return result[0]
+                f"Selected telegram_id by username successfully; username = {username}; telegram_id = {resutracker[0]}")
+            return resutracker[0]
 
     async def select_student_groups_names_with_id(self, telegram_id: int) -> list[tuple[int, str]]:
         query = f"""--sql
@@ -311,30 +311,30 @@ class Selector(DatabaseConnector):
         LEFT JOIN education_group eg ON egm.group_id = eg.id
         WHERE telegram_id={telegram_id};
         """
-        result = await self._execute_query(query)
-        if result is False:
+        resutracker = await self._execute_query(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting user groups with id; telegram_id = {telegram_id}")
             return []
         else:
             logger.success(
-                f"Selected user groups with id successfully; telegram_id = {telegram_id}; result = {result}")
-            return result
+                f"Selected user groups with id successfully; telegram_id = {telegram_id}; resutracker = {resutracker}")
+            return resutracker
 
     async def check_is_group_exists_by_group_name(self, group_name: str) -> bool:
         query = f"""--sql
         SELECT EXISTS(SELECT * FROM education_group
         WHERE group_name = '{group_name}');
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while checking is group exists by group_name; group_name = {group_name}")
             return False
         else:
             logger.success(
-                f"Checked is group exists by group_name successfully; group_name = {group_name}; result = {result[0]}")
-            return result[0]
+                f"Checked is group exists by group_name successfully; group_name = {group_name}; resutracker = {resutracker[0]}")
+            return resutracker[0]
 
     async def select_unregistered_users_from_group(self, group_name: str) -> list[tuple[int, str]] | None:
         group_id = await self.select_group_id_by_group_name(group_name)
@@ -346,15 +346,15 @@ class Selector(DatabaseConnector):
             ON education_group_members.member_id = registered_members.member_id
         WHERE group_id = {group_id} AND telegram_id IS NULL
         """
-        result = await self._execute_query(query)
-        if result is False:
+        resutracker = await self._execute_query(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting unregistered members from group; group_name = {group_name}")
             return None
         else:
             logger.success(
-                f"Selected unregistered members from group successfully; group_name = {group_name}; result = {result}")
-            return result
+                f"Selected unregistered members from group successfully; group_name = {group_name}; resutracker = {resutracker}")
+            return resutracker
 
     async def select_students_labs_with_status_in_group(self, group_id: str, telegram_id: int) -> list[tuple[int, str]] | None:
         query = f"""--sql
@@ -363,24 +363,24 @@ class Selector(DatabaseConnector):
                lab_description descr,
                coalesce((SELECT status_name
                          FROM lab_status_type
-                         WHERE id=lt.status_id),
+                         WHERE id=tracker.status_id),
                          'Не сдано') -- Если status_id null (не сдано) получаем "Не сдано"
         FROM lab_registry lb
-        LEFT JOIN lab_tracker lt ON lb.id = lt.lab_id
+        LEFT JOIN lab_tracker tracker ON lb.id = tracker.lab_id
         WHERE group_id = {group_id}
         AND member_id = (SELECT member_id
                          FROM registered_members
                          WHERE group_id = {group_id} AND telegram_id = {telegram_id})
         """
-        result = await self._execute_query(query)
-        if result is False:
+        resutracker = await self._execute_query(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting student's labs with status in group; group_name = {group_id}, telegram_id={telegram_id}")
             return None
         else:
             logger.success(
-                f"Selected student's labs with status in group successfully; group_name = {group_id}, telegram_id={telegram_id}; result = {result}")
-            return result
+                f"Selected student's labs with status in group successfully; group_name = {group_id}, telegram_id={telegram_id}; resutracker = {resutracker}")
+            return resutracker
 
     async def select_undone_group_labs_for_student(self, group_id: str, telegram_id: int) -> list[tuple[int, str]] | None:
         query = f"""--sql
@@ -395,15 +395,16 @@ class Selector(DatabaseConnector):
                                         WHERE telegram_id = {telegram_id}
                                         AND group_id = {group_id}))
         """
-        result = await self._execute_query(query)
-        if result is False:
+        resutracker = await self._execute_query(query)
+        if resutracker is False:
             logger.error(
-                f"Error while selecting undone group's labs for student; group_name = {group_id}, telegram_id={telegram_id}")
+                f"Error while selecting undone group's labs for student; group_id = {group_id}, telegram_id={telegram_id}")
             return None
         else:
             logger.success(
-                f"Selected undone group's labs for student successfully; group_name = {group_id}, telegram_id={telegram_id}; result = {result}")
-            return result
+                f"Selected undone group's labs for student successfully; group_id = {group_id}, telegram_id={telegram_id}; resutracker = {resutracker}")
+            print(f"\n\n\n{resutracker}\n\n\n")
+            return resutracker
 
     async def select_lab_condition_files_from_group(self, group_id: int) -> list[tuple[int, str, str]]:
         """selects lab id, lab description (file name) and cloud link to file by group_id
@@ -418,15 +419,15 @@ class Selector(DatabaseConnector):
         FROM lab_registry
         WHERE group_id = {group_id}
         """
-        result = await self._execute_query(query)
-        if result is False:
+        resutracker = await self._execute_query(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting lab condition files from group; group_id = {group_id}")
             return []
         else:
             logger.success(
-                f"Selected lab condition files from group successfully; group_id = {group_id}; result = {result}")
-            return result
+                f"Selected lab condition files from group successfully; group_id = {group_id}; resutracker = {resutracker}")
+            return resutracker
 
     async def select_labs_with_status_count_from_group(self, group_id: int, status: str) -> int:
         """selects count of labs with status from group
@@ -448,15 +449,15 @@ class Selector(DatabaseConnector):
                         FROM lab_status_type
                         WHERE status_name = '{status}');
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting passed labs count from group; group_id = {group_id}")
             return 0
         else:
             logger.success(
-                f"Selected passed labs count from group successfully; group_id = {group_id}; result = {result[0]}")
-            return result[0]
+                f"Selected passed labs count from group successfully; group_id = {group_id}; resutracker = {resutracker[0]}")
+            return resutracker[0]
 
     async def select_all_labs_count_from_group(self, group_id: int) -> int:
         query = f"""--sql
@@ -464,12 +465,142 @@ class Selector(DatabaseConnector):
         FROM lab_registry
         WHERE group_id = {group_id};
         """
-        result = await self._execute_query_with_returning_one_row(query)
-        if result is False:
+        resutracker = await self._execute_query_with_returning_one_row(query)
+        if resutracker is False:
             logger.error(
                 f"Error while selecting all labs count from group; group_id = {group_id}")
             return 0
         else:
             logger.success(
-                f"Selected all labs count from group successfully; group_id = {group_id}; result = {result[0]}")
-            return result[0]
+                f"Selected all labs count from group successfully; group_id = {group_id}; resutracker = {resutracker[0]}")
+            return resutracker[0]
+
+    async def select_first_unchecked_lab_in_group(self, group_id: int) -> models.LaboratoryWork:
+        """selects first not checked lab in group
+
+        Args:
+            group_id (int): group id in database
+
+        Returns:
+            models.LaboratoryWork: laboratory work model
+        """
+        query = f"""--sql
+        SELECT tracker.id,
+                registry.lab_number,
+                registry.lab_description,
+                registry.cloud_link,
+                egm.credentials
+        FROM lab_tracker tracker
+        LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
+        LEFT JOIN education_group_members egm ON tracker.member_id = egm.member_id
+        WHERE tracker.group_id = {group_id}
+        AND tracker.status_id = (SELECT id
+                            FROM lab_status_type
+                            WHERE status_name = 'Не проверено')
+        ORDER BY tracker.id ASC
+        LIMIT 1;
+        """
+
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting first not checked lab in group; group_id = {group_id}")
+            return models.LaboratoryWork()
+        else:
+            logger.success(
+                f"Selected first not checked lab in group successfully; group_id = {group_id}; result = {result}")
+            lab = models.LaboratoryWork()
+            lab.id = result[0][0]
+            lab.lab_number = result[0][1]
+            lab.lab_description = result[0][2]
+            lab.cloud_link = result[0][3]
+            lab.credentials = result[0][4]
+            return lab
+
+    async def select_next_unchecked_lab_in_group(self, group_id: int, current_lab_id: int) -> models.LaboratoryWork:
+        """selects next unchecked lab in group
+
+        Args:
+            group_id (int): group id in database
+            current_lab_id (int): current lab id in database
+
+        Returns:
+            models.LaboratoryWork: laboratory work model
+        """
+        query = f"""--sql
+        SELECT tracker.id,
+                registry.lab_number,
+                registry.lab_description,
+                registry.cloud_link,
+                egm.credentials
+        FROM lab_tracker tracker
+        LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
+        LEFT JOIN education_group_members egm ON tracker.member_id = egm.member_id
+        WHERE tracker.group_id = {group_id}
+        AND tracker.status_id = (SELECT id
+                            FROM lab_status_type
+                            WHERE status_name = 'Не проверено')
+        AND tracker.id > {current_lab_id}
+        ORDER BY tracker.id ASC
+        LIMIT 1;
+        """
+
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting next unchecked lab in group; group_id = {group_id}, current_lab_id = {current_lab_id}")
+            return models.LaboratoryWork()
+        else:
+            logger.success(
+                f"Selected next unchecked lab in group successfully; group_id = {group_id}, current_lab_id = {current_lab_id}; result = {result}")
+            lab = models.LaboratoryWork()
+            lab.id = result[0][0]
+            lab.lab_number = result[0][1]
+            lab.lab_description = result[0][2]
+            lab.cloud_link = result[0][3]
+            lab.credentials = result[0][4]
+            return lab
+
+    async def select_previous_unchecked_lab_in_group(self, group_id: int, current_lab_id: int) -> models.LaboratoryWork:
+        """selects previous unchecked lab in group
+
+        Args:
+            group_id (int): group id in database
+            current_lab_id (int): current lab id in database
+
+        Returns:
+            models.LaboratoryWork: laboratory work model
+        """
+        query = f"""--sql
+        SELECT tracker.id,
+                registry.lab_number,
+                registry.lab_description,
+                registry.cloud_link,
+                egm.credentials
+        FROM lab_tracker tracker
+        LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
+        LEFT JOIN education_group_members egm ON tracker.member_id = egm.member_id
+        WHERE tracker.group_id = {group_id}
+        AND tracker.status_id = (SELECT id
+                            FROM lab_status_type
+                            WHERE status_name = 'Не проверено')
+        AND tracker.id < {current_lab_id}
+        ORDER BY tracker.id ASC
+        LIMIT 1;
+        """
+
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting previous unchecked lab in group; group_id = {group_id}, current_lab_id = {current_lab_id}")
+            return models.LaboratoryWork()
+        else:
+            logger.success(
+                f"Selected previous unchecked lab in group successfully; group_id = {group_id}, current_lab_id = {current_lab_id}; result = {result}")
+            lab = models.LaboratoryWork()
+            lab.id = result[0][0]
+            lab.lab_number = result[0][1]
+            lab.lab_description = result[0][2]
+            lab.cloud_link = result[0][3]
+            lab.credentials = result[0][4]
+            return lab
