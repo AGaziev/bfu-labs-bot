@@ -1,3 +1,5 @@
+from aiogram.utils.markdown import hlink
+
 class Formatter:
     @staticmethod
     def list_of_students(studs: dict[int, str]):
@@ -24,4 +26,11 @@ class Formatter:
         result = f"{accepted}/{not_done + accepted}\n"
         for lab in lab_stats[1]:
             result += f"{lab['number']}. {lab['descr']}\n"
+        return result
+
+    @staticmethod
+    def list_lab_for_post(not_done_labs: [dict]):
+        result = ""
+        for lab in not_done_labs:
+            result+=f"{lab['number']}. {hlink(lab['descr'], lab['cloud_link'])}\n"
         return result
