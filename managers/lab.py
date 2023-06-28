@@ -30,6 +30,10 @@ class LabManager:
         return zip(files, filenames)
 
     @staticmethod
+    async def get_lab_link_by_path(path):
+        return CloudManager.get_public_link_by_destination_path(path)
+
+    @staticmethod
     async def accept_laboratory_work(lab_id: int):
         # TODO: update lab status in database and send notification to student
         ...
