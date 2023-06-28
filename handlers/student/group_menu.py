@@ -25,11 +25,10 @@ async def student_group_menu(call: types.CallbackQuery, state: FSMContext, callb
 
 async def show_not_done_labs_files(call: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
-        labs = await LabManager.get_student_undone_labs(data["group_id"], call.from_user.id)
+        labs = await LabManager.get_student_undone_labs_files(data["group_id"], call.from_user.id)
         labs_input = []
         for file_, filename in labs:
             file_.seek(0)
-            inputLab = types.InputFile(file_, filename=filename)
-            labs_input.append(types.InputMediaDocument(inputLab))
-        print(labs_input)
+            input_lab = types.InputFile(file_, filename=filename)
+            labs_input.append(types.InputMediaDocument(input_lab))
         await call.message.answer_media_group(types.MediaGroup(labs_input))
