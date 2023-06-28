@@ -360,11 +360,12 @@ class Selector(DatabaseConnector):
         query = f"""--sql
         SELECT lab_id as id,
                lab_number as number,
-               lab_description descr,
+               lab_description as descr,
+               cloud_link as path -- TODO: REFACTOR AFTER CHANGING NAME OF COLUMN 
                coalesce((SELECT status_name
                          FROM lab_status_type
                          WHERE id=tracker.status_id),
-                         'Не сдано') -- Если status_id null (не сдано) получаем "Не сдано"
+                         'Не сдано') as status -- Если status_id null (не сдано) получаем "Не сдано"
         FROM lab_registry lb
         LEFT JOIN lab_tracker tracker ON lb.id = tracker.lab_id
         WHERE group_id = {group_id}
