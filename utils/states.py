@@ -38,8 +38,6 @@ class ConnectGroup(StatesGroup):
 class PostLab(StatesGroup):
     choose_lab = State()
     upload_lab_file = State()
-    ask_for_filename_to_change = State()
-    wait_for_new_filename = State()
 
 class Student(StatesGroup):
     start = State()
