@@ -32,3 +32,12 @@ async def teacher_group_menu(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(group_name=group_name)
     await state.update_data(group_id=group_id)
     await states.TeacherState.group_menu.set()
+
+
+async def send_stats_of_group(call: types.CallbackQuery, state: FSMContext, callback_data: dict):
+    group_id = callback_data['group_id']
+    group_name = await database_manager.select_group_name_by_group_id(group_id=group_id)
+    stats_file = await GroupManager.get_group_stats_file(group_id=group_id)
+    stats_file.name = f"Статистика {group_name}.xlsx"
+    doc = types.InputFile(stats_file)
+    await call.message.answer_document(doc, caption="Статистика по лабораторным:")

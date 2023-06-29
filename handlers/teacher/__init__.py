@@ -3,12 +3,12 @@ from aiogram import Dispatcher
 
 from loguru import logger
 
-from utils import states
+from utils import states, callbacks
 from .add_group import set_new_group_name, set_new_group_students, correcting_students_list, change_stundents_list_to_new_file, end_group_add, send_file_sample
 from .cancel_operation import cancel_operation
 from .register import register_as_teacher, confirm_teacher_credentials, confirm_credentials_and_write_to_database, change_teacher_credentials
 from .show_my_groups import show_my_groups
-from .group_menu import teacher_group_menu
+from .group_menu import teacher_group_menu, send_stats_of_group
 from .add_new_lab import wait_for_lab_conditions_file, ask_for_filename_to_change, wait_for_new_filename, upload_file_to_cloud_drive, change_filename
 
 
@@ -132,4 +132,9 @@ def setup_teacher_handlers(dp: Dispatcher):
         state=states.TeacherState.add_lab.ask_for_filename_to_change
     )
 
+    dp.register_callback_query_handler(
+        send_stats_of_group,
+        callbacks.stats_callback.filter(user_role="teacher"),
+        state=states.TeacherState.group_menu
+    )
     logger.info('Teacher handlers are successfully registered')
