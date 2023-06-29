@@ -81,3 +81,4 @@ class StatsGenerator:
         file_ = BytesIO()
         book.save(file_)
         file_.seek(0)
+        return file_
