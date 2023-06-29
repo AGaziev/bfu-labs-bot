@@ -691,12 +691,12 @@ class Selector(DatabaseConnector):
         query = f"""--sql
         SELECT credentials
         FROM education_group_members
-        WHERE member_id = (SELECT member_id
-                            FROM registered_members
-                            WHERE telegram_id = {telegram_id})
-        AND group_id = (SELECT id
+        WHERE group_id = (SELECT id
                         FROM education_group
-                        WHERE group_name = '{group_name}');
+                        WHERE group_name = '{group_name}')
+        AND member_id IN (SELECT member_id
+                        FROM registered_members
+                        WHERE telegram_id = {telegram_id});
         """
 
         result = await self._execute_query_with_returning_one_row(query)
