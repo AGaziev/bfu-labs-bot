@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
 from managers import database_manager
-from utils.callbacks import group_callback, show_callback, add_lab_callback, check_lab_callback
+from utils.callbacks import group_callback, show_callback, add_lab_callback, check_lab_callback,stats_callback
 
 
 async def menu_kb() -> InlineKeyboardMarkup:
@@ -100,6 +100,12 @@ async def teacher_group_menu_kb(group_id) -> InlineKeyboardMarkup:
             text='📚Проверить лабораторные',
             callback_data=show_callback.new(
                 data_type="labs", user_role="teacher")
+        ),
+        InlineKeyboardButton(
+            text='📊Статистика по лабораторным',
+            callback_data=stats_callback.new(
+                group_id=group_id, user_role="teacher"
+            )
         ),
         InlineKeyboardButton(
             text='📃Переименовать группу',
