@@ -358,10 +358,10 @@ class Selector(DatabaseConnector):
 
     async def select_students_labs_with_status_in_group(self, group_id: str, telegram_id: int) -> list[tuple[int, str]] | None:
         query = f"""--sql
-        SELECT lab_id as id,
-               lab_number as number,
-               lab_description as descr,
-               cloud_link as path -- TODO: REFACTOR AFTER CHANGING NAME OF COLUMN 
+        SELECT lb.id as id,
+               lb.lab_number as number,
+               lb.lab_description as descr,
+               lb.cloud_link as path, -- TODO: REFACTOR AFTER CHANGING NAME OF COLUMN 
                coalesce((SELECT status_name
                          FROM lab_status_type
                          WHERE id=tracker.status_id),

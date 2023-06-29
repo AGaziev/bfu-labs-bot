@@ -46,7 +46,7 @@ class DatabaseConnector(Config):
             *args (tuple): arguments for query
 
         Returns:
-            list[asyncpg.Record] | None: result of query execution
+            asyncpg.Record | None: result of query execution
         """
         conn = await self._create_connection()
 

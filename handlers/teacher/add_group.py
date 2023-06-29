@@ -104,3 +104,4 @@ async def end_group_add(call: types.CallbackQuery, state: FSMContext):
                                   reply_markup=await kb.teacher_group_menu_kb(group_id),
                                   parse_mode="HTML")
         await state.finish()
+        await states.TeacherState.group_menu.set() #FIXME ??

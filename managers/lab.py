@@ -9,8 +9,11 @@ from .db import database_manager
 class LabManager:
     @staticmethod
     async def get_student_lab_stats(group_id, telegram_id) -> tuple[
-        tuple[tuple[int, str] | None, tuple[int, str] | None]]:
+            tuple[tuple[int, str] | None, tuple[int, str] | None]] | None:
         lab_statistic = await database_manager.select_students_labs_with_status_in_group(group_id, telegram_id)
+        if not lab_statistic:
+            return None
+
         accepted_labs: list[tuple[int, str] | None] = []
         not_done_labs: list[tuple[int, str] | None] = []
         for lab_info in lab_statistic:
