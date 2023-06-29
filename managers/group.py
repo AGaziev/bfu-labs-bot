@@ -1,9 +1,12 @@
+import itertools
+
 from loguru import logger
 from io import BytesIO
 
 from utils.enums import Blocked
 import utils.mailer as mailing
 from utils.models import GroupInfo, LaboratoryWork
+from utils.stat_generator import StatsGenerator
 from .cloud import CloudManager
 from .db import database_manager
 
@@ -130,6 +133,19 @@ class GroupManager:
         group_info.lab_condition_files_count = await GroupManager.select_lab_condition_files_count_from_group(group_id=group_id)
         group_info.passed_labs_count, group_info.rejected_labs_count, group_info.not_checked_labs_count, group_info.labs_at_all = await GroupManager.select_students_labs_statuses_count_from_group(group_id=group_id)
         return group_info
+
+    @staticmethod
+    async def get_group_stats_file(group_id: int):
+        stats = await database_manager.select_lab_stats_by_whole_group(group_id)
+        group_name = await database_manager.select_group_name_by_group_id(group_id)
+        lab_number = await database_manager.select_all_labs_count_from_group(group_id)
+        info_for_generator = {}
+        for name, labs in itertools.groupby(stats, key=lambda x: x[0]):
+            labs = list(labs)
+            info_for_generator[name] = [bool(labs[0][1]),
+                                        [[lab[2], lab[3].date(), lab[4]] for lab in labs if lab[2] is not None]]
+        print(info_for_generator)
+        return StatsGenerator.generate_stats(group_name, info_for_generator, lab_number)
 
     @staticmethod
     async def get_first_not_checked_lab_in_group(group_id: int) -> LaboratoryWork:
