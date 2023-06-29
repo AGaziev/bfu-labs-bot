@@ -737,3 +737,44 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Selected lab name by number successfully; group_name = {group_name}, lab_number = {lab_number}; result = {result[0]}{result[1]}")
             return result[0], result[1]
+
+    async def select_lab_stats_by_whole_group(self, group_id) -> tuple[str, bool, int, datetime.date, int]:
+        query = f"""--sql
+        SELECT credentials as name,
+               coalesce(telegram_id, 0) as is_registered,
+               lab_number as number,
+               lt.created_at as date,
+               status_id as status
+        FROM education_group_members egm
+        LEFT JOIN registered_members rm on egm.member_id = rm.member_id
+        FULL JOIN lab_tracker lt on rm.member_id = lt.member_id
+        LEFT JOIN lab_registry lr on lt.lab_id = lr.id
+        WHERE egm.group_id = {group_id};
+        """
+
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting lab stats by whole group; group_id = {group_id}")
+            return None
+        else:
+            logger.success(
+                f"Selected lab stats by whole group successfully; group_id = {group_id}; result = {result}")
+            return result
+
+    async def select_added_labs_count_for_group(self, group_id) -> int:
+        query = f"""--sql
+        SELECT COUNT(*) as count
+        FROM lab_registry
+        WHERE group_id={group_id}
+        """
+
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting added labs count for group; group_id = {group_id}")
+            return None
+        else:
+            logger.success(
+                f"Selected added labs count for group successfully; group_id = {group_id}; result = {result}")
+            return result
