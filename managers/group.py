@@ -1,4 +1,5 @@
 from loguru import logger
+from io import BytesIO
 
 from utils.enums import Blocked
 import utils.mailer as mailing
@@ -141,3 +142,13 @@ class GroupManager:
     @staticmethod
     async def get_previous_not_checked_lab_in_group(group_id: int, current_lab_id: int) -> LaboratoryWork:
         return await database_manager.select_previous_unchecked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
+
+    @staticmethod
+    async def post_lab_from_student(group_name: str, telegram_id: int, lab_number: int, lab_file: BytesIO) -> None:
+        student_credentials = await database_manager.select_student_credentials(telegram_id=telegram_id, group_name=group_name)
+        lab_name, lab_id = await database_manager.select_lab_name_and_id_by_number(group_name=group_name, lab_number=lab_number)
+
+        cloud_path = CloudManager.add_lab_from_student(
+            group_name=group_name, student_name=student_credentials, lab_path_or_file=lab_file, lab_name=lab_name)
+
+        await database_manager.insert_new_lab_from_student(lab_id=lab_id, member_credentials=student_credentials, status='Не проверено', cloud_link=cloud_path)

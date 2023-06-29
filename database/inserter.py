@@ -199,3 +199,35 @@ class Inserter(DatabaseConnector):
             logger.success(
                 f"Inserted into lab_registry {group_id}, {lab_description}, {cloud_link} successfully")
             return True
+
+    async def insert_new_lab_from_student(self, lab_id: int, member_credentials: str, status: str, cloud_link: str) -> None:
+        """Inserts new lab link into table 'lab_registry'
+
+        Args:
+            lab_id (int): lab id in database
+            member_credentials (str): credentials of student in format 'firstname lastname' or 'firstname lastname patronymic'
+            status (str): status of lab
+            cloud_link (str): link to file on cloud storage
+        """
+        query = f"""--sql
+        INSERT INTO lab_tracker (lab_id, member_id, status_id, cloud_link)
+        VALUES (
+            {lab_id},
+            (SELECT egm.member_id
+            FROM education_group_members egm
+            WHERE credentials = '{member_credentials}'),
+
+            (SELECT lst.id
+            FROM lab_status_type lst
+            WHERE status_name = '{status}'),
+
+            '{cloud_link}'
+        );
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                f"Error while inserting into lab_tracker with {lab_id}, {member_credentials}, {status}, {cloud_link}")
+        else:
+            logger.success(
+                f"Inserted into lab_tracker {lab_id}, {member_credentials}, {status}, {cloud_link} successfully")

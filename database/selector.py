@@ -677,3 +677,63 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Checked if previous unchecked lab exists in group successfully; lab_id = {lab_id}; result = {result[0]}")
             return result[0]
+
+    async def select_student_credentials(self, telegram_id: int, group_name: str) -> str:
+        """selects student credentials
+
+        Args:
+            telegram_id (int): telegram id of student
+            group_name (str): group name
+
+        Returns:
+            str: student credentials
+        """
+        query = f"""--sql
+        SELECT credentials
+        FROM education_group_members
+        WHERE member_id = (SELECT member_id
+                            FROM registered_members
+                            WHERE telegram_id = {telegram_id})
+        AND group_id = (SELECT id
+                        FROM education_group
+                        WHERE group_name = '{group_name}');
+        """
+
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting student credentials; telegram_id = {telegram_id}, group_name = {group_name}")
+            return ""
+        else:
+            logger.success(
+                f"Selected student credentials successfully; telegram_id = {telegram_id}, group_name = {group_name}; result = {result[0]}")
+            return result[0]
+
+    async def select_lab_name_and_id_by_number(self, group_name, lab_number) -> tuple[str, int]:
+        """selects lab name by number
+
+        Args:
+            group_name (str): group name
+            lab_number (int): lab number
+
+        Returns:
+            str: lab name
+        """
+        query = f"""--sql
+        SELECT lab_description, id
+        FROM lab_registry
+        WHERE lab_number = {lab_number}
+        AND group_id = (SELECT id
+                        FROM education_group
+                        WHERE group_name = '{group_name}');
+        """
+
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting lab name by number; group_name = {group_name}, lab_number = {lab_number}")
+            return "", 0
+        else:
+            logger.success(
+                f"Selected lab name by number successfully; group_name = {group_name}, lab_number = {lab_number}; result = {result[0]}{result[1]}")
+            return result[0], result[1]

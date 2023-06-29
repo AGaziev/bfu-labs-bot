@@ -19,7 +19,7 @@ class LabManager:
             for lab_info in lab_statistic_of_student:
                 current_lab = LaboratoryWork(
                     lab_id=lab_info["id"],
-                    number=lab_info["lab_number"],
+                    number=lab_info["number"],
                     description=lab_info["descr"],
                     cloud_link=lab_info["path"],
                 )

@@ -78,6 +78,7 @@ async def wait_for_lab_file(message: types.Message, state: FSMContext):
 
 
 async def end_posting_lab(call: types.CallbackQuery, state: FSMContext):
+    await call.message.edit_text(f"{call.message.text}\nУспешно подтверждено!", reply_markup=None)
     async with state.proxy() as posting_data:
         await GroupManager.post_lab_from_student(group_name=posting_data['group_name'],
                                                  telegram_id=call.from_user.id,
