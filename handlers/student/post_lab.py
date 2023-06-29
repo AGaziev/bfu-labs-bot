@@ -63,6 +63,7 @@ async def wait_for_lab_file(message: types.Message, state: FSMContext):
         return
     else:
         await state.update_data(io_file=io_file)
+        await state.update_data(file_extension=message.document.file_name.split(".")[-1])
         async with state.proxy() as posting_data:
             lab_file = types.InputFile(
                 io_file, filename=message.document.file_name)
@@ -78,11 +79,14 @@ async def wait_for_lab_file(message: types.Message, state: FSMContext):
 
 
 async def end_posting_lab(call: types.CallbackQuery, state: FSMContext):
-    await call.message.edit_text(f"{call.message.text}\nУспешно подтверждено!", reply_markup=None)
+    await call.message.edit_caption(f"{call.message.caption}\n{hbold('Успешно подтверждено!')}",
+                                    reply_markup=None,
+                                    parse_mode=types.ParseMode.HTML)
     async with state.proxy() as posting_data:
         await GroupManager.post_lab_from_student(group_name=posting_data['group_name'],
                                                  telegram_id=call.from_user.id,
                                                  lab_number=posting_data['lab_number'],
-                                                 lab_file=posting_data['io_file'])
+                                                 lab_file=posting_data['io_file'],
+                                                 file_extension=posting_data['file_extension'])
         await call.message.answer("Ваша лабораторная у преподавателя!")
     await state.finish()

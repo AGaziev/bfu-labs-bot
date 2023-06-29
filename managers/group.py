@@ -144,9 +144,10 @@ class GroupManager:
         return await database_manager.select_previous_unchecked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
 
     @staticmethod
-    async def post_lab_from_student(group_name: str, telegram_id: int, lab_number: int, lab_file: BytesIO) -> None:
+    async def post_lab_from_student(group_name: str, telegram_id: int, lab_number: int, lab_file: BytesIO, file_extension: str) -> None:
         student_credentials = await database_manager.select_student_credentials(telegram_id=telegram_id, group_name=group_name)
         lab_name, lab_id = await database_manager.select_lab_name_and_id_by_number(group_name=group_name, lab_number=lab_number)
+        lab_name = f'{lab_name}.{file_extension}'
 
         cloud_path = CloudManager.add_lab_from_student(
             group_name=group_name, student_name=student_credentials, lab_path_or_file=lab_file, lab_name=lab_name)
