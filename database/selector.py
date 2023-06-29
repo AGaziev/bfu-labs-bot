@@ -392,7 +392,7 @@ class Selector(DatabaseConnector):
         AND id NOT IN (SELECT lab_id
                        FROM lab_tracker
                        WHERE group_id = {group_id}
-                       AND member_id = (SELECT member_id
+                       AND member_id IN (SELECT member_id
                                         FROM registered_members
                                         WHERE telegram_id = {telegram_id}
                                         AND group_id = {group_id}))
