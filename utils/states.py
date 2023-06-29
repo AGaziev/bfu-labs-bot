@@ -36,8 +36,10 @@ class ConnectGroup(StatesGroup):
 
 
 class PostLab(StatesGroup):
+    show_undone_labs_for_post = State()
     choose_lab = State()
     upload_lab_file = State()
+
 
 class Student(StatesGroup):
     start = State()

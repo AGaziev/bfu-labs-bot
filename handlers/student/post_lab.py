@@ -17,21 +17,24 @@ async def show_undone_labs_for_post(call: types.CallbackQuery, state: FSMContext
     group_name = await GroupManager.get_group_name_by_id(group_id)
     lab_stats = await LabManager.get_student_lab_stats(group_id, call.from_user.id)
     not_done_lab_names_with_number = {}
-    for lab in lab_stats[1]:
-        lab['cloud_link'] = await LabManager.get_lab_link_by_path(lab['path'])
-        not_done_lab_names_with_number[lab['number']] = lab['descr']
+    if lab_stats:
+        for lab in lab_stats.not_done:
+            lab.cloud_link = await LabManager.get_lab_link_by_path(lab.cloud_link)
+            not_done_lab_names_with_number[lab.number] = lab.description
     await call.message.edit_text(f"Какую лабораторную сдаем?\n"
                                  f"Введи число перед названием\n"
-                                 f"{Formatter.list_lab_for_post(lab_stats[1])}",
+                                 f"{Formatter.list_lab_for_post(lab_stats.not_done)}",
                                  parse_mode=types.ParseMode.HTML,
                                  reply_markup=await kb.cancel_kb())
     await state.update_data(group_id=group_id)
     await state.update_data(group_name=group_name)
-    await state.update_data(lab_names=not_done_lab_names_with_number)
+    await state.update_data(lab_names=not_done_lab_names_with_number or None)
     await states.Student.post_lab.show_undone_labs_for_post.set()
 
 
 async def choose_lab(message: types.Message, state: FSMContext):
+    # FIXME: add state or etc.
+    # PROBLEM: if user send file before choosing lab, throws KeyError: 'lab_number'
     async with state.proxy() as posting_data:
         try:
             lab_number = int(message.text)
@@ -61,23 +64,24 @@ async def wait_for_lab_file(message: types.Message, state: FSMContext):
     else:
         await state.update_data(io_file=io_file)
         async with state.proxy() as posting_data:
-            lab_file = types.InputFile(io_file)
+            lab_file = types.InputFile(
+                io_file, filename=message.document.file_name)
             await message.answer_document(
                 lab_file,
                 caption=f"Вы собираетесь сдать лабораторную номер {posting_data['lab_number']}\n"
                         f"{hbold(posting_data['lab_name'])}\n"
-                        f"Название файла: {lab_file.filename}"
+                        f"Название файла: {hbold(lab_file.filename)}\n"
                         f"Если не тот файл, пришлите снова",
                 reply_markup=await kb.confirmation_kb(),
                 parse_mode=types.ParseMode.HTML
             )
 
 
-async def end_posting_lab(callback: types.CallbackQuery, state: FSMContext):
+async def end_posting_lab(call: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as posting_data:
         await GroupManager.post_lab_from_student(group_name=posting_data['group_name'],
-                                                 telegram_id=callback.from_user.id,
+                                                 telegram_id=call.from_user.id,
                                                  lab_number=posting_data['lab_number'],
                                                  lab_file=posting_data['io_file'])
-        await callback.message.answer(f"Ваша лабораторная у преподавателя!")
+        await call.message.answer("Ваша лабораторная у преподавателя!")
     await state.finish()

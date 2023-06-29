@@ -12,9 +12,9 @@ from managers import GroupManager, CloudManager, LabManager
 
 
 def create_message_by_lab_work(lab_work: LaboratoryWork) -> str:
-    message = f"Лабораторная работа №{hbold(lab_work.lab_number)}\n"\
+    message = f"Лабораторная работа №{hbold(lab_work.number)}\n"\
         f"Студент: {hbold(lab_work.member_credentials)}\n"\
-        f"Лабораторная работа: {hbold(lab_work.lab_description)}\n\n"
+        f"Лабораторная работа: {hbold(lab_work.description)}\n\n"
 
     return message
 

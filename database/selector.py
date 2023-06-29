@@ -3,6 +3,7 @@ from loguru import logger
 from typing import Any
 import utils.models as models
 from utils.enums import Blocked
+from datetime import datetime
 
 
 class Selector(DatabaseConnector):
@@ -356,7 +357,7 @@ class Selector(DatabaseConnector):
                 f"Selected unregistered members from group successfully; group_name = {group_name}; resutracker = {resutracker}")
             return resutracker
 
-    async def select_students_labs_with_status_in_group(self, group_id: str, telegram_id: int) -> list[tuple[int, str]] | None:
+    async def select_students_labs_with_status_in_group(self, group_id: str, telegram_id: int) -> list[tuple[int, int, str, str]] | None:
         query = f"""--sql
         SELECT lb.id as id,
                lb.lab_number as number,
@@ -383,7 +384,7 @@ class Selector(DatabaseConnector):
                 f"Selected student's labs with status in group successfully; group_name = {group_id}, telegram_id={telegram_id}; resutracker = {resutracker}")
             return resutracker
 
-    async def select_undone_group_labs_for_student(self, group_id: str, telegram_id: int) -> list[tuple[int, str]] | None:
+    async def select_undone_group_labs_for_student(self, group_id: str, telegram_id: int) -> list[tuple[int, int, str, str, int, datetime]] | None:
         query = f"""--sql
         SELECT *
         FROM lab_registry
@@ -404,7 +405,6 @@ class Selector(DatabaseConnector):
         else:
             logger.success(
                 f"Selected undone group's labs for student successfully; group_id = {group_id}, telegram_id={telegram_id}; resutracker = {resutracker}")
-            print(f"\n\n\n{resutracker}\n\n\n")
             return resutracker
 
     async def select_lab_condition_files_from_group(self, group_id: int) -> list[tuple[int, str, str]]:
@@ -514,8 +514,8 @@ class Selector(DatabaseConnector):
                 f"Selected first not checked lab in group successfully; group_id = {group_id}; result = {result}")
             lab = models.LaboratoryWork()
             lab.id = result[0][0]
-            lab.lab_number = result[0][1]
-            lab.lab_description = result[0][2]
+            lab.number = result[0][1]
+            lab.description = result[0][2]
             lab.cloud_link = result[0][3]
             lab.credentials = result[0][4]
             return lab
@@ -558,8 +558,8 @@ class Selector(DatabaseConnector):
                 f"Selected next unchecked lab in group successfully; group_id = {group_id}, current_lab_id = {current_lab_id}; result = {result}")
             lab = models.LaboratoryWork()
             lab.id = result[0][0]
-            lab.lab_number = result[0][1]
-            lab.lab_description = result[0][2]
+            lab.number = result[0][1]
+            lab.description = result[0][2]
             lab.cloud_link = result[0][3]
             lab.credentials = result[0][4]
             return lab
@@ -602,8 +602,8 @@ class Selector(DatabaseConnector):
                 f"Selected previous unchecked lab in group successfully; group_id = {group_id}, current_lab_id = {current_lab_id}; result = {result}")
             lab = models.LaboratoryWork()
             lab.id = result[0][0]
-            lab.lab_number = result[0][1]
-            lab.lab_description = result[0][2]
+            lab.number = result[0][1]
+            lab.description = result[0][2]
             lab.cloud_link = result[0][3]
             lab.credentials = result[0][4]
             return lab
