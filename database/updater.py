@@ -36,3 +36,25 @@ class Updater(DatabaseConnector):
             logger.success(
                 f"Updated users.is_blocked with {is_blocked} for user_id = {user_id} successfully")
             return True
+
+    async def update_lab_status(self, lab_id: int, status: str):
+        query = f"""--sql
+        UPDATE lab_tracker
+        SET status_id = (
+            SELECT id
+            FROM lab_status_type
+            WHERE status_name = '{status}'),
+
+            updated_at = NOW()
+
+        WHERE id = {lab_id};
+        """
+        result = await self._execute_query(query)
+        if result is False:
+            logger.error(
+                logger.error(f"Error while updating labs.status with {status} for lab_id = {lab_id}"))
+            return False
+        else:
+            logger.success(
+                f"Updated labs.status with {status} for lab_id = {lab_id} successfully")
+            return True

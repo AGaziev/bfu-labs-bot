@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
 from managers import database_manager
-from utils.callbacks import group_callback, show_callback, add_lab_callback, check_lab_callback,stats_callback
+from utils.callbacks import group_callback, show_callback, add_lab_callback, check_lab_callback, stats_callback
 
 
 async def menu_kb() -> InlineKeyboardMarkup:
@@ -266,17 +266,20 @@ async def sample_files_with_cancel_button_kb() -> InlineKeyboardMarkup:
 
 async def teacher_check_students_labs_kb(lab_id: int, show_rate_buttons: bool = True) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=2, )
-
     if show_rate_buttons:
         rate_buttons = [
             InlineKeyboardButton(
                 text='✅Принять',
                 callback_data=check_lab_callback.new(
-                    lab_id=lab_id, status='accepted')),
+                    lab_id=lab_id, status='accepted'
+                )
+            ),
             InlineKeyboardButton(
                 text='❌Отклонить',
                 callback_data=check_lab_callback.new(
-                    lab_id=lab_id, status='rejected')),
+                    lab_id=lab_id, status='rejected'
+                )
+            ),
         ]
     else:
         rate_buttons = []
@@ -285,13 +288,19 @@ async def teacher_check_students_labs_kb(lab_id: int, show_rate_buttons: bool = 
         rate_buttons.append(InlineKeyboardButton(
             text='⬅️',
             callback_data=check_lab_callback.new(
-                lab_id=lab_id, status='previous')))
+                lab_id=lab_id, status='previous'
+            )
+        )
+        )
 
     if await database_manager.is_exist_next_unchecked_lab_in_group(lab_id):
         rate_buttons.append(InlineKeyboardButton(
             text='➡️',
             callback_data=check_lab_callback.new(
-                lab_id=lab_id, status='next')))
+                lab_id=lab_id, status='next'
+            )
+        )
+        )
 
     for button in rate_buttons:
         kb.insert(button)

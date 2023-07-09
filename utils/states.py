@@ -28,6 +28,7 @@ class TeacherState(StatesGroup):
     show_my_groups = State()
     group_menu = State()
     add_lab = AddLab()
+    check_students_labs = State()
 
 
 class ConnectGroup(StatesGroup):

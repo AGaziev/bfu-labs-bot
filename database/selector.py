@@ -496,7 +496,7 @@ class Selector(DatabaseConnector):
         FROM lab_tracker tracker
         LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
         LEFT JOIN education_group_members egm ON tracker.member_id = egm.member_id
-        WHERE tracker.group_id = {group_id}
+        WHERE egm.group_id = {group_id}
         AND tracker.status_id = (SELECT id
                             FROM lab_status_type
                             WHERE status_name = 'Не проверено')
@@ -513,11 +513,11 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Selected first not checked lab in group successfully; group_id = {group_id}; result = {result}")
             lab = models.LaboratoryWork()
-            lab.id = result[0][0]
-            lab.number = result[0][1]
-            lab.description = result[0][2]
-            lab.cloud_link = result[0][3]
-            lab.credentials = result[0][4]
+            lab.id_ = result[0]['id']
+            lab.number = result[0]['lab_number']
+            lab.description = result[0]['lab_description']
+            lab.cloud_link = result[0]['cloud_link']
+            lab.member_credentials = result[0]['credentials']
             return lab
 
     async def select_next_unchecked_lab_in_group(self, group_id: int, current_lab_id: int) -> models.LaboratoryWork:
@@ -539,7 +539,7 @@ class Selector(DatabaseConnector):
         FROM lab_tracker tracker
         LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
         LEFT JOIN education_group_members egm ON tracker.member_id = egm.member_id
-        WHERE tracker.group_id = {group_id}
+        WHERE egm.group_id = {group_id}
         AND tracker.status_id = (SELECT id
                             FROM lab_status_type
                             WHERE status_name = 'Не проверено')
@@ -557,11 +557,11 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Selected next unchecked lab in group successfully; group_id = {group_id}, current_lab_id = {current_lab_id}; result = {result}")
             lab = models.LaboratoryWork()
-            lab.id = result[0][0]
-            lab.number = result[0][1]
-            lab.description = result[0][2]
-            lab.cloud_link = result[0][3]
-            lab.credentials = result[0][4]
+            lab.id_ = result[0]['id']
+            lab.number = result[0]['lab_number']
+            lab.description = result[0]['lab_description']
+            lab.cloud_link = result[0]['cloud_link']
+            lab.member_credentials = result[0]['credentials']
             return lab
 
     async def select_previous_unchecked_lab_in_group(self, group_id: int, current_lab_id: int) -> models.LaboratoryWork:
@@ -583,7 +583,7 @@ class Selector(DatabaseConnector):
         FROM lab_tracker tracker
         LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
         LEFT JOIN education_group_members egm ON tracker.member_id = egm.member_id
-        WHERE tracker.group_id = {group_id}
+        WHERE egm.group_id = {group_id}
         AND tracker.status_id = (SELECT id
                             FROM lab_status_type
                             WHERE status_name = 'Не проверено')
@@ -601,11 +601,11 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Selected previous unchecked lab in group successfully; group_id = {group_id}, current_lab_id = {current_lab_id}; result = {result}")
             lab = models.LaboratoryWork()
-            lab.id = result[0][0]
-            lab.number = result[0][1]
-            lab.description = result[0][2]
-            lab.cloud_link = result[0][3]
-            lab.credentials = result[0][4]
+            lab.id_ = result[0]['id']
+            lab.number = result[0]['lab_number']
+            lab.description = result[0]['lab_description']
+            lab.cloud_link = result[0]['cloud_link']
+            lab.member_credentials = result[0]['credentials']
             return lab
 
     async def is_exist_next_unchecked_lab_in_group(self, lab_id: int) -> bool:
@@ -618,19 +618,29 @@ class Selector(DatabaseConnector):
             bool: True if exists, False if not
         """
         query = f"""--sql
-        SELECT EXISTS(
-            SELECT tracker.id
-            FROM lab_tracker tracker
-            LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
-            WHERE tracker.group_id = (SELECT group_id
-                                    FROM lab_tracker
-                                    WHERE id = {lab_id})
-            AND tracker.status_id = (SELECT id
-                                    FROM lab_status_type
-                                    WHERE status_name = 'Не проверено')
-            AND tracker.id > {lab_id}
-            ORDER BY tracker.id ASC
-            LIMIT 1);
+            SELECT EXISTS(
+                SELECT tracker.id
+                FROM lab_tracker tracker
+                LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
+                LEFT JOIN education_group_members egm ON tracker.member_id = egm.member_id
+                WHERE egm.group_id = (
+                    SELECT egm.group_id
+                    FROM  education_group_members egm
+                    WHERE egm.member_id = (
+                        SELECT tracker.member_id
+                        FROM lab_tracker tracker
+                        WHERE tracker.id = {lab_id}
+                    )
+                )
+                AND tracker.status_id = (
+                    SELECT lst.id
+                    FROM lab_status_type lst
+                    WHERE lst.status_name = 'Не проверено'
+                )
+                AND tracker.id > {lab_id}
+                ORDER BY tracker.id ASC
+                LIMIT 1
+            );
         """
 
         result = await self._execute_query_with_returning_one_row(query)
@@ -653,19 +663,29 @@ class Selector(DatabaseConnector):
             bool: True if exists, False if not
         """
         query = f"""--sql
-        SELECT EXISTS(
-            SELECT tracker.id
-            FROM lab_tracker tracker
-            LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
-            WHERE tracker.group_id = (SELECT group_id
-                                    FROM lab_tracker
-                                    WHERE id = {lab_id})
-            AND tracker.status_id = (SELECT id
-                                    FROM lab_status_type
-                                    WHERE status_name = 'Не проверено')
-            AND tracker.id < {lab_id}
-            ORDER BY tracker.id ASC
-            LIMIT 1);
+            SELECT EXISTS(
+                SELECT tracker.id
+                FROM lab_tracker tracker
+                LEFT JOIN lab_registry registry ON tracker.lab_id = registry.id
+                LEFT JOIN education_group_members egm ON tracker.member_id = egm.member_id
+                WHERE egm.group_id = (
+                    SELECT egm.group_id
+                    FROM  education_group_members egm
+                    WHERE egm.member_id = (
+                        SELECT tracker.member_id
+                        FROM lab_tracker tracker
+                        WHERE tracker.id = {lab_id}
+                    )
+                )
+                AND tracker.status_id = (
+                    SELECT lst.id
+                    FROM lab_status_type lst
+                    WHERE lst.status_name = 'Не проверено'
+                )
+                AND tracker.id < {lab_id}
+                ORDER BY tracker.id ASC
+                LIMIT 1
+            );
         """
 
         result = await self._execute_query_with_returning_one_row(query)
@@ -778,3 +798,34 @@ class Selector(DatabaseConnector):
             logger.success(
                 f"Selected added labs count for group successfully; group_id = {group_id}; result = {result}")
             return result
+
+    async def select_lab_and_owner_telegram_id_by_lab_id(self, lab_id: int) -> tuple[models.LaboratoryWork, int] | tuple[None, None]:
+        query = f"""--sql
+        SELECT tracker.lab_id,
+            lr.lab_number,
+            lr.lab_description,
+            tracker.cloud_link,
+            egm.credentials,
+            users.telegram_id
+        FROM lab_registry lr
+        LEFT JOIN lab_tracker tracker ON lr.id = tracker.lab_id
+        LEFT JOIN education_group_members egm ON tracker.member_id = egm.member_id
+        LEFT JOIN registered_members rm ON egm.member_id = rm.member_id
+        LEFT JOIN users ON rm.telegram_id = users.telegram_id
+        WHERE lr.id = {lab_id};
+        """
+
+        result = await self._execute_query_with_returning_one_row(query)
+        if result is False:
+            logger.error(
+                f"Error while selecting lab and owner telegram_id by lab_id; lab_id = {lab_id}")
+            return None, None
+        else:
+            logger.success(
+                f"Selected lab and owner telegram_id by lab_id successfully; lab_id = {lab_id}; result = {result}")
+            lab = models.LaboratoryWork()
+            lab.number = result['lab_number']
+            lab.description = result['lab_description']
+            lab.cloud_link = result['cloud_link']
+            lab.member_credentials = result['credentials']
+            return lab, result['telegram_id']

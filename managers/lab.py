@@ -5,6 +5,10 @@ from utils.mailer import Mailer
 from .cloud import CloudManager
 from .db import database_manager
 from utils.models import StudentsLabs, LaboratoryWork
+from loader import bot
+
+from aiogram import types
+from aiogram.utils.markdown import hlink
 
 
 class LabManager:
@@ -18,7 +22,7 @@ class LabManager:
         if lab_statistic_of_student:
             for lab_info in lab_statistic_of_student:
                 current_lab = LaboratoryWork(
-                    lab_id=lab_info["id"],
+                    id_=lab_info["id"],
                     number=lab_info["number"],
                     description=lab_info["descr"],
                     cloud_link=lab_info["path"],
@@ -30,7 +34,7 @@ class LabManager:
 
         undone_labs = await database_manager.select_undone_group_labs_for_student(group_id, telegram_id)
         undone_labs = [LaboratoryWork(
-            lab_id=lab["id"],
+            id_=lab["id"],
             number=lab["lab_number"],
             description=lab["lab_description"],
             cloud_link=lab["cloud_link"],
@@ -51,15 +55,31 @@ class LabManager:
         return zip(files, filenames)
 
     @staticmethod
-    async def get_lab_link_by_path(path):
+    async def get_lab_link_by_path(path: str):
         return CloudManager.get_public_link_by_destination_path(path)
 
     @staticmethod
     async def accept_laboratory_work(lab_id: int):
-        # TODO: update lab status in database and send notification to student
-        ...
+        await database_manager.update_lab_status(lab_id=lab_id, status='Сдано')
+        lab, student_telegram_id = await database_manager.select_lab_and_owner_telegram_id_by_lab_id(lab_id)
+        lab_link = await LabManager.get_lab_link_by_path(lab.cloud_link)
+        message = f"✅✅✅\nВаша лабораторная работа №{lab.number} была проверена и принята преподавателем\n"\
+            f"Данные по работе:\n"\
+            f"Название: {lab.description}\n"\
+            f"{hlink('Ссылка', lab_link)} на работу\n"
+        await bot.send_message(chat_id=student_telegram_id,
+                               text=message,
+                               parse_mode=types.ParseMode.HTML)
 
     @staticmethod
     async def reject_laboratory_work(lab_id: int):
-        # TODO: update lab status in database and send notification to student
-        ...
+        await database_manager.update_lab_status(lab_id=lab_id, status='Отклонено')
+        lab, student_telegram_id = await database_manager.select_lab_and_owner_telegram_id_by_lab_id(lab_id)
+        lab_link = await LabManager.get_lab_link_by_path(lab.cloud_link)
+        message = f"❌❌❌\nВаша лабораторная работа №{lab.number} была проверена и отклонена преподавателем\n"\
+            f"Данные по работе:\n"\
+            f"Название: {lab.description}\n"\
+            f"{hlink('Ссылка', lab_link)} на работу\n"
+        await bot.send_message(chat_id=student_telegram_id,
+                               text=message,
+                               parse_mode=types.ParseMode.HTML)

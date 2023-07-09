@@ -10,6 +10,7 @@ from .register import register_as_teacher, confirm_teacher_credentials, confirm_
 from .show_my_groups import show_my_groups
 from .group_menu import teacher_group_menu, send_stats_of_group
 from .add_new_lab import wait_for_lab_conditions_file, ask_for_filename_to_change, wait_for_new_filename, upload_file_to_cloud_drive, change_filename
+from .check_students_labs import show_not_checked_labs, show_next_not_checked_lab, show_previous_not_checked_lab, accept_laboratory_work, reject_laboratory_work
 
 
 def setup_teacher_handlers(dp: Dispatcher):
@@ -137,4 +138,35 @@ def setup_teacher_handlers(dp: Dispatcher):
         callbacks.stats_callback.filter(user_role="teacher"),
         state=states.TeacherState.group_menu
     )
+
+    dp.register_callback_query_handler(
+        show_not_checked_labs,
+        callbacks.show_callback.filter(user_role="teacher", data_type="labs"),
+        state=states.TeacherState.group_menu
+    )
+
+    dp.register_callback_query_handler(
+        show_previous_not_checked_lab,
+        callbacks.check_lab_callback.filter(status="previous"),
+        state=states.TeacherState.check_students_labs
+    )
+
+    dp.register_callback_query_handler(
+        show_next_not_checked_lab,
+        callbacks.check_lab_callback.filter(status="next"),
+        state=states.TeacherState.check_students_labs
+    )
+
+    dp.register_callback_query_handler(
+        accept_laboratory_work,
+        callbacks.check_lab_callback.filter(status="accepted"),
+        state=states.TeacherState.check_students_labs
+    )
+
+    dp.register_callback_query_handler(
+        reject_laboratory_work,
+        callbacks.check_lab_callback.filter(status="rejected"),
+        state=states.TeacherState.check_students_labs
+    )
+
     logger.info('Teacher handlers are successfully registered')

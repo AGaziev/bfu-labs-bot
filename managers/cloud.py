@@ -40,7 +40,11 @@ class CloudManager:
 
     @staticmethod
     def get_public_link_by_destination_path(destination_path: str):
-        return cloud_drive.get_meta(destination_path).public_url
+        url = cloud_drive.get_meta(destination_path).public_url
+        if not url:
+            cloud_drive.publish(destination_path)
+            url = cloud_drive.get_meta(destination_path).public_url
+        return url
 
     @classmethod
     def is_group_exists(cls, group_name: str):
@@ -65,6 +69,7 @@ class CloudManager:
         file_ = BytesIO()
         cloud_drive.download(path, file_)
         filename = CloudManager.get_filename_by_path(path)
+        file_.seek(0)
         return file_, filename
 
     @staticmethod
