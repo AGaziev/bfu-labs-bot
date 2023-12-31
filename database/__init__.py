@@ -1,15 +1,15 @@
 from loguru import logger
 try:
-    from .inserter import Inserter
-    from .selector import Selector
-    from .updater import Updater
-    from .deleter import Deleter
+    from _legacy.inserter import Inserter
+    from _legacy.selector import Selector
+    from _legacy.updater import Updater
+    from _legacy.deleter import Deleter
 except ImportError:
     logger.error(
         "Error while importing inserter.py, selector.py, updater.py or deleter.py")
 
 try:
-    from .creator import Creator
-    from .filler import Filler
+    from _legacy.creator import Creator
+    from _legacy.filler import Filler
 except ImportError:
-    logger.error("Error while importing creator.py or filler.py")
+    logger.error("Error while importing inserter.py or filler.py")
