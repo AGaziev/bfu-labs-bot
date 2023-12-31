@@ -1,13 +1,13 @@
-from loguru import logger
-
-
 def configure_and_fill_database_tables() -> None:
-    from database import Creator, Filler
-    import asyncio
-    creator = Creator()
-    filler = Filler()
-    asyncio.run(creator.recreate_all_tables())
-    asyncio.run(filler.fill_necessarily_tables())
+    from repositories import db
+    import utils.models
+    db.create_tables([utils.models.User,
+                      utils.models.Teacher,
+                      utils.models.Group,
+                      utils.models.GroupMember,
+                      utils.models.LabRegistry,
+                      utils.models.Status,
+                      utils.models.LabWork])
 
 
 if __name__ == '__main__':
