@@ -12,22 +12,6 @@ class Config:
         self.admins = self._get_admins()
         self.database_connection_parameters : DBCreds = DBCreds()
 
-    @property
-    def bot_token(self) -> str:
-        return self.bot_token
-
-    @property
-    def cloud_drive_token(self) -> str:
-        return self.cloud_drive_token
-
-    @property
-    def database_connection_parameters(self) -> dict:
-        return self.database_connection_parameters
-
-    @property
-    def admins(self) -> tuple[int, ...]:
-        return self.admins
-
     def _get_admins(self) -> tuple:
         try:
             admins = tuple(map(int, [telegram_id for telegram_id in os.getenv(
@@ -38,10 +22,11 @@ class Config:
 
         return admins
 
+
 class DBCreds():
     def __init__(self):
-        user = os.getenv('DB_USER')
-        password = os.getenv('DB_USER_PASSWORD')
-        host = os.getenv('DB_HOST')
-        port = os.getenv('DB_PORT')
-        database = os.getenv('DB_NAME')
+        self.user = os.getenv('DB_USER')
+        self.password = os.getenv('DB_USER_PASSWORD')
+        self.host = os.getenv('DB_HOST')
+        self.port = os.getenv('DB_PORT')
+        self.database = os.getenv('DB_NAME')
