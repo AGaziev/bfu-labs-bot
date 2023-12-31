@@ -5,26 +5,22 @@ from io import BytesIO
 
 from utils.enums import Blocked
 import utils.mailer as mailing
-from utils.models import GroupInfo, LaboratoryWork
 from utils.stat_generator import StatsGenerator
 from .cloud import CloudManager
-from .db import database_manager
+from .db import DatabaseManager
 
 
 class GroupManager:
 
     @staticmethod
     async def create_group(name: str, students: list, teacher_id: int):
+        # create in cloud
         CloudManager.create_group_folder(name)
         folder_url = CloudManager.get_group_folder_link(name)
-        await database_manager.insert_new_education_group(
-            group_name=name,
-            owner_id=teacher_id,
-            cloud_folder_link=folder_url)
-        group_id = await database_manager.select_group_id_by_group_name(group_name=name)
-        await database_manager.insert_many_members_into_education_group(group_id=group_id,
-                                                                        members=students)
-        return folder_url, group_id
+        # create in db
+        group = DatabaseManager.createGroup(name, teacher_id)
+        DatabaseManager.addGroupMembersToGroup(group)
+        return folder_url, group.get_id()
 
     @staticmethod
     async def is_group_name_exists(name: str) -> bool:
