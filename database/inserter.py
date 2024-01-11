@@ -15,8 +15,8 @@ class Inserter:
             return Group
 
     @staticmethod
-    def add_group_members_to_group(group: Group, membersNames: list):
-        for memberName in membersNames:
+    def add_group_members_to_group(group: Group, members_names: list):
+        for memberName in members_names:
             try:
                 GroupMember.create(group=group, name=memberName, user=None).save()
             except Exception as e:
