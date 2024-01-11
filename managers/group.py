@@ -13,38 +13,38 @@ from .db import DatabaseManager
 class GroupManager:
 
     @staticmethod
-    async def create_group(name: str, students: list, teacher_id: int):
+    def create_group(name: str, students: list, teacher_id: int):
         # create in cloud
         CloudManager.create_group_folder(name)
         folder_url = CloudManager.get_group_folder_link(name)
         # create in db
-        group = DatabaseManager.createGroup(name, teacher_id)
-        DatabaseManager.addGroupMembersToGroup(group)
+        group = DatabaseManager.create_group(name, teacher_id)
+        DatabaseManager.add_group_members_to_group(group, students)
         return folder_url, group.get_id()
 
     @staticmethod
-    async def is_group_name_exists(name: str) -> bool:
+    def is_group_name_exists(name: str) -> bool:
         on_disk = CloudManager.is_group_exists(name)
-        in_database = await database_manager.check_is_group_exists_by_group_name(
-            group_name=name)
+        group = DatabaseManager.get_group_by_name(name)
+        in_database = group is not None
         # restore cloud folder
         if in_database and not on_disk:
             CloudManager.create_group_folder(name)
         return on_disk and in_database
 
     @staticmethod
-    async def get_group_id_by_name(name: str):
-        return await database_manager.select_group_id_by_group_name(group_name=name)
+    def get_group_id_by_name(name: str):
+        return DatabaseManager.get_group_by_name(name).get_id()
 
     @staticmethod
-    async def get_group_name_by_id(group_id: int):
-        return await database_manager.select_group_name_by_group_id(group_id=group_id)
+    def get_group_name_by_id(group_id: int):
+        return DatabaseManager.get_group_by_id(group_id)
 
     @staticmethod
-    async def connect_student_to_group(group_name: str, student_name: str, member_id: int, telegram_id) -> bool:
+    def connect_student_to_group(group_name: str, student_name: str, member_id: int, telegram_id) -> bool:
         try:
             CloudManager.create_student_folder(group_name, student_name)
-            await database_manager.insert_one_registered_user(member_id, telegram_id)
+            DatabaseManager.connect_user_to_group(member_id, telegram_id)
         except Exception as e:
             # TODO: handle specific exceptions
             logger.error(e)
@@ -53,20 +53,20 @@ class GroupManager:
 
     @staticmethod
     async def get_unregistered_users_of_group(group_name: str) -> dict[int, str]:
-        unregistered_users = await database_manager.select_unregistered_users_from_group(group_name=group_name)
-        ids_and_credentials = {record[0]: record[1]
-                               for record in unregistered_users}
+        unregistered_users = await DatabaseManager.get_unregistered_members_for_group(group_name=group_name)
+        ids_and_credentials = {user.id: user.name
+                               for user in unregistered_users}
         return ids_and_credentials
 
     @staticmethod
     async def get_groups_for_student(telegram_id: int) -> list[tuple[int, str]]:
-        student_groups = await database_manager.select_student_groups_names_with_id(telegram_id)
-        return student_groups
+        student_groups = await DatabaseManager.select_student_groups_names_with_id(telegram_id)
+        groups = [(group.get_id(), group.name) for group in student_groups]
+        return groups
 
     @staticmethod
     async def is_student_already_connected(telegram_id: int, group_id: int) -> bool:
-        users_in_group = await database_manager.select_registered_members_from_group(
-            group_id, is_blocked=Blocked.ANY)
+        users_in_group = await DatabaseManager.select_registered_members_from_group(group_id)
         return telegram_id in users_in_group
 
     @staticmethod
