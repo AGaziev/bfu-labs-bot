@@ -5,6 +5,7 @@ from io import BytesIO
 
 from utils.enums import Blocked
 import utils.mailer as mailing
+from utils.group_info import GroupInfo
 from utils.stat_generator import StatsGenerator
 from .cloud import CloudManager
 from .db import DatabaseManager
@@ -71,7 +72,9 @@ class GroupManager:
 
     @staticmethod
     async def add_lab_to_db(group_id: int, lab_name: str, lab_link: str):
-        if await database_manager.insert_new_lab_link(group_id=group_id, lab_description=lab_name, cloud_link=lab_link):
+        if await (DatabaseManager.add_new_lab_to_group(group=DatabaseManager.get_group_by_id(group_id),
+                                                       lab_descr=lab_name,
+                                                       lab_link=lab_link)):
             logger.success(f"Added lab {lab_name} to group {group_id}")
         else:
             logger.error(
@@ -90,17 +93,17 @@ class GroupManager:
 
     @staticmethod
     async def get_count_of_registered_members_from_group(group_id: int):
-        members = await database_manager.select_registered_members_from_group(group_id=group_id, is_blocked=Blocked.ANY)
+        members = await DatabaseManager.select_registered_members_from_group(group_id=group_id)
         return len(members)
 
     @staticmethod
     async def get_count_of_unregistered_members_from_group(group_name: str):
-        members = await database_manager.select_unregistered_users_from_group(group_name=group_name)
+        members = await DatabaseManager.get_unregistered_members_for_group(group_name=group_name)
         return len(members)
 
     @staticmethod
     async def select_lab_condition_files_count_from_group(group_id: int):
-        files = await database_manager.select_lab_condition_files_from_group(group_id=group_id)
+        files = await DatabaseManager.get_labs_for_group(group_id=group_id)
         return len(files)
 
     @staticmethod
@@ -112,10 +115,10 @@ class GroupManager:
         Returns:
             tuple[int, int, int, int]: passed, rejected, not checked, labs at all
         """
-        passed = await database_manager.select_labs_with_status_count_from_group(group_id=group_id, status='Сдано')
-        rejected = await database_manager.select_labs_with_status_count_from_group(group_id=group_id, status='Отклонено')
-        not_checked = await database_manager.select_labs_with_status_count_from_group(group_id=group_id, status='Не проверено')
-        labs_at_all = await database_manager.select_all_labs_count_from_group(group_id=group_id)
+        passed = await DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id, status='Сдано')
+        rejected = await DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id, status='Отклонено')
+        not_checked = await DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id, status='Не проверено')
+        labs_at_all = await DatabaseManager.select_all_labs_count_from_group(group_id=group_id)
 
         return passed, rejected, not_checked, labs_at_all
 
@@ -132,9 +135,9 @@ class GroupManager:
 
     @staticmethod
     async def get_group_stats_file(group_id: int):
-        stats = await database_manager.select_lab_stats_by_whole_group(group_id)
-        group_name = await database_manager.select_group_name_by_group_id(group_id)
-        lab_number = await database_manager.select_all_labs_count_from_group(group_id)
+        stats = await DatabaseManager.select_lab_stats_by_whole_group(group_id)
+        group_name = await DatabaseManager.select_group_name_by_group_id(group_id)
+        lab_number = await DatabaseManager.select_all_labs_count_from_group(group_id)
         info_for_generator = {}
         for name, labs in itertools.groupby(stats, key=lambda x: x[0]):
             labs = list(labs)
