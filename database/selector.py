@@ -1,5 +1,5 @@
 from handlers.error import error_handling
-from utils import Group, GroupMember
+from utils import Group, GroupMember, LabRegistry
 
 
 class Selector:
@@ -23,3 +23,7 @@ class Selector:
     @staticmethod
     def select_registered_members_from_group(group_id) -> list[GroupMember]:
         return GroupMember.select(GroupMember.id).where((GroupMember.group == group_id) & (GroupMember.user != None))
+
+    @staticmethod
+    def get_labs_for_group(group_id) -> list[LabRegistry]:
+        return LabRegistry.select().where(LabRegistry.group == group_id)

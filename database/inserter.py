@@ -1,5 +1,5 @@
 from handlers.error import error_handling
-from utils import Group, GroupMember
+from utils import Group, GroupMember, LabWork, LabRegistry
 
 
 class Inserter:
@@ -24,4 +24,16 @@ class Inserter:
                                f"Не смогли зарегистрировать участника группы {group.name} "
                                f"с айди {group.id} с именем {memberName}")
                 return False
+        return True
+
+    @staticmethod
+    def add_new_lab_to_group(group: Group, lab_descr: str, lab_link: str):
+        try:
+            LabRegistry.create(group=group, name=lab_descr, link=lab_link)
+        except Exception as e:
+            error_handling(e,
+                           f"Не смогли зарегистрировать новую лабораторную "
+                           f"для группы {group.id} с описанием {lab_descr} и ссылкой"
+                           f"{lab_link}")
+            return False
         return True
