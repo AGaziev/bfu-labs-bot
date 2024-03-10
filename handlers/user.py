@@ -16,11 +16,11 @@ from utils import states
 async def cmd_start(message: types.Message, state: FSMContext):
     if state:
         await state.finish()
-    await database_manager.update_user_is_blocked_field_by_user_id(user_id=message.from_user.id,
+    DatabaseManager.update_user_is_blocked_field_by_user_id(user_id=message.from_user.id,
                                                                    is_blocked=False)
 
-    if not await database_manager.check_is_user_exist(user_id=message.from_user.id):
-        await database_manager.insert_new_user(user_id=message.from_user.id,
+    if not DatabaseManager.check_is_user_exist(user_id=message.from_user.id):
+        DatabaseManager.insert_new_user(user_id=message.from_user.id,
                                                username=message.from_user.username)
         logger.info(
             f"New user {message.from_user.full_name} with id {message.from_user.id} was added to database")
@@ -31,7 +31,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         #                     reply_markup=await kb.student_menu_kb(telegram_id=message.from_user.id),
         #                     parse_mode=types.ParseMode.HTML)
 
-        if await database_manager.check_is_user_teacher(user_id=message.from_user.id):
+        if DatabaseManager.check_is_user_teacher(user_id=message.from_user.id):
             await message.reply(f"С возвращением, {hbold(message.from_user.full_name)}",
                                 reply_markup=await kb.teacher_menu_kb(),
                                 parse_mode=types.ParseMode.HTML)

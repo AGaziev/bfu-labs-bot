@@ -11,8 +11,8 @@ from utils import states
 async def teacher_group_menu(call: types.CallbackQuery, state: FSMContext):
     # call.data sample: "group:1:teacher"
     group_id = call.data.split(":")[1]
-    group_name = await database_manager.select_group_name_by_group_id(group_id=group_id)
-    group_info = await GroupManager.get_group_info(group_id=group_id, group_name=group_name)
+    group_name = GroupManager.get_group_name_by_id(group_id=group_id)
+    group_info = GroupManager.get_group_info(group_id=group_id, group_name=group_name)
 
     def percent_hitalic(x: int, y: int) -> str:
         percent = f"{round(x/y*100, 2)}%" if y else "0%"
@@ -37,8 +37,8 @@ async def teacher_group_menu(call: types.CallbackQuery, state: FSMContext):
 
 async def send_stats_of_group(call: types.CallbackQuery, state: FSMContext, callback_data: dict):
     group_id = callback_data['group_id']
-    group_name = await database_manager.select_group_name_by_group_id(group_id=group_id)
-    stats_file = await GroupManager.get_group_stats_file(group_id=group_id)
+    group_name = GroupManager.get_group_name_by_id(group_id=group_id)
+    stats_file = GroupManager.get_group_stats_file(group_id=group_id)
     stats_file.name = f"Статистика {group_name}.xlsx"
     doc = types.InputFile(stats_file)
     await call.message.answer_document(doc, caption="Статистика по лабораторным:")

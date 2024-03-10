@@ -12,8 +12,8 @@ from aiogram.utils.markdown import hlink
 
 class LabManager:
     @staticmethod
-    async def get_student_lab_stats(group_id: int, telegram_id: int) -> StudentsLabs | None:
-        lab_statistic_of_student = await database_manager.select_students_labs_with_status_in_group(group_id, telegram_id)
+    async def get_student_lab_stats(group_id: int, telegram_id: int):
+        lab_statistic_of_student = await DatabaseManager.select_students_labs_with_status_in_group(group_id, telegram_id)
 
         accepted_labs: list[LaboratoryWork | None] = []
         not_done_labs: list[LaboratoryWork | None] = []
@@ -31,7 +31,7 @@ class LabManager:
                 else:
                     not_done_labs.append(current_lab)
 
-        undone_labs = await database_manager.select_undone_group_labs_for_student(group_id, telegram_id)
+        undone_labs = await DatabaseManager.select_undone_group_labs_for_student(group_id, telegram_id)
         undone_labs = [LaboratoryWork(
             id_=lab["id"],
             number=lab["lab_number"],
@@ -48,7 +48,7 @@ class LabManager:
 
     @staticmethod
     async def get_student_undone_labs_files(group_id: int, telegram_id: int):
-        undone_labs = await database_manager.select_undone_group_labs_for_student(group_id, telegram_id)
+        undone_labs = await DatabaseManager.select_undone_group_labs_for_student(group_id, telegram_id)
         links = tuple([lab["cloud_link"] for lab in undone_labs])
         files, filenames = CloudManager.get_files_by_link(links)
         return zip(files, filenames)
@@ -59,8 +59,8 @@ class LabManager:
 
     @staticmethod
     async def accept_laboratory_work(lab_id: int):
-        await database_manager.update_lab_status(lab_id=lab_id, status='Сдано')
-        lab, student_telegram_id = await database_manager.select_lab_and_owner_telegram_id_by_lab_id(lab_id)
+        await DatabaseManager.update_lab_status(lab_id=lab_id, status='Сдано')
+        lab, student_telegram_id = await DatabaseManager.select_lab_and_owner_telegram_id_by_lab_id(lab_id)
         lab_link = await LabManager.get_lab_link_by_path(lab.cloud_link)
         message = f"✅✅✅\nВаша лабораторная работа №{lab.number} была проверена и принята преподавателем\n"\
             f"Данные по работе:\n"\
@@ -72,8 +72,8 @@ class LabManager:
 
     @staticmethod
     async def reject_laboratory_work(lab_id: int):
-        await database_manager.update_lab_status(lab_id=lab_id, status='Отклонено')
-        lab, student_telegram_id = await database_manager.select_lab_and_owner_telegram_id_by_lab_id(lab_id)
+        await DatabaseManager.update_lab_status(lab_id=lab_id, status='Отклонено')
+        lab, student_telegram_id = await DatabaseManager.select_lab_and_owner_telegram_id_by_lab_id(lab_id)
         lab_link = await LabManager.get_lab_link_by_path(lab.cloud_link)
         message = f"❌❌❌\nВаша лабораторная работа №{lab.number} была проверена и отклонена преподавателем\n"\
             f"Данные по работе:\n"\

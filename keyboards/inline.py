@@ -64,7 +64,7 @@ async def teacher_menu_kb(show_all_groups_button: bool = True) -> InlineKeyboard
 
 async def student_menu_kb(telegram_id: int) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=2, )
-    if await database_manager.select_student_groups_names_with_id(telegram_id=telegram_id):
+    if DatabaseManager.select_student_groups_names_with_id(telegram_id=telegram_id):
         kb.insert(InlineKeyboardButton(
             text='👥Мои группы',
             callback_data=show_callback.new(data_type="group", user_role="student")), )
@@ -86,7 +86,7 @@ async def confirmation_kb() -> InlineKeyboardMarkup:
     return kb
 
 
-async def teacher_group_menu_kb(group_id) -> InlineKeyboardMarkup:
+def teacher_group_menu_kb(group_id) -> InlineKeyboardMarkup:
     """
     group_id - group's id from database to build a callback
     """
@@ -144,7 +144,7 @@ async def student_group_menu_kb(group_id) -> InlineKeyboardMarkup:
     return kb
 
 
-async def get_groups_kb(group_names_and_ids: list[tuple[int, str]], role: str) -> InlineKeyboardMarkup:
+async def get_groups_kb(group_names_and_ids: list[Group], role: str) -> InlineKeyboardMarkup:
     """returns inline keyboard with groups
 
     Args:

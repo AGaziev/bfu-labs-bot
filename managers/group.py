@@ -53,26 +53,26 @@ class GroupManager:
         return True
 
     @staticmethod
-    async def get_unregistered_users_of_group(group_name: str) -> dict[int, str]:
-        unregistered_users = await DatabaseManager.get_unregistered_members_for_group(group_name=group_name)
+    def get_unregistered_users_of_group(group_name: str) -> dict[int, str]:
+        unregistered_users = DatabaseManager.get_unregistered_members_for_group(group_name=group_name)
         ids_and_credentials = {user.id: user.name
                                for user in unregistered_users}
         return ids_and_credentials
 
     @staticmethod
-    async def get_groups_for_student(telegram_id: int) -> list[tuple[int, str]]:
-        student_groups = await DatabaseManager.select_student_groups_names_with_id(telegram_id)
+    def get_groups_for_student(telegram_id: int) -> list[tuple[int, str]]:
+        student_groups = DatabaseManager.select_student_groups_names_with_id(telegram_id)
         groups = [(group.get_id(), group.name) for group in student_groups]
         return groups
 
     @staticmethod
-    async def is_student_already_connected(telegram_id: int, group_id: int) -> bool:
-        users_in_group = await DatabaseManager.select_registered_members_from_group(group_id)
+    def is_student_already_connected(telegram_id: int, group_id: int) -> bool:
+        users_in_group = DatabaseManager.select_registered_members_from_group(group_id)
         return telegram_id in users_in_group
 
     @staticmethod
-    async def add_lab_to_db(group_id: int, lab_name: str, lab_link: str):
-        if await (DatabaseManager.add_new_lab_to_group(group=DatabaseManager.get_group_by_id(group_id),
+    def add_lab_to_db(group_id: int, lab_name: str, lab_link: str):
+        if (DatabaseManager.add_new_lab_to_group(group=DatabaseManager.get_group_by_id(group_id),
                                                        lab_descr=lab_name,
                                                        lab_link=lab_link)):
             logger.success(f"Added lab {lab_name} to group {group_id}")
@@ -87,27 +87,27 @@ class GroupManager:
             group_id=group_id, description=lab_name, link_to_lab=link_to_lab)
 
     @staticmethod
-    async def add_lab_to_db_and_notify_students(group_id: int, lab_name: str, lab_link: str, lab_path: str):
-        await GroupManager.add_lab_to_db(group_id, lab_name, lab_path)
-        await GroupManager.notify_group_member_about_new_lab(group_id, lab_name, lab_link)
+    def add_lab_to_db_and_notify_students(group_id: int, lab_name: str, lab_link: str, lab_path: str):
+        GroupManager.add_lab_to_db(group_id, lab_name, lab_path)
+        GroupManager.notify_group_member_about_new_lab(group_id, lab_name, lab_link)
 
     @staticmethod
-    async def get_count_of_registered_members_from_group(group_id: int):
-        members = await DatabaseManager.select_registered_members_from_group(group_id=group_id)
+    def get_count_of_registered_members_from_group(group_id: int):
+        members = DatabaseManager.select_registered_members_from_group(group_id=group_id)
         return len(members)
 
     @staticmethod
-    async def get_count_of_unregistered_members_from_group(group_name: str):
-        members = await DatabaseManager.get_unregistered_members_for_group(group_name=group_name)
+    def get_count_of_unregistered_members_from_group(group_name: str):
+        members = DatabaseManager.get_unregistered_members_for_group(group_name=group_name)
         return len(members)
 
     @staticmethod
-    async def select_lab_condition_files_count_from_group(group_id: int):
-        files = await DatabaseManager.get_labs_for_group(group_id=group_id)
+    def select_lab_condition_files_count_from_group(group_id: int):
+        files = DatabaseManager.get_labs_for_group(group_id=group_id)
         return len(files)
 
     @staticmethod
-    async def select_students_labs_statuses_count_from_group(group_id: int) -> tuple[int, int, int, int]:
+    def select_students_labs_statuses_count_from_group(group_id: int) -> tuple[int, int, int, int]:
         """
         Args:
             group_id (int): group id in database
@@ -115,29 +115,37 @@ class GroupManager:
         Returns:
             tuple[int, int, int, int]: passed, rejected, not checked, labs at all
         """
-        passed = await DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id, status='Сдано')
-        rejected = await DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id, status='Отклонено')
-        not_checked = await DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id, status='Не проверено')
-        labs_at_all = await DatabaseManager.select_all_labs_count_from_group(group_id=group_id)
+        passed = DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id,
+                                                                          status=LabStatus.HandOver)
+        rejected = DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id,
+                                                                            status=LabStatus.Rejected)
+        not_checked = DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id,
+                                                                               status=LabStatus.NotChecked)
+        labs_at_all = DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id,
+                                                                               status=LabStatus.All)
 
         return passed, rejected, not_checked, labs_at_all
 
     @staticmethod
-    async def get_group_info(group_id: int, group_name: str):
+    def get_group_info(group_id: int, group_name: str):
         group_info = GroupInfo()
-        group_info.registered_members_count = await GroupManager.get_count_of_registered_members_from_group(group_id=group_id)
-        group_info.unregistered_members_count = await GroupManager.get_count_of_unregistered_members_from_group(group_name=group_name)
+        group_info.registered_members_count = GroupManager.get_count_of_registered_members_from_group(group_id=group_id)
+        group_info.unregistered_members_count = GroupManager.get_count_of_unregistered_members_from_group(
+            group_name=group_name)
         group_info.students_at_all = group_info.registered_members_count + \
-            group_info.unregistered_members_count
-        group_info.lab_condition_files_count = await GroupManager.select_lab_condition_files_count_from_group(group_id=group_id)
-        group_info.passed_labs_count, group_info.rejected_labs_count, group_info.not_checked_labs_count, group_info.labs_at_all = await GroupManager.select_students_labs_statuses_count_from_group(group_id=group_id)
+                                     group_info.unregistered_members_count
+        group_info.lab_condition_files_count = GroupManager.select_lab_condition_files_count_from_group(
+            group_id=group_id)
+        group_info.passed_labs_count, group_info.rejected_labs_count, group_info.not_checked_labs_count, group_info.labs_at_all = GroupManager.select_students_labs_statuses_count_from_group(
+            group_id=group_id)
         return group_info
 
     @staticmethod
-    async def get_group_stats_file(group_id: int):
-        stats = await DatabaseManager.select_lab_stats_by_whole_group(group_id)
-        group_name = await DatabaseManager.select_group_name_by_group_id(group_id)
-        lab_number = await DatabaseManager.select_all_labs_count_from_group(group_id)
+    def get_group_stats_file(group_id: int):
+        stats = DatabaseManager.select_lab_stats_by_whole_group(group_id)
+        group_for_stats = DatabaseManager.get_group_by_id(group_id)
+        group_name = group_for_stats.name
+        lab_number = DatabaseManager.select_all_labs_count_from_group(group_id)
         info_for_generator = {}
         for name, labs in itertools.groupby(stats, key=lambda x: x[0]):
             labs = list(labs)
@@ -147,24 +155,27 @@ class GroupManager:
         return StatsGenerator.generate_stats(group_name, info_for_generator, lab_number)
 
     @staticmethod
-    async def get_first_not_checked_lab_in_group(group_id: int) -> LaboratoryWork:
-        return await database_manager.select_first_unchecked_lab_in_group(group_id=group_id)
+    def get_first_not_checked_lab_in_group(group_id: int):
+        return DatabaseManager.select_first_unchecked_lab_in_group(group_id=group_id)
 
     @staticmethod
-    async def get_next_not_checked_lab_in_group(group_id: int, current_lab_id: int) -> LaboratoryWork:
-        return await database_manager.select_next_unchecked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
+    def get_next_not_checked_lab_in_group(group_id: int, current_lab_id: int):
+        return DatabaseManager.select_next_unchecked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
 
     @staticmethod
-    async def get_previous_not_checked_lab_in_group(group_id: int, current_lab_id: int) -> LaboratoryWork:
-        return await database_manager.select_previous_unchecked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
+    def get_previous_not_checked_lab_in_group(group_id: int, current_lab_id: int):
+        return DatabaseManager.select_previous_unchecked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
 
     @staticmethod
-    async def post_lab_from_student(group_name: str, telegram_id: int, lab_number: int, lab_file: BytesIO, file_extension: str) -> None:
-        student_credentials = await database_manager.select_student_credentials(telegram_id=telegram_id, group_name=group_name)
-        lab_name, lab_id = await database_manager.select_lab_name_and_id_by_number(group_name=group_name, lab_number=lab_number)
+    def post_lab_from_student(group_name: str, telegram_id: int, lab_number: int, lab_file: BytesIO,
+                              file_extension: str) -> None:
+        student_credentials = DatabaseManager.select_student_credentials(telegram_id=telegram_id, group_name=group_name)
+        lab_name, lab_id = DatabaseManager.select_lab_name_and_id_by_number(group_name=group_name,
+                                                                            lab_number=lab_number)
         lab_name = f'{lab_name}.{file_extension}'
 
         cloud_path = CloudManager.add_lab_from_student(
             group_name=group_name, student_name=student_credentials, lab_path_or_file=lab_file, lab_name=lab_name)
 
-        await database_manager.insert_new_lab_from_student(lab_id=lab_id, member_credentials=student_credentials, status='Не проверено', cloud_link=cloud_path)
+        DatabaseManager.insert_new_lab_from_student(lab_id=lab_id, member_credentials=student_credentials,
+                                                    status='Не проверено', cloud_link=cloud_path)

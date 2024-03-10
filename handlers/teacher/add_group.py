@@ -22,12 +22,12 @@ async def set_new_group_name(callback: types.CallbackQuery, state: FSMContext):
 async def set_new_group_students(message: types.Message, state: FSMContext, user_id: int = None):
     # TODO: to validate type (with exist and bad names check)
     group_name = message.text.upper().replace(' ', '_')
-    owner_credentials = await database_manager.select_teacher_credentials_by_telegram_id(telegram_id=message.from_user.id)
-    repository_name = f"{group_name}_{owner_credentials.firstname}_{owner_credentials.lastname}"
+    owner_credentials = DatabaseManager.select_teacher_credentials_by_telegram_id(telegram_id=message.from_user.id)
+    repository_name = f"{group_name}_{owner_credentials.first_name}_{owner_credentials.last_name}"
     if owner_credentials.patronymic:
         repository_name += f"_{owner_credentials.patronymic}"
 
-    if await GroupManager.is_group_name_exists(repository_name):
+    if GroupManager.is_group_name_exists(repository_name):
         await message.answer(f"Название {hbold(repository_name)} уже занято, попробуйте другое",
                              reply_markup=await kb.cancel_kb(), parse_mode=types.ParseMode.HTML, )
     else:
