@@ -43,7 +43,7 @@ class Group(RegisterDateModel):
 class GroupMember(BaseModel):
     name = CharField()
     group = ForeignKeyField(Group, on_delete='CASCADE')
-    user = ForeignKeyField(User, on_delete='SET NULL')
+    user = ForeignKeyField(User, on_delete='SET NULL', null=True)
 
     class Meta:
         db_table = 'GroupMember'
