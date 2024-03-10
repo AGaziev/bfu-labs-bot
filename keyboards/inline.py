@@ -156,9 +156,9 @@ async def get_groups_kb(group_names_and_ids: list[Group], role: str) -> InlineKe
     if group_names_and_ids:
         group_buttons = [
             InlineKeyboardButton(
-                text=f'{group_name}',
-                callback_data=group_callback.new(group_id=group_id, role=role))
-            for group_id, group_name in group_names_and_ids
+                text=f'{group.name}',
+                callback_data=group_callback.new(group_id=group.id, role=role))
+            for group in group_names_and_ids
         ]
 
         for button in group_buttons:

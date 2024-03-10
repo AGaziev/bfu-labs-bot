@@ -14,14 +14,15 @@ from .db import DatabaseManager
 class GroupManager:
 
     @staticmethod
-    def create_group(name: str, students: list, teacher_id: int):
+    def create_group(name: str, students: list, teacher_user_id: int):
         # create in cloud
         CloudManager.create_group_folder(name)
         folder_url = CloudManager.get_group_folder_link(name)
         # create in db
-        group = DatabaseManager.create_group(name, teacher_id)
+        teacher = DatabaseManager.select_teacher_credentials_by_telegram_id(teacher_user_id)
+        group = DatabaseManager.create_group(name, teacher.id)
         DatabaseManager.add_group_members_to_group(group, students)
-        return folder_url, group.get_id()
+        return folder_url, group.id
 
     @staticmethod
     def is_group_name_exists(name: str) -> bool:
@@ -39,7 +40,7 @@ class GroupManager:
 
     @staticmethod
     def get_group_name_by_id(group_id: int):
-        return DatabaseManager.get_group_by_id(group_id)
+        return DatabaseManager.get_group_by_id(group_id).name
 
     @staticmethod
     def connect_student_to_group(group_name: str, student_name: str, member_id: int, telegram_id) -> bool:

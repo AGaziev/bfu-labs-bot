@@ -96,13 +96,13 @@ async def change_stundents_list_to_new_file(callback: types.CallbackQuery, state
 async def end_group_add(call: types.CallbackQuery, state: FSMContext):
     await call.message.delete()
     async with state.proxy() as group_data:
-        group_data["cloud_drive_url"], group_id = await GroupManager.create_group(
+        group_data["cloud_drive_url"], group_id = GroupManager.create_group(
             group_data["name"], group_data["students"], call.from_user.id)
         group_name = group_data['name']
         group_url = group_data['cloud_drive_url']
         await call.message.answer(f"Группа {hbold(group_name)} успешно создана\n"
                                   f"{hlink('Ссылка на группу', group_url)}",
-                                  reply_markup=await kb.teacher_group_menu_kb(group_id),
+                                  reply_markup=kb.teacher_group_menu_kb(group_id),
                                   parse_mode="HTML")
         await state.finish()
         await states.TeacherState.group_menu.set() #FIXME ??

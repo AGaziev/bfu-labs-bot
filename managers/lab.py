@@ -15,8 +15,8 @@ class LabManager:
     async def get_student_lab_stats(group_id: int, telegram_id: int):
         lab_statistic_of_student = await DatabaseManager.select_students_labs_with_status_in_group(group_id, telegram_id)
 
-        accepted_labs: list[LaboratoryWork | None] = []
-        not_done_labs: list[LaboratoryWork | None] = []
+        accepted_labs: list = []
+        not_done_labs: list = []
         # FIXME: а если == "Не проверено"?
         if lab_statistic_of_student:
             for lab_info in lab_statistic_of_student:
