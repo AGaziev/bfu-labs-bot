@@ -9,7 +9,6 @@ import keyboards as kb
 from middlewares import rate_limit
 
 from loader import bot
-from managers import database_manager
 from .is_admin_wrapper import is_user_admin
 
 

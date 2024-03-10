@@ -1,5 +1,9 @@
 from aiogram.utils.markdown import hlink
-from utils.models import StudentsLabs, LaboratoryWork
+
+from _legacy.laboratory_work import LaboratoryWork
+from _legacy.students_labs import StudentsLabs
+
+
 class Formatter:
     @staticmethod
     def list_of_students(studs: dict[int, str]):

@@ -3,7 +3,7 @@ import itertools
 from loguru import logger
 from io import BytesIO
 
-from utils.enums import Blocked
+from utils.enums import Blocked, LabStatus
 import utils.mailer as mailing
 from utils.group_info import GroupInfo
 from utils.stat_generator import StatsGenerator

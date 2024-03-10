@@ -1,7 +1,8 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
-from managers import database_manager
+from managers.db import DatabaseManager
+from utils import Group
 from utils.callbacks import group_callback, show_callback, add_lab_callback, check_lab_callback, stats_callback
 
 

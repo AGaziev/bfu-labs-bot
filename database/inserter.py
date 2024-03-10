@@ -1,5 +1,5 @@
 from handlers.error import error_handling
-from utils import Group, GroupMember, LabWork, LabRegistry
+from utils import Group, GroupMember, LabWork, LabRegistry, Status, User
 
 
 class Inserter:

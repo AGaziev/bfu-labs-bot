@@ -1,10 +1,9 @@
 from loguru import logger
 
-from utils.enums import Blocked
-from utils.mailer import Mailer
+from _legacy.laboratory_work import LaboratoryWork
+from _legacy.students_labs import StudentsLabs
+from managers import *
 from .cloud import CloudManager
-from .db import database_manager
-from utils.models import StudentsLabs, LaboratoryWork
 from loader import bot
 
 from aiogram import types

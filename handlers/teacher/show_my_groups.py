@@ -1,8 +1,8 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 import keyboards as kb
+from managers.db import DatabaseManager
 from middlewares import rate_limit
-from managers import database_manager
 from utils import states
 
 

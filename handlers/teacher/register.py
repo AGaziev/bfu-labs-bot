@@ -8,7 +8,6 @@ from loader import bot
 import keyboards as kb
 from middlewares import rate_limit
 from utils import states
-from managers import database_manager
 from data import configuration
 
 

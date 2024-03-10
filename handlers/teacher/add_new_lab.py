@@ -7,7 +7,7 @@ from loguru import logger
 import keyboards as kb
 from middlewares import rate_limit
 from utils import states
-from managers import GroupManager, CloudManager, database_manager
+from managers import GroupManager, CloudManager
 
 
 @rate_limit(limit=3)

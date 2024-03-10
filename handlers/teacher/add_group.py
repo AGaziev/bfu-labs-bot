@@ -4,9 +4,10 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.markdown import hbold, hitalic, hlink
 import keyboards as kb
+from managers.db import DatabaseManager
 from middlewares import rate_limit
 from utils import states
-from managers import GroupManager, database_manager
+from managers import GroupManager
 from utils.parsers import TxtParser
 from utils.samples_gerenator import SamplesGenerator
 

@@ -5,9 +5,9 @@ from aiogram.utils.markdown import hbold, hitalic, hlink
 from loguru import logger
 
 import keyboards as kb
+from _legacy.laboratory_work import LaboratoryWork
 from middlewares import rate_limit
 from utils import states
-from utils.models import LaboratoryWork
 from managers import GroupManager, CloudManager, LabManager
 
 

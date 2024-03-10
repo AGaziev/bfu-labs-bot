@@ -1,5 +1,9 @@
+from peewee import fn, JOIN
+
+from _legacy.laboratory_work import LaboratoryWork
 from handlers.error import error_handling
-from utils import Group, GroupMember, LabRegistry
+from utils import Group, GroupMember, LabRegistry, LabWork, User, Status, Teacher
+from utils.enums import LabStatus
 
 
 class Selector:

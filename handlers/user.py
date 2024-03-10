@@ -4,12 +4,12 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.markdown import hbold
 
+from managers.db import DatabaseManager
 from middlewares import rate_limit
 import keyboards as kb
 
 from data import configuration
 from utils import states
-from managers import database_manager
 
 
 @rate_limit(limit=3)
