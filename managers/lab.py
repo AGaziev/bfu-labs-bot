@@ -2,12 +2,13 @@ from loguru import logger
 
 from _legacy.laboratory_work import LaboratoryWork
 from _legacy.students_labs import StudentsLabs
-from managers import *
 from .cloud import CloudManager
 from loader import bot
 
 from aiogram import types
 from aiogram.utils.markdown import hlink
+
+from .db import DatabaseManager
 
 
 class LabManager:

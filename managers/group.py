@@ -62,9 +62,8 @@ class GroupManager:
 
     @staticmethod
     def get_groups_for_student(telegram_id: int) -> list[tuple[int, str]]:
-        student_groups = DatabaseManager.select_student_groups_names_with_id(telegram_id)
-        groups = [(group.get_id(), group.name) for group in student_groups]
-        return groups
+        student_groups = DatabaseManager.select_student_groups_names_with_id(telegram_id).objects()
+        return student_groups
 
     @staticmethod
     def is_student_already_connected(telegram_id: int, group_id: int) -> bool:
