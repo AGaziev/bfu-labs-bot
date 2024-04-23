@@ -15,7 +15,7 @@ from managers import GroupManager
 @rate_limit(limit=3)
 async def show_my_groups(call: types.CallbackQuery, state: FSMContext):
     """Show groups for student"""
-    groups = await GroupManager.get_groups_for_student(call.from_user.id)
+    groups = GroupManager.get_groups_for_student(call.from_user.id)
     if not groups:
         await call.message.answer("У вас нет групп, подключитесь к какой-нибудь", reply_markup=await kb.student_menu_kb())
         return
