@@ -9,12 +9,13 @@ from _legacy.laboratory_work import LaboratoryWork
 from middlewares import rate_limit
 from utils import states
 from managers import GroupManager, CloudManager, LabManager
+from loader import bot
 
 
 def create_message_by_lab_work(lab_work: LaboratoryWork) -> str:
-    message = f"Лабораторная работа №{hbold(lab_work.number)}\n"\
-        f"Студент: {hbold(lab_work.member_credentials)}\n"\
-        f"Лабораторная работа: {hbold(lab_work.description)}\n\n"
+    message = f"Лабораторная работа №{hbold(lab_work.number)}\n" \
+              f"Студент: {hbold(lab_work.member_credentials)}\n" \
+              f"Лабораторная работа: {hbold(lab_work.description)}\n\n"
 
     return message
 
@@ -37,7 +38,8 @@ async def show_not_checked_labs(call: types.CallbackQuery, state: FSMContext):
     input_file = types.InputFile(document, filename=filename)
     await call.message.delete()
     await call.message.answer_document(input_file, caption=message,
-                                       reply_markup=await kb.teacher_check_students_labs_kb(lab_id=first_not_checked_lab.id_),
+                                       reply_markup=await kb.teacher_check_students_labs_kb(
+                                           lab_id=first_not_checked_lab.id_),
                                        parse_mode=types.ParseMode.HTML)
     await state.update_data(current_lab_id=first_not_checked_lab.id_)
 
@@ -49,7 +51,8 @@ async def show_next_not_checked_lab(call: types.CallbackQuery, state: FSMContext
         group_name = data['group_name']
         current_lab_id = data['current_lab_id']
 
-    next_not_checked_lab = await GroupManager.get_next_not_checked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
+    next_not_checked_lab = await GroupManager.get_next_not_checked_lab_in_group(group_id=group_id,
+                                                                                current_lab_id=current_lab_id)
     message = f"Выбранная группа:\n{hbold(group_name)}\n\n"
     message += create_message_by_lab_work(lab_work=next_not_checked_lab)
 
@@ -57,8 +60,9 @@ async def show_next_not_checked_lab(call: types.CallbackQuery, state: FSMContext
         path=next_not_checked_lab.cloud_link)
     input_file = types.InputFile(document, filename=filename)
 
-    await call.message.edit_media(types.InputMediaDocument(input_file, caption=message, parse_mode=types.ParseMode.HTML),
-                                  reply_markup=await kb.teacher_check_students_labs_kb(lab_id=next_not_checked_lab.id_))
+    await call.message.edit_media(
+        types.InputMediaDocument(input_file, caption=message, parse_mode=types.ParseMode.HTML),
+        reply_markup=await kb.teacher_check_students_labs_kb(lab_id=next_not_checked_lab.id_))
     await state.update_data(current_lab_id=next_not_checked_lab.id_)
 
 
@@ -68,7 +72,8 @@ async def show_previous_not_checked_lab(call: types.CallbackQuery, state: FSMCon
         group_name = data['group_name']
         current_lab_id = data['current_lab_id']
 
-    previous_not_checked_lab = await GroupManager.get_previous_not_checked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
+    previous_not_checked_lab = await GroupManager.get_previous_not_checked_lab_in_group(group_id=group_id,
+                                                                                        current_lab_id=current_lab_id)
     message = f"Выбранная группа:\n{hbold(group_name)}\n\n"
     message += create_message_by_lab_work(lab_work=previous_not_checked_lab)
 
@@ -76,8 +81,9 @@ async def show_previous_not_checked_lab(call: types.CallbackQuery, state: FSMCon
         path=previous_not_checked_lab.cloud_link)
     input_file = types.InputFile(document, filename=filename)
 
-    await call.message.edit_media(types.InputMediaDocument(input_file, caption=message, parse_mode=types.ParseMode.HTML),
-                                  reply_markup=await kb.teacher_check_students_labs_kb(lab_id=previous_not_checked_lab.id_))
+    await call.message.edit_media(
+        types.InputMediaDocument(input_file, caption=message, parse_mode=types.ParseMode.HTML),
+        reply_markup=await kb.teacher_check_students_labs_kb(lab_id=previous_not_checked_lab.id_))
     await state.update_data(current_lab_id=previous_not_checked_lab.id_)
 
 

@@ -14,12 +14,12 @@ from loguru import logger
 async def show_undone_labs_for_post(call: types.CallbackQuery, state: FSMContext, callback_data: dict):
     # call.data sample: "group:1:student"
     group_id = callback_data["group_id"]
-    group_name = await GroupManager.get_group_name_by_id(group_id)
-    lab_stats = await LabManager.get_student_lab_stats(group_id, call.from_user.id)
+    group_name = GroupManager.get_group_name_by_id(group_id)
+    lab_stats = LabManager.get_student_lab_stats(group_id, call.from_user.id)
     not_done_lab_names_with_number = {}
     if lab_stats:
         for lab in lab_stats.not_done:
-            lab.cloud_link = await LabManager.get_lab_link_by_path(lab.cloud_link)
+            lab.cloud_link = LabManager.get_lab_link_by_path(lab.cloud_link)
             not_done_lab_names_with_number[lab.number] = lab.description
     await call.message.edit_text(f"Какую лабораторную сдаем?\n"
                                  f"Введи число перед названием\n"
@@ -83,10 +83,10 @@ async def end_posting_lab(call: types.CallbackQuery, state: FSMContext):
                                     reply_markup=None,
                                     parse_mode=types.ParseMode.HTML)
     async with state.proxy() as posting_data:
-        await GroupManager.post_lab_from_student(group_name=posting_data['group_name'],
-                                                 telegram_id=call.from_user.id,
-                                                 lab_number=posting_data['lab_number'],
-                                                 lab_file=posting_data['io_file'],
-                                                 file_extension=posting_data['file_extension'])
+        GroupManager.post_lab_from_student(group_name=posting_data['group_name'],
+                                           telegram_id=call.from_user.id,
+                                           lab_number=posting_data['lab_number'],
+                                           lab_file=posting_data['io_file'],
+                                           file_extension=posting_data['file_extension'])
         await call.message.answer("Ваша лабораторная у преподавателя!")
     await state.finish()

@@ -52,9 +52,8 @@ class GroupMember(BaseModel):
 class LabRegistry(RegisterDateModel):
     group = ForeignKeyField(Group, on_delete='CASCADE')
     name = CharField()
-    number = IntegerField()
     cloud_link = CharField()
-    deadline = IntegerField()
+    deadline = IntegerField(null=True)
 
     class Meta:
         db_table = 'LabRegistry'

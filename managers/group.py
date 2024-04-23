@@ -73,8 +73,8 @@ class GroupManager:
     @staticmethod
     def add_lab_to_db(group_id: int, lab_name: str, lab_link: str):
         if (DatabaseManager.add_new_lab_to_group(group=DatabaseManager.get_group_by_id(group_id),
-                                                       lab_descr=lab_name,
-                                                       lab_link=lab_link)):
+                                                 lab_descr=lab_name,
+                                                 lab_link=lab_link)):
             logger.success(f"Added lab {lab_name} to group {group_id}")
         else:
             logger.error(
@@ -87,9 +87,9 @@ class GroupManager:
             group_id=group_id, description=lab_name, link_to_lab=link_to_lab)
 
     @staticmethod
-    def add_lab_to_db_and_notify_students(group_id: int, lab_name: str, lab_link: str, lab_path: str):
+    async def add_lab_to_db_and_notify_students(group_id: int, lab_name: str, lab_link: str, lab_path: str):
         GroupManager.add_lab_to_db(group_id, lab_name, lab_path)
-        GroupManager.notify_group_member_about_new_lab(group_id, lab_name, lab_link)
+        await GroupManager.notify_group_member_about_new_lab(group_id, lab_name, lab_link)
 
     @staticmethod
     def get_count_of_registered_members_from_group(group_id: int):

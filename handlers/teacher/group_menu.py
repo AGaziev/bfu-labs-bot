@@ -15,7 +15,7 @@ async def teacher_group_menu(call: types.CallbackQuery, state: FSMContext):
     group_info = GroupManager.get_group_info(group_id=group_id, group_name=group_name)
 
     def percent_hitalic(x: int, y: int) -> str:
-        percent = f"{round(x/y*100, 2)}%" if y else "0%"
+        percent = f"{round(x / y * 100, 2)}%" if y else "0%"
         return hitalic(percent)
 
     await call.message.edit_text(f"Вы выбрали группу\n{hbold(group_name)}\n\n"
@@ -28,9 +28,9 @@ async def teacher_group_menu(call: types.CallbackQuery, state: FSMContext):
                                  f"👀   Ожидают проверки: {hbold(group_info.not_checked_labs_count or 0)} — {percent_hitalic(group_info.not_checked_labs_count, group_info.labs_at_all)}\n"
                                  f"🏆   Сданы: {hbold(group_info.passed_labs_count or 0)} — {percent_hitalic(group_info.passed_labs_count, group_info.labs_at_all)}\n"
                                  f"👎   Не сданы: {hbold(group_info.rejected_labs_count or 0)} — {percent_hitalic(group_info.rejected_labs_count, group_info.labs_at_all)}\n",
-                                 reply_markup=await kb.teacher_group_menu_kb(group_id=group_id),
+                                 reply_markup=kb.teacher_group_menu_kb(group_id=group_id),
                                  parse_mode=types.ParseMode.HTML)
-    await state.update_data(group_name=group_name)
+    await state.update_data(name=group_name)
     await state.update_data(group_id=group_id)
     await states.TeacherState.group_menu.set()
 

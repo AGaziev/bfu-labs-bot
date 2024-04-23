@@ -6,13 +6,12 @@ from utils import Group, GroupMember, LabRegistry, LabWork, User, Status, Teache
 from utils.enums import LabStatus
 
 
-
 class Selector:
 
     @staticmethod
     def get_group_member_by_telegram_and_group(group_id, telegram_id) -> GroupMember:
         member_subquery = GroupMember.get((GroupMember.group == group_id) &
-                        (GroupMember.user == telegram_id))
+                                          (GroupMember.user == telegram_id))
         return member_subquery
 
     @staticmethod
@@ -35,7 +34,7 @@ class Selector:
 
     @staticmethod
     def select_registered_members_from_group(group_id) -> list[GroupMember]:
-        return GroupMember.select(GroupMember.id).where((GroupMember.group == group_id) & (GroupMember.user != None))
+        return GroupMember.select().where((GroupMember.group == group_id) & (GroupMember.user != None)).objects()
 
     @staticmethod
     def get_labs_for_group(group_id) -> list[LabRegistry]:
@@ -44,14 +43,15 @@ class Selector:
     @staticmethod
     def select_labs_with_status_count_from_group(group_id, status: LabStatus):
         subquery_member_ids = (GroupMember
-                               .select(GroupMember.user)
+                               .select(GroupMember.id)
                                .where(GroupMember.group == group_id))
 
         subquery_status_id = (Status
                               .select(Status.id)
                               .where(Status.title == status.value)
-                              .limit(1)
-                              )  # Используем limit(1) для получения одного id, так как предполагается, что status_name уникален
+                              .limit(1))
+        # Используем limit(1) для получения одного id, так как предполагается,
+        # что status_name уникален
 
         query = (LabWork
                  .select(LabWork.id)
@@ -89,7 +89,7 @@ class Selector:
 
     @staticmethod
     def select_first_unchecked_lab_in_group(group_id):
-        subquery = (LabStatus
+        subquery = (Status
                     .select(LabStatus.id)
                     .where(LabStatus.status_name == 'Не проверено')
                     .limit(1))
@@ -193,7 +193,6 @@ class Selector:
 
         query = (LabRegistry
                  .select(LabRegistry.id.alias('id'),
-                         LabRegistry.number.alias('number'),
                          LabRegistry.name.alias('descr'),
                          LabRegistry.cloud_link.alias('path'),
                          fn.COALESCE(Status.title, 'Не сдано').alias('status'))
