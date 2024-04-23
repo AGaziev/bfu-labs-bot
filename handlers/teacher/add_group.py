@@ -3,6 +3,8 @@ from io import BytesIO
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.markdown import hbold, hitalic, hlink
+from yadisk.exceptions import DirectoryExistsError
+
 import keyboards as kb
 from managers.db import DatabaseManager
 from middlewares import rate_limit
@@ -96,8 +98,13 @@ async def change_stundents_list_to_new_file(callback: types.CallbackQuery, state
 async def end_group_add(call: types.CallbackQuery, state: FSMContext):
     await call.message.delete()
     async with state.proxy() as group_data:
-        group_data["cloud_drive_url"], group_id = GroupManager.create_group(
-            group_data["name"], group_data["students"], call.from_user.id)
+        try:
+            group_data["cloud_drive_url"], group_id = GroupManager.create_group(
+                group_data["name"], group_data["students"], call.from_user.id)
+        except DirectoryExistsError:
+            await call.message.answer("Такое название уже есть на облаке, попробуйте другое или обратитесь к администратору")
+            await states.TeacherState.add_group.name.set()
+            return
         group_name = group_data['name']
         group_url = group_data['cloud_drive_url']
         await call.message.answer(f"Группа {hbold(group_name)} успешно создана\n"
