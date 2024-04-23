@@ -59,27 +59,23 @@ class LabManager:
         return CloudManager.get_public_link_by_destination_path(path)
 
     @staticmethod
-    async def accept_laboratory_work(lab_id: int):
-        await DatabaseManager.update_lab_status(lab_id=lab_id, status='Сдано')
+    def accept_laboratory_work(lab_id: int) -> [int, str]:
+        DatabaseManager.update_lab_status(lab_id=lab_id, status='Сдано')
         lab, student_telegram_id = DatabaseManager.select_lab_and_owner_telegram_id_by_lab_id(lab_id)
-        lab_link = await LabManager.get_lab_link_by_path(lab.cloud_link)
-        message = f"✅✅✅\nВаша лабораторная работа №{lab.number} была проверена и принята преподавателем\n"\
-            f"Данные по работе:\n"\
-            f"Название: {lab.description}\n"\
-            f"{hlink('Ссылка', lab_link)} на работу\n"
-        await bot.send_message(chat_id=student_telegram_id,
-                               text=message,
-                               parse_mode=types.ParseMode.HTML)
+        lab_link = LabManager.get_lab_link_by_path(lab.cloud_link)
+        message = f"✅✅✅\nВаша лабораторная работа №{lab.number} была проверена и принята преподавателем\n" \
+                  f"Данные по работе:\n" \
+                  f"Название: {lab.description}\n" \
+                  f"{hlink('Ссылка', lab_link)} на работу\n"
+        return student_telegram_id, message
 
     @staticmethod
-    async def reject_laboratory_work(lab_id: int):
+    def reject_laboratory_work(lab_id: int):
         DatabaseManager.update_lab_status(lab_id=lab_id, status='Отклонено')
         lab, student_telegram_id = DatabaseManager.select_lab_and_owner_telegram_id_by_lab_id(lab_id)
         lab_link = LabManager.get_lab_link_by_path(lab.cloud_link)
-        message = f"❌❌❌\nВаша лабораторная работа №{lab.number} была проверена и отклонена преподавателем\n"\
-            f"Данные по работе:\n"\
-            f"Название: {lab.description}\n"\
-            f"{hlink('Ссылка', lab_link)} на работу\n"
-        await bot.send_message(chat_id=student_telegram_id,
-                               text=message,
-                               parse_mode=types.ParseMode.HTML)
+        message = f"❌❌❌\nВаша лабораторная работа №{lab.number} была проверена и отклонена преподавателем\n" \
+                  f"Данные по работе:\n" \
+                  f"Название: {lab.description}\n" \
+                  f"{hlink('Ссылка', lab_link)} на работу\n"
+        return student_telegram_id, message

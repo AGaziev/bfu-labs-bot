@@ -85,9 +85,13 @@ async def accept_laboratory_work(call: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         lab_id = data['current_lab_id']
 
-    await LabManager.accept_laboratory_work(lab_id=lab_id)
+    student_telegram_id, message = LabManager.accept_laboratory_work(lab_id=lab_id)
+    await bot.send_message(chat_id=student_telegram_id,
+                           text=message,
+                           parse_mode=types.ParseMode.HTML)
     await call.message.edit_caption(f"✅Лабораторная работа принята\n\n{call.message.caption}",
-                                    reply_markup=await kb.teacher_check_students_labs_kb(lab_id=lab_id, show_rate_buttons=False),
+                                    reply_markup=await kb.teacher_check_students_labs_kb(lab_id=lab_id,
+                                                                                         show_rate_buttons=False),
                                     parse_mode=types.ParseMode.HTML)
 
 
@@ -95,7 +99,11 @@ async def reject_laboratory_work(call: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         lab_id = data['current_lab_id']
 
-    await LabManager.reject_laboratory_work(lab_id=lab_id)
+    student_telegram_id, message = LabManager.reject_laboratory_work(lab_id=lab_id)
+    await bot.send_message(chat_id=student_telegram_id,
+                           text=message,
+                           parse_mode=types.ParseMode.HTML)
     await call.message.edit_caption(f"❌Лабораторная работа отклонена\n\n{call.message.caption}",
-                                    reply_markup=await kb.teacher_check_students_labs_kb(lab_id=lab_id, show_rate_buttons=False),
+                                    reply_markup=await kb.teacher_check_students_labs_kb(lab_id=lab_id,
+                                                                                         show_rate_buttons=False),
                                     parse_mode=types.ParseMode.HTML)
