@@ -13,7 +13,7 @@ from .db import DatabaseManager
 
 class LabManager:
     @staticmethod
-    async def get_student_lab_stats(group_id: int, telegram_id: int):
+    def get_student_lab_stats(group_id: int, telegram_id: int):
         lab_statistic_of_student = DatabaseManager.select_students_labs_with_status_in_group(group_id, telegram_id)
 
         accepted_labs: list = []
@@ -22,10 +22,9 @@ class LabManager:
         if lab_statistic_of_student:
             for lab_info in lab_statistic_of_student:
                 current_lab = LaboratoryWork(
-                    id_=lab_info["id"],
-                    number=lab_info["number"],
-                    description=lab_info["descr"],
-                    cloud_link=lab_info["path"],
+                    id_=lab_info.id,
+                    description=lab_info.name,
+                    cloud_link=lab_info.cloud_link,
                 )
                 if lab_info["status"] == "Сдано":
                     accepted_labs.append(current_lab)
@@ -34,10 +33,9 @@ class LabManager:
 
         undone_labs = DatabaseManager.select_undone_group_labs_for_student(group_id, telegram_id)
         undone_labs = [LaboratoryWork(
-            id_=lab["id"],
-            number=lab["lab_number"],
-            description=lab["lab_description"],
-            cloud_link=lab["cloud_link"],
+            id_=lab.id,
+            description=lab.name,
+            cloud_link=lab.cloud_link,
         ) for lab in undone_labs]
 
         not_done_labs.extend(undone_labs)
@@ -48,14 +46,14 @@ class LabManager:
         return StudentsLabs(accepted_labs, not_done_labs)
 
     @staticmethod
-    async def get_student_undone_labs_files(group_id: int, telegram_id: int):
+    def get_student_undone_labs_files(group_id: int, telegram_id: int):
         undone_labs = DatabaseManager.select_undone_group_labs_for_student(group_id, telegram_id)
-        links = tuple([lab["cloud_link"] for lab in undone_labs])
+        links = tuple([lab.cloud_link for lab in undone_labs])
         files, filenames = CloudManager.get_files_by_link(links)
         return zip(files, filenames)
 
     @staticmethod
-    async def get_lab_link_by_path(path: str):
+    def get_lab_link_by_path(path: str):
         return CloudManager.get_public_link_by_destination_path(path)
 
     @staticmethod
