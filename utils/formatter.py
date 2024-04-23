@@ -28,8 +28,8 @@ class Formatter:
             return "Лабораторных еще нет :("
         accepted, not_done = len(lab_stats.accepted), len(lab_stats.not_done)
         result = f"{accepted}/{not_done + accepted}\n"
-        for lab in lab_stats.not_done:
-            result += f"{lab.number}. {lab.description}\n"
+        for i, lab in enumerate(lab_stats.not_done):
+            result += f"{i + 1}. {lab.description}\n"
         return result
 
     @staticmethod
