@@ -1,4 +1,4 @@
-from peewee import fn, JOIN
+from peewee import fn, JOIN, ModelSelect
 
 from _legacy.laboratory_work import LaboratoryWork
 from handlers.error import error_handling
@@ -6,7 +6,15 @@ from utils import Group, GroupMember, LabRegistry, LabWork, User, Status, Teache
 from utils.enums import LabStatus
 
 
+
 class Selector:
+
+    @staticmethod
+    def get_group_member_by_telegram_and_group(group_id, telegram_id) -> GroupMember:
+        member_subquery = GroupMember.get((GroupMember.group == group_id) &
+                        (GroupMember.user == telegram_id))
+        return member_subquery
+
     @staticmethod
     def get_group_by_name(name: str) -> Group:
         return Group.get_or_none(name=name)
@@ -43,13 +51,13 @@ class Selector:
                               .select(Status.id)
                               .where(Status.title == status.value)
                               .limit(1)
-                )  # Используем limit(1) для получения одного id, так как предполагается, что status_name уникален
+                              )  # Используем limit(1) для получения одного id, так как предполагается, что status_name уникален
 
         query = (LabWork
-                 .select(fn.COUNT(LabWork.id))
+                 .select(LabWork.id)
                  .where((LabWork.member.in_(subquery_member_ids)) &
-                        (LabWork.status == subquery_status_id)))
-        return query.scalar()
+                        (LabWork.status == subquery_status_id))).tuples()
+        return len(query)
 
     @staticmethod
     def select_lab_stats_by_whole_group(group_id):
@@ -134,20 +142,20 @@ class Selector:
                     .limit(1))
 
         return (LabWork
-                 .select(LabWork.id,
-                         LabRegistry.lab_number,
-                         LabRegistry.lab_description,
-                         LabRegistry.cloud_link,
-                         GroupMember.credentials)
-                 .join(LabRegistry, JOIN.LEFT_OUTER, on=(LabWork.lab_id == LabRegistry.id))
-                 .switch(LabWork)
-                 .join(GroupMember, JOIN.LEFT_OUTER,
-                       on=(LabWork.member_id == GroupMember.member_id))
-                 .where((GroupMember.group_id == group_id) &
-                        (LabWork.status_id.in_(subquery)) &
-                        (LabWork.id < current_lab_id))
-                 .order_by(LabWork.id.asc())
-                 .limit(1))
+                .select(LabWork.id,
+                        LabRegistry.lab_number,
+                        LabRegistry.lab_description,
+                        LabRegistry.cloud_link,
+                        GroupMember.credentials)
+                .join(LabRegistry, JOIN.LEFT_OUTER, on=(LabWork.lab_id == LabRegistry.id))
+                .switch(LabWork)
+                .join(GroupMember, JOIN.LEFT_OUTER,
+                      on=(LabWork.member_id == GroupMember.member_id))
+                .where((GroupMember.group_id == group_id) &
+                       (LabWork.status_id.in_(subquery)) &
+                       (LabWork.id < current_lab_id))
+                .order_by(LabWork.id.asc())
+                .limit(1))
 
     @staticmethod
     def select_student_credentials(telegram_id, group_name):
@@ -181,35 +189,27 @@ class Selector:
 
     @staticmethod
     def select_students_labs_with_status_in_group(group_id, telegram_id):
-        member_id_subquery = (User
-                              .select(User.member_id)
-                              .where((User.group_id == group_id) &
-                                     (User.telegram_id == telegram_id))
-                              .limit(1))
+        member = Selector.get_group_member_by_telegram_and_group(group_id, telegram_id)
 
         query = (LabRegistry
                  .select(LabRegistry.id.alias('id'),
-                         LabRegistry.lab_number.alias('number'),
-                         LabRegistry.lab_description.alias('descr'),
+                         LabRegistry.number.alias('number'),
+                         LabRegistry.name.alias('descr'),
                          LabRegistry.cloud_link.alias('path'),
-                         fn.COALESCE(Status.status_name, 'Не сдано').alias('status'))
+                         fn.COALESCE(Status.title, 'Не сдано').alias('status'))
                  .join(LabWork, JOIN.LEFT_OUTER, on=(LabRegistry.id == LabWork.lab_id))
                  .join(Status, JOIN.LEFT_OUTER, on=(LabWork.status_id == Status.id))
                  .where(LabRegistry.group_id == group_id,
-                        LabWork.member_id == member_id_subquery))
+                        LabWork.member_id == member.id))
         return query
 
     @staticmethod
     def select_undone_group_labs_for_student(group_id, telegram_id):
-        subquery_member_id = (User
-                              .select(User.member_id)
-                              .where((User.telegram_id == telegram_id) &
-                                     (User.group_id == group_id)))
+        member = Selector.get_group_member_by_telegram_and_group(group_id, telegram_id)
 
         subquery_lab_id = (LabWork
                            .select(LabWork.lab_id)
-                           .where((LabWork.group_id == group_id) &
-                                  (LabWork.member_id.in_(subquery_member_id))))
+                           .where((LabWork.member_id == member.id)))
 
         query = (LabRegistry
                  .select()

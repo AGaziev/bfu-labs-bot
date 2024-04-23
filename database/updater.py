@@ -5,7 +5,8 @@ from utils import Group, GroupMember, Status, LabWork, User
 class Updater:
     @staticmethod
     def connect_user_to_group(member_id: int, telegram_id: int):
-        return GroupMember.get_by_id(member_id).update(telegram_id=telegram_id)
+        return GroupMember.update(user=telegram_id)\
+            .where(GroupMember.id == member_id).execute()
 
     @staticmethod
     def update_lab_status(lab_id: int, status: str):
