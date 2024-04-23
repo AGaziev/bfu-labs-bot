@@ -5,6 +5,7 @@ from io import BytesIO
 from loguru import logger
 
 import keyboards as kb
+from managers.db import DatabaseManager
 from middlewares import rate_limit
 from utils import states
 from managers import GroupManager, CloudManager
@@ -60,7 +61,7 @@ async def upload_file_to_cloud_drive(call:types.CallbackQuery, state: FSMContext
     async with state.proxy() as data:
         io_file = data["io_file"]
         filename = data["filename"]
-        group_name = data["group_name"]
+        group_name = data["name"]
 
     await call.message.edit_text(f"Загружаю файл {hbold(filename)} на облачный диск",
                                  reply_markup= None,
@@ -68,7 +69,7 @@ async def upload_file_to_cloud_drive(call:types.CallbackQuery, state: FSMContext
 
     lab_path = CloudManager.add_lab_to_group_folder(group_name=group_name, lab_path_or_file=io_file, lab_name=filename)
     lab_url = CloudManager.get_public_link_by_destination_path(destination_path=lab_path)
-    group_id = await database_manager.select_group_id_by_group_name(group_name=group_name)
+    group_id = DatabaseManager.get_group_by_name(name=group_name)
 
     await call.message.answer(f"Файл {hbold(filename)} успешно загружен на облачный диск\n{hlink('Ссылка на файл', url=lab_url)}",
                               parse_mode=types.ParseMode.HTML)
