@@ -260,6 +260,13 @@ class Selector:
         return query
 
     @staticmethod
+    def select_teacher_credentials_by_group_id(group_id):
+        teacher_id = Group.select(Group.teacher).where(Group.id == group_id)
+
+        query = Teacher.get_by_id(teacher_id)
+        return query
+
+    @staticmethod
     def select_group_ids_and_names_owned_by_telegram_id(telegram_id):
         query = (Group
                  .select(Group.id, Group.name)
