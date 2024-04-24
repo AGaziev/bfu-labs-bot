@@ -55,14 +55,16 @@ class GroupManager:
 
     @staticmethod
     def get_unregistered_users_of_group(group_name: str) -> dict[int, str]:
-        unregistered_users = DatabaseManager.get_unregistered_members_for_group(group_name=group_name)
+        group = DatabaseManager.get_group_by_name(group_name)
+        unregistered_users = DatabaseManager.select_type_members_for_group(group=group, registered=False)
         ids_and_credentials = {user.id: user.name
                                for user in unregistered_users}
         return ids_and_credentials
 
     @staticmethod
     def get_groups_for_student(telegram_id: int) -> list[tuple[int, str]]:
-        student_groups = DatabaseManager.select_student_groups_names_with_id(telegram_id).objects()
+        user = DatabaseManager.get_user_by_telegram_id(telegram_id)
+        student_groups = DatabaseManager.select_user_groups_names_with_id(user)
         return student_groups
 
     @staticmethod
@@ -72,9 +74,11 @@ class GroupManager:
 
     @staticmethod
     def add_lab_to_db(group_id: int, lab_name: str, lab_link: str):
+        new_lab_number = DatabaseManager.select_all_labs_count_from_group(group_id)+1
         if (DatabaseManager.add_new_lab_to_group(group=DatabaseManager.get_group_by_id(group_id),
                                                  lab_descr=lab_name,
-                                                 lab_link=lab_link)):
+                                                 lab_link=lab_link,
+                                                 number=new_lab_number)):
             logger.success(f"Added lab {lab_name} to group {group_id}")
         else:
             logger.error(
@@ -98,7 +102,7 @@ class GroupManager:
 
     @staticmethod
     def get_count_of_unregistered_members_from_group(group_name: str):
-        members = DatabaseManager.get_unregistered_members_for_group(group_name=group_name)
+        members = DatabaseManager.select_unregistered_members_for_group(group_name=group_name)
         return len(members)
 
     @staticmethod
@@ -115,14 +119,15 @@ class GroupManager:
         Returns:
             tuple[int, int, int, int]: passed, rejected, not checked, labs at all
         """
-        passed = DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id,
-                                                                          status=LabStatus.HandOver)
-        rejected = DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id,
-                                                                            status=LabStatus.Rejected)
-        not_checked = DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id,
-                                                                               status=LabStatus.NotChecked)
-        labs_at_all = DatabaseManager.select_labs_with_status_count_from_group(group_id=group_id,
-                                                                               status=LabStatus.All)
+        group = DatabaseManager.get_group_by_id(group_id)
+        passed = DatabaseManager.select_labs_with_status_count_from_group(group=group,
+                                                                          status=LabStatus.HANDOVER)
+        rejected = DatabaseManager.select_labs_with_status_count_from_group(group=group,
+                                                                            status=LabStatus.REJECTED)
+        not_checked = DatabaseManager.select_labs_with_status_count_from_group(group=group,
+                                                                               status=LabStatus.NOTCHECKED)
+        labs_at_all = DatabaseManager.select_labs_with_status_count_from_group(group=group,
+                                                                               status=LabStatus.ALL)
 
         return passed, rejected, not_checked, labs_at_all
 
@@ -147,12 +152,14 @@ class GroupManager:
         group_name = group_for_stats.name
         lab_number = DatabaseManager.select_all_labs_count_from_group(group_id)
         info_for_generator = {}
-        for name, labs in itertools.groupby(stats, key=lambda x: x[0]):
+        for name, labs in itertools.groupby(stats, key=lambda x: x.name):
             labs = list(labs)
-            info_for_generator[name] = [bool(labs[0][1]),
-                                        [[lab[2], lab[3].date(), lab[4]] for lab in labs if lab[2] is not None]]
-        print(info_for_generator)
-        return StatsGenerator.generate_stats(group_name, info_for_generator, lab_number)
+            info_for_generator[name] = [bool(labs[0].is_registered),
+                                        [[lab.number, lab.date, lab.status] for lab in labs if lab.number is not None]]
+        if info_for_generator:
+            return StatsGenerator.generate_stats(group_name, info_for_generator, lab_number)
+        else:
+            return False
 
     @staticmethod
     def get_first_not_checked_lab_in_group(group_id: int):

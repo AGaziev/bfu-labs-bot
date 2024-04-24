@@ -64,7 +64,8 @@ async def teacher_menu_kb(show_all_groups_button: bool = True) -> InlineKeyboard
 
 async def student_menu_kb(telegram_id: int) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=2, )
-    if DatabaseManager.select_student_groups_names_with_id(telegram_id=telegram_id):
+    user = DatabaseManager.get_user_by_telegram_id(telegram_id)
+    if DatabaseManager.select_user_groups_names_with_id(user):
         kb.insert(InlineKeyboardButton(
             text='👥Мои группы',
             callback_data=show_callback.new(data_type="group", user_role="student")), )
@@ -109,7 +110,7 @@ def teacher_group_menu_kb(group_id) -> InlineKeyboardMarkup:
             )
         ),
         InlineKeyboardButton(
-            text='📃Переименовать группу',
+            text='📃Переименовать группу(IN PROGRESS)',
             callback_data='rename_group'
         )
     ]

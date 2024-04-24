@@ -19,7 +19,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
     DatabaseManager.update_user_is_blocked_field_by_user_id(user_id=message.from_user.id,
                                                                    is_blocked=False)
 
-    if not DatabaseManager.check_is_user_exist(user_id=message.from_user.id):
+    if not DatabaseManager.is_user_exist():
         DatabaseManager.insert_new_user(user_id=message.from_user.id,
                                                username=message.from_user.username)
         logger.info(
