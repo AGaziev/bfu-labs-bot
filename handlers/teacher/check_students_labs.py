@@ -26,7 +26,7 @@ async def show_not_checked_labs(call: types.CallbackQuery, state: FSMContext):
     await states.TeacherState.check_students_labs.set()
     async with state.proxy() as data:
         group_id: int = data['group_id']
-        group_name: str = data['group_name']
+        group_name: str = data['name']
 
     first_not_checked_lab = await GroupManager.get_first_not_checked_lab_in_group(group_id=group_id)
     message = f"Выбранная группа:\n{hbold(group_name)}\n\n"

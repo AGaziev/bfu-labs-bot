@@ -106,6 +106,7 @@ async def end_group_add(call: types.CallbackQuery, state: FSMContext):
             await states.TeacherState.add_group.name.set()
             return
         group_name = group_data['name']
+        group_data["group_id"] = group_id
         group_url = group_data['cloud_drive_url']
         await call.message.answer(f"Группа {hbold(group_name)} успешно создана\n"
                                   f"{hlink('Ссылка на группу', group_url)}",
