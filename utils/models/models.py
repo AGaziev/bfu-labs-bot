@@ -67,7 +67,7 @@ class Status(BaseModel):
         db_table = 'Status'
 
 
-class LabWork(BaseModel):
+class LabWork(RegisterDateModel):
     member = ForeignKeyField(GroupMember, on_delete='NO ACTION')
     lab = ForeignKeyField(LabRegistry, on_delete='NO ACTION')
     status = ForeignKeyField(Status, on_delete='NO ACTION')
