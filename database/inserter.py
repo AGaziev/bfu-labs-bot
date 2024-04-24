@@ -28,9 +28,9 @@ class Inserter:
         return True
 
     @staticmethod
-    def add_new_lab_to_group(group: Group, lab_descr: str, lab_link: str):
+    def add_new_lab_to_group(group: Group, lab_descr: str, lab_link: str, number: int):
         try:
-            LabRegistry.create(group=group, name=lab_descr, cloud_link=lab_link)
+            LabRegistry.create(group=group, name=lab_descr, cloud_link=lab_link, number=number)
         except Exception as e:
             print(f"Не смогли зарегистрировать новую лабораторную "
                   f"для группы {group.id} с описанием {lab_descr} и ссылкой"
