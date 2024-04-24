@@ -28,7 +28,7 @@ async def show_not_checked_labs(call: types.CallbackQuery, state: FSMContext):
         group_id: int = data['group_id']
         group_name: str = data['name']
 
-    first_not_checked_lab = await GroupManager.get_first_not_checked_lab_in_group(group_id=group_id)
+    first_not_checked_lab = GroupManager.get_first_not_checked_lab_in_group(group_id=group_id)
     message = f"Выбранная группа:\n{hbold(group_name)}\n\n"
     message += create_message_by_lab_work(lab_work=first_not_checked_lab)
 
