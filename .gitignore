@@ -168,3 +168,4 @@ tempCodeRunnerFile.py
 #some test files
 test_creator.py
 test*.py
+/data/.env.test
