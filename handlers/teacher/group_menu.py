@@ -39,6 +39,9 @@ async def send_stats_of_group(call: types.CallbackQuery, state: FSMContext, call
     group_id = callback_data['group_id']
     group_name = GroupManager.get_group_name_by_id(group_id=group_id)
     stats_file = GroupManager.get_group_stats_file(group_id=group_id)
+    if not stats_file:
+        await call.message.answer("Пока нет статистики :(\nПригласите студентов и дайте им лабораторную работу")
+        return
     stats_file.name = f"Статистика {group_name}.xlsx"
     doc = types.InputFile(stats_file)
     await call.message.answer_document(doc, caption="Статистика по лабораторным:")
