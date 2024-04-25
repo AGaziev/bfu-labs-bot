@@ -15,7 +15,9 @@ from .db import DatabaseManager
 class LabManager:
     @staticmethod
     def get_student_lab_stats(group_id: int, telegram_id: int):
-        lab_statistic_of_student = DatabaseManager.select_students_labs_with_status_in_group(group_id, telegram_id)
+        user = DatabaseManager.get_user_by_telegram_id(telegram_id)
+        group = DatabaseManager.get_group_by_id(group_id)
+        lab_statistic_of_student = DatabaseManager.select_students_labs_with_status_in_group(group, user)
 
         accepted_labs: list = []
         not_done_labs: list = []
@@ -71,10 +73,30 @@ class LabManager:
     @staticmethod
     def reject_laboratory_work(lab_id: int):
         DatabaseManager.update_lab_status(lab_id=lab_id, status='Отклонено')
-        lab, student_telegram_id = DatabaseManager.select_lab_and_owner_telegram_id_by_lab_id(lab_id)
+        lab = DatabaseManager.get_lab_by_id(lab_id)
+        student = DatabaseManager.get_group_member_by_id(lab.member)
         lab_link = LabManager.get_lab_link_by_path(lab.cloud_link)
         message = f"❌❌❌\nВаша лабораторная работа №{lab.number} была проверена и отклонена преподавателем\n" \
                   f"Данные по работе:\n" \
                   f"Название: {lab.description}\n" \
                   f"{hlink('Ссылка', lab_link)} на работу\n"
+        return student.user, message
+
+    @staticmethod
+    def get_all_labs_for_group(group_id):
+        group = DatabaseManager.get_group_by_id(group_id)
+        return DatabaseManager.select_labs_for_group(group)
+
+    @staticmethod
+    def get_not_checked_labs_for_teacher(group_id):
+        group = DatabaseManager.get_group_by_id(group_id)
+        return DatabaseManager.select_labs_with_status_for_group(group, LabStatus.NOTCHECKED)
+
+    @staticmethod
+    def select_lab_condition_files_count_from_group(group_id: int):
+        group = DatabaseManager.get_group_by_id(group_id)
+        files = DatabaseManager.select_labs_for_group(group)
+        return len(files)
+
+
         return student_telegram_id, message
