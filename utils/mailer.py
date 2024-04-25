@@ -42,13 +42,13 @@ class Mailer:
             description (str): user's description, it can be deadline or something else
             link_to_lab (str): link to lab on cloud storage
         """
-        users_to_send_notification = DatabaseManager.select_registered_members_from_group(
-            group_id=group_id)
-        teacher = DatabaseManager.select_teacher_credentials_by_group_id(group_id=group_id)
+        group = DatabaseManager.get_group_by_id(group_id)
+        users_to_send_notification = DatabaseManager.select_all_members_from_group(group)
+        teacher = DatabaseManager.get_teacher_by_group_id(group_id)
 
-        if not users_to_send_notification:
-            logger.error(
-                f"Error while selecting registered members from group; group_id = {group_id}")
+        if len(users_to_send_notification):
+            logger.warning(
+                f"No users to send notification, add some; group_id = {group.name}")
             return False
 
         message = self._create_notification_message(teacher=teacher, description=description,
