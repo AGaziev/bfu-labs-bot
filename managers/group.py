@@ -97,19 +97,10 @@ class GroupManager:
         await GroupManager.notify_group_member_about_new_lab(group_id, lab_name, lab_link)
 
     @staticmethod
-    def get_count_of_registered_members_from_group(group_id: int):
-        members = DatabaseManager.select_registered_members_from_group(group_id=group_id)
+    def get_count_of_type_members_from_group(group_id: int, registered: bool):
+        group = DatabaseManager.get_group_by_id(group_id)
+        members = DatabaseManager.select_type_members_for_group(group, registered)
         return len(members)
-
-    @staticmethod
-    def get_count_of_unregistered_members_from_group(group_name: str):
-        members = DatabaseManager.select_unregistered_members_for_group(group_name=group_name)
-        return len(members)
-
-    @staticmethod
-    def select_lab_condition_files_count_from_group(group_id: int):
-        files = DatabaseManager.get_labs_for_group(group_id=group_id)
-        return len(files)
 
     @staticmethod
     def select_students_labs_statuses_count_from_group(group_id: int) -> tuple[int, int, int, int]:
