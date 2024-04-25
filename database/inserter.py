@@ -1,7 +1,7 @@
 from peewee import fn
 
 from handlers.error import error_handling
-from utils import Group, GroupMember, LabWork, LabRegistry, Status, User
+from utils import Group, GroupMember, LabWork, LabRegistry, Status, User, Teacher
 
 
 class Inserter:
@@ -73,3 +73,8 @@ class Inserter:
                  .insert(telegram_id=user_id, username=username))
 
         query.execute()
+
+    @staticmethod
+    def insert_new_teacher(telegram_id, first_name, last_name, patronymic):
+        Teacher.insert(user=telegram_id, first_name=first_name, last_name=last_name, patronymic=patronymic) \
+            .execute()
