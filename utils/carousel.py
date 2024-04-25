@@ -10,8 +10,8 @@ class Carousel(object):
             self.index += 1
         except IndexError:
             if self.repeatable:
-                self.index = 0
                 result = self.collection[self.index]
+                self.index = 0
             raise StopIteration
         finally:
             return result
@@ -23,12 +23,8 @@ class Carousel(object):
                 raise StopIteration
         return self.collection[self.index]
 
+    def get(self):
+        return self.collection[self.index]
+
     def __iter__(self):
         return self
-
-
-a = [0,1,2,3,4]
-b = Carousel(a, True)
-while True:
-    print(b.next())
-    input("prev?")
