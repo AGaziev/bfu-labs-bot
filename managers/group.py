@@ -69,6 +69,12 @@ class GroupManager:
         return student_groups
 
     @staticmethod
+    def get_groups_for_teacher(telegram_id: int) -> list[Group]:
+        teacher = DatabaseManager.get_teacher_by_telegram_id(telegram_id)
+        teacher_groups = DatabaseManager.select_teacher_groups(teacher)
+        return teacher_groups
+
+    @staticmethod
     def is_student_already_connected(telegram_id: int, group_id: int) -> bool:
         group = DatabaseManager.get_group_by_id(group_id)
         users_in_group = DatabaseManager.select_type_members_for_group(group, True)
