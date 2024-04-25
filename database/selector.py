@@ -49,6 +49,7 @@ class Selector:
     def get_lab_by_id(lab_id: int) -> LabWork:
         return LabWork.get_by_id(lab_id)
 
+
     # endregion
     # region Getters For User
     @staticmethod
@@ -76,17 +77,17 @@ class Selector:
     @staticmethod
     def get_teacher_by_group_id(group_id):
         teacher_id = Group.get_by_id(group_id).teacher
-        return Teacher.get(Teacher.user == teacher_id)
+        return Teacher.get(Teacher.id == teacher_id)
     # endregion
     @staticmethod
     def select_all_members_from_group(group: Group) -> list[GroupMember]:
-        return GroupMember.select() \
-            .where(GroupMember.group == group.id)
+        return GroupMember.select().where(GroupMember.group == group.id)
 
     @staticmethod
     def select_type_members_for_group(group: Group, registered: bool) -> list[GroupMember]:
-        return Selector.select_all_members_from_group(group.id) \
-            .where((GroupMember.user is None) != registered)
+        query = Selector.select_all_members_from_group(group) \
+            .where((GroupMember.user.is_null() != registered))
+        return query
 
     @staticmethod
     def select_user_groups_names_with_id(user: User) -> list[Group]:
@@ -102,15 +103,24 @@ class Selector:
             .where(LabRegistry.group == group.id)
 
     @staticmethod
-    def select_labs_with_status_count_from_group(group: Group, status: LabStatus) -> int:
+    def select_labs_with_status_for_group(group: Group, status: LabStatus) -> list[LabWork]:
         labs = Selector.select_labs_for_group(group)
 
-        labStatus = Selector.get_lab_status(status)
+        if status != LabStatus.ALL:
+            lab_status = Selector.get_lab_status(status)
+        else:
+            lab_status = "*"
 
         query = (LabWork
-                 .select(fn.COUNT)
+                 .select()
                  .where((LabWork.lab.in_(labs)) &
-                        (LabWork.status == labStatus.id)))
+                        ((LabWork.status == lab_status.id) if lab_status != "*" else True)))
+        return query
+
+    @staticmethod
+    def select_labs_with_status_count_from_group(group: Group, status: LabStatus) -> int:
+        lab_works = Selector.select_labs_with_status_for_group(group, status)
+        query = lab_works.select(fn.COUNT("*"))
         return query.scalar()
 
     @staticmethod
@@ -137,73 +147,6 @@ class Selector:
 
         return query.scalar()
 
-    # @staticmethod
-    # def select_first_unchecked_lab_in_group(group_id):
-    #     subquery = (Status
-    #                 .select(Status.id)
-    #                 .where(Status.status_name == 'Не проверено')
-    #                 .limit(1))
-    #
-    #     query = (LabWork
-    #              .select(LabWork.id,
-    #                      LabRegistry.lab_number,
-    #                      LabRegistry.lab_description,
-    #                      LabRegistry.cloud_link,
-    #                      GroupMember.credentials)
-    #              .join(LabRegistry, JOIN.LEFT_OUTER, on=(LabWork.lab_id == LabRegistry.id))
-    #              .switch(LabWork)
-    #              .join(GroupMember, JOIN.LEFT_OUTER,
-    #                    on=(LabWork.member_id == GroupMember.member_id))
-    #              .where((GroupMember.group_id == group_id) &
-    #                     (LabWork.status_id.in_(subquery)))
-    #              .order_by(LabWork.id.asc())
-    #              .limit(1))
-    #     return query
-
-    # @staticmethod
-    # def select_next_unchecked_lab_in_group(group_id, current_lab_id):
-    #     subquery = Selector.get_lab_status(LabStatus.NOTCHECKED)
-    #
-    #     query = (LabWork
-    #              .select(LabWork.id,
-    #                      LabRegistry.lab_number,
-    #                      LabRegistry.lab_description,
-    #                      LabRegistry.cloud_link,
-    #                      GroupMember.credentials)
-    #              .join(LabRegistry, JOIN.LEFT_OUTER, on=(LabWork.lab_id == LabRegistry.id))
-    #              .switch(LabWork)
-    #              .join(GroupMember, JOIN.LEFT_OUTER,
-    #                    on=(LabWork.member_id == GroupMember.member_id))
-    #              .where((GroupMember.group_id == group_id) &
-    #                     (LabWork.status_id.in_(subquery)) &
-    #                     (LabWork.id > current_lab_id))
-    #              .order_by(LabWork.id.asc())
-    #              .limit(1))
-    #     return query
-    #
-    # @staticmethod
-    # def select_previous_unchecked_lab_in_group(group_id, current_lab_id):
-    #     subquery = (LabStatus
-    #                 .select(LabStatus.id)
-    #                 .where(LabStatus.status_name == 'Не проверено')
-    #                 .limit(1))
-    #
-    #     return (LabWork
-    #             .select(LabWork.id,
-    #                     LabRegistry.lab_number,
-    #                     LabRegistry.lab_description,
-    #                     LabRegistry.cloud_link,
-    #                     GroupMember.credentials)
-    #             .join(LabRegistry, JOIN.LEFT_OUTER, on=(LabWork.lab_id == LabRegistry.id))
-    #             .switch(LabWork)
-    #             .join(GroupMember, JOIN.LEFT_OUTER,
-    #                   on=(LabWork.member_id == GroupMember.member_id))
-    #             .where((GroupMember.group_id == group_id) &
-    #                    (LabWork.status_id.in_(subquery)) &
-    #                    (LabWork.id < current_lab_id))
-    #             .order_by(LabWork.id.asc())
-    #             .limit(1))
-
     @staticmethod
     def select_students_labs_with_status_in_group(group: Group, user: User, status_filter=LabStatus.ALL) -> list[LabRegistry]:
         member = Selector.get_group_member_by_telegram_and_group(group.id, user.telegram_id)
@@ -229,16 +172,13 @@ class Selector:
     def select_teacher_groups(teacher: Teacher):
         query = (Group
                  .select(Group.id, Group.name)
-                 .where(Group.teacher == Teacher.id))
+                 .where(Group.teacher == teacher.id))
         return query
 
-    # @staticmethod
-    # def ff(user_id):
-    #     query = (Teacher
-    #              .select(fn.EXISTS(
-    #         Teacher.select(fn.COUNT(1))
-    #         .where(Teacher.telegram_id == user_id)
-    #     ).alias('exists')))
-    #
-    #     # Для выполнения запроса и получения результата
-    #     return query.scalar()  # Возвращает True, если запись существует, иначе False
+    @staticmethod
+    def select_undone_group_labs_for_student(student: GroupMember):
+        user = Selector.get_user_by_telegram_id(student.user)
+        group = Selector.get_group_by_id(student.group)
+        labs = Selector.select_students_labs_with_status_in_group(group, user).select(LabWork.lab)
+        query = LabRegistry.select().where(~(LabRegistry.id.not_in(labs)))
+        return query
