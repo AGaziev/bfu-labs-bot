@@ -2,11 +2,6 @@ import io
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.utils.exceptions import MessageNotModified
-from aiogram.utils.markdown import escape_md
-
-import keyboards
-from data import config
 import keyboards as kb
 from middlewares import rate_limit
 from utils import states

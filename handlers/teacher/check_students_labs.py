@@ -7,9 +7,11 @@ from loguru import logger
 import keyboards as kb
 from _legacy.laboratory_work import LaboratoryWork
 from middlewares import rate_limit
-from utils import states
+from utils import states, LabWork
 from managers import GroupManager, CloudManager, LabManager
 from loader import bot
+from utils.callbacks import check_lab_callback
+from utils.carousel import Carousel
 
 
 def create_message_by_lab_work(lab_work: LaboratoryWork) -> str:

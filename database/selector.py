@@ -1,6 +1,5 @@
 from peewee import fn, JOIN
 
-from _legacy.laboratory_work import LaboratoryWork
 from utils import Group, GroupMember, LabRegistry, LabWork, User, Status, Teacher
 from utils.enums import LabStatus
 

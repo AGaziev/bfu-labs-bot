@@ -2,6 +2,7 @@ from loguru import logger
 
 from _legacy.laboratory_work import LaboratoryWork
 from _legacy.students_labs import StudentsLabs
+from utils.enums import LabStatus
 from .cloud import CloudManager
 from loader import bot
 

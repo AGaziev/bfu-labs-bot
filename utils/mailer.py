@@ -5,7 +5,6 @@ from aiogram.utils.exceptions import BotBlocked
 from managers.db import DatabaseManager
 from utils import GroupMember
 from utils.models import Teacher
-from utils.enums import Blocked
 from aiogram.utils.markdown import hitalic, hbold, hcode
 import keyboards as kb
 import asyncio

@@ -1,7 +1,3 @@
-from aiogram import executor
-from loguru import logger
-
-
 async def set_commands(dp):
     from aiogram import types
 

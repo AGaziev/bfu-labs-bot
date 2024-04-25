@@ -1,5 +1,4 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils.callback_data import CallbackData
 
 from managers.db import DatabaseManager
 from utils import Group

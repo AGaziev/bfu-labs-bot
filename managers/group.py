@@ -1,10 +1,11 @@
 import itertools
-
-from loguru import logger
 from io import BytesIO
 
-from utils.enums import Blocked, LabStatus
+from loguru import logger
+
 import utils.mailer as mailing
+from utils import Group
+from utils.enums import LabStatus
 from utils.group_info import GroupInfo
 from utils.stat_generator import StatsGenerator
 from .cloud import CloudManager
