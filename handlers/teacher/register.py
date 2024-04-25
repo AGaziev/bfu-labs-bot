@@ -6,6 +6,7 @@ from loguru import logger
 from loader import bot
 
 import keyboards as kb
+from managers import GroupManager
 from middlewares import rate_limit
 from utils import states
 from data import configuration
@@ -48,7 +49,7 @@ async def confirm_credentials_and_write_to_database(call: types.CallbackQuery, s
     """Confirm credentials and write to database"""
     async with state.proxy() as data:
         credentials:list[str] = data['credentials']
-    await database_manager.insert_new_teacher(telegram_id=call.from_user.id,
+    await GroupManager.insert_new_teacher(telegram_id=call.from_user.id,
                                           last_name=credentials[0],
                                           first_name=credentials[1],
                                           patronymic=credentials[2] if len(credentials) == 3 else None)

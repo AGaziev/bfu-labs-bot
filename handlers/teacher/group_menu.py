@@ -8,11 +8,11 @@ from managers import GroupManager
 from utils import states
 
 
-async def teacher_group_menu(call: types.CallbackQuery, state: FSMContext):
+async def teacher_group_menu(call: types.CallbackQuery, callback_data: dict, state: FSMContext):
     # call.data sample: "group:1:teacher"
-    group_id = call.data.split(":")[1]
-    group_name = GroupManager.get_group_name_by_id(group_id=group_id)
-    group_info = GroupManager.get_group_info(group_id=group_id, group_name=group_name)
+    group_id = callback_data["group_id"]
+    group_name = GroupManager.get_group_name_by_id(int(group_id))
+    group_info = GroupManager.get_group_info(int(group_id))
 
     def percent_hitalic(x: int, y: int) -> str:
         percent = f"{round(x / y * 100, 2)}%" if y else "0%"

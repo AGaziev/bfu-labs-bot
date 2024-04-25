@@ -7,6 +7,7 @@ from yadisk.exceptions import DirectoryExistsError
 
 import keyboards as kb
 from managers.db import DatabaseManager
+from managers.user import UserManager
 from middlewares import rate_limit
 from utils import states
 from managers import GroupManager
@@ -24,7 +25,7 @@ async def set_new_group_name(callback: types.CallbackQuery, state: FSMContext):
 async def set_new_group_students(message: types.Message, state: FSMContext, user_id: int = None):
     # TODO: to validate type (with exist and bad names check)
     group_name = message.text.upper().replace(' ', '_')
-    owner_credentials = DatabaseManager.select_teacher_credentials_by_telegram_id(telegram_id=message.from_user.id)
+    owner_credentials = UserManager.get_teacher(telegram_id=message.from_user.id)
     repository_name = f"{group_name}_{owner_credentials.first_name}_{owner_credentials.last_name}"
     if owner_credentials.patronymic:
         repository_name += f"_{owner_credentials.patronymic}"

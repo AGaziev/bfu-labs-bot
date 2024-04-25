@@ -6,6 +6,7 @@ from aiogram.utils.markdown import hbold
 from loguru import logger
 
 import keyboards as kb
+from managers.user import UserManager
 from middlewares import rate_limit
 
 from loader import bot
@@ -32,10 +33,12 @@ async def send_invitation_message_to_user(username_or_user_id: str) -> bool:
     if username_or_user_id.isdigit():
         user_id = int(username_or_user_id)
     else:
-        user_id = await database_manager.select_telegram_id_by_username(username=username_or_user_id)
+        user_id = await UserManager.get_user_by_username(username=username_or_user_id)
 
     try:
-        await bot.send_message(chat_id=user_id, text=f"Вы были приглашены стать преподавателем.\nВведите необходисмые данные после нажатия на кнопку {hbold('Зарегистрироваться')}",
+        await bot.send_message(chat_id=user_id, text=f"Вы были приглашены стать преподавателем.\n"
+                                                     f"Введите необходисмые данные после нажатия на кнопку "
+                                                     f"{hbold('Зарегистрироваться')}",
                                parse_mode=types.ParseMode.HTML,
                                reply_markup=await kb.register_as_teacher_kb())
 
