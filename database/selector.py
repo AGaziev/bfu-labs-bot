@@ -49,7 +49,6 @@ class Selector:
     def get_lab_by_id(lab_id: int) -> LabWork:
         return LabWork.get_by_id(lab_id)
 
-
     # endregion
     # region Getters For User
     @staticmethod
@@ -67,7 +66,8 @@ class Selector:
 
     @staticmethod
     def get_user_by_telegram_id(telegram_id):
-        return User.get_or_none(telegram_id)
+        return User.get_or_none(User.telegram_id == telegram_id)
+
     # endregion
     # region Getters For Teacher
     @staticmethod
@@ -78,6 +78,7 @@ class Selector:
     def get_teacher_by_group_id(group_id):
         teacher_id = Group.get_by_id(group_id).teacher
         return Teacher.get(Teacher.id == teacher_id)
+
     # endregion
     @staticmethod
     def select_all_members_from_group(group: Group) -> list[GroupMember]:
@@ -148,18 +149,21 @@ class Selector:
         return query.scalar()
 
     @staticmethod
-    def select_students_labs_with_status_in_group(group: Group, user: User, status_filter=LabStatus.ALL) -> list[LabRegistry]:
+    def select_students_labs_with_status_in_group(group: Group, user: User, status_filter=LabStatus.ALL) \
+        -> list[LabRegistry]:
         member = Selector.get_group_member_by_telegram_and_group(group.id, user.telegram_id)
+
+        student_lab_works = Selector.select_all_student_lab_works(member)
 
         query = (LabRegistry
                  .select(LabRegistry.id,
                          LabRegistry.name,
                          LabRegistry.cloud_link,
-                         fn.COALESCE(Status.title, LabStatus.NOTHANDOVER).alias('status'))
-                 .join(LabWork, JOIN.LEFT_OUTER, on=(LabRegistry.id == LabWork.lab_id))
-                 .join(Status, JOIN.LEFT_OUTER, on=(LabWork.status_id == Status.id))
-                 .where(LabRegistry.group_id == group.id,
-                        LabWork.member_id == member.id))
+                         LabRegistry.number,
+                         fn.COALESCE(Status.title, LabStatus.NOTHANDOVER.value).alias('status'))
+                 .join(student_lab_works, JOIN.LEFT_OUTER, on=(LabRegistry.id == student_lab_works.c.lab_id))
+                 .join(Status, JOIN.LEFT_OUTER, on=(student_lab_works.c.status_id == Status.id))
+                 .where(LabRegistry.group_id == group.id))
         if status_filter != LabStatus.ALL:
             query = query.where(query.status == status_filter)
         return query
@@ -181,4 +185,15 @@ class Selector:
         group = Selector.get_group_by_id(student.group)
         labs = Selector.select_students_labs_with_status_in_group(group, user).select(LabWork.lab)
         query = LabRegistry.select().where(~(LabRegistry.id.not_in(labs)))
+        return query
+
+    @staticmethod
+    def select_all_student_lab_works(student: GroupMember):
+        query = (
+            LabWork
+            .select(LabWork.status,
+                    LabWork.lab,
+                    LabWork.member)
+            .where(LabWork.member == student.id)
+        )
         return query
