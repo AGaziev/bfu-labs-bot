@@ -43,18 +43,19 @@ class Mailer:
             link_to_lab (str): link to lab on cloud storage
         """
         group = DatabaseManager.get_group_by_id(group_id)
-        users_to_send_notification = DatabaseManager.select_all_members_from_group(group)
+        students_to_send_notification = DatabaseManager.select_all_members_from_group(group)
         teacher = DatabaseManager.get_teacher_by_group_id(group_id)
 
-        if len(users_to_send_notification):
+        if not len(students_to_send_notification):
             logger.warning(
                 f"No users to send notification, add some; group_id = {group.name}")
             return False
-
+        else:
+            active_students = filter(lambda student: student.user, students_to_send_notification)
         message = self._create_notification_message(teacher=teacher, description=description,
                                                     link_to_lab=link_to_lab, group_id=group_id)
 
-        await self._start_mailing(users_to_send_notification=users_to_send_notification, message=message,
+        await self._start_mailing(users_to_send_notification=active_students, message=message,
                                   url_to_lab=link_to_lab)
         return True
 
@@ -78,7 +79,8 @@ class Mailer:
                   description_part + group_name_part
         return message
 
-    async def _start_mailing(self, users_to_send_notification: [GroupMember], message: str, url_to_lab: str) -> None:
+    async def _start_mailing(self, users_to_send_notification, message: str,
+                             url_to_lab: str) -> None:
         """Starts mailing to users
 
         Args:
