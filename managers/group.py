@@ -120,7 +120,7 @@ class GroupManager:
         """
         group = DatabaseManager.get_group_by_id(group_id)
         passed = DatabaseManager.select_labs_with_status_count_from_group(group=group,
-                                                                          status=LabStatus.HANDOVER)
+                                                                          status=LabStatus.ACCEPTED)
         rejected = DatabaseManager.select_labs_with_status_count_from_group(group=group,
                                                                             status=LabStatus.REJECTED)
         not_checked = DatabaseManager.select_labs_with_status_count_from_group(group=group,

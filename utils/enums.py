@@ -8,7 +8,7 @@ class Blocked(enum.Enum):
 
 
 class LabStatus(enum.Enum):
-    HANDOVER = "Сдано"
+    ACCEPTED = "Сдано"
     REJECTED = "Отклонено"
     NOTCHECKED = "Не проверено"
     NOTHANDOVER = "Не сдано"

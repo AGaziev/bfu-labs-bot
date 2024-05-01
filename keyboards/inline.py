@@ -38,7 +38,7 @@ async def cancel_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=1, )
     kb.insert(InlineKeyboardButton(
         text='❌Отмена',
-        callback_data='cancel'),)
+        callback_data='cancel'), )
 
     return kb
 
@@ -90,7 +90,7 @@ def teacher_group_menu_kb(group_id) -> InlineKeyboardMarkup:
     """
     group_id - group's id from database to build a callback
     """
-    kb = InlineKeyboardMarkup(row_width=1,)
+    kb = InlineKeyboardMarkup(row_width=1, )
     group_buttons = [
         InlineKeyboardButton(
             text='➕Добавить лабораторную работу',
@@ -228,7 +228,7 @@ async def changed_mind_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=1, )
     kb.insert(InlineKeyboardButton(
         text='❌Я передумал',
-        callback_data='changed_mind'),)
+        callback_data='changed_mind'), )
 
     return kb
 
@@ -237,7 +237,7 @@ async def cloud_link_to_lab_kb(url: str) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=1, )
     kb.insert(InlineKeyboardButton(
         text='🔗Ссылка на облако',
-        url=url),)
+        url=url), )
 
     return kb
 
@@ -260,7 +260,7 @@ async def sample_files_with_cancel_button_kb() -> InlineKeyboardMarkup:
 
     kb.add(InlineKeyboardButton(
         text='❌Отмена',
-        callback_data='cancel'),)
+        callback_data='cancel'), )
 
     return kb
 

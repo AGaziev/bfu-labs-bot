@@ -14,7 +14,7 @@ def configure_and_fill_database_tables() -> None:
     #db.drop_tables(alltables, safe=False)
     db.create_tables(alltables)
     lab_statuses = [
-        {"title": LabStatus.HANDOVER.value},
+        {"title": LabStatus.ACCEPTED.value},
         {"title": LabStatus.NOTCHECKED.value},
         {"title": LabStatus.REJECTED.value},
     ]
