@@ -30,7 +30,7 @@ async def show_not_checked_labs(call: types.CallbackQuery, state: FSMContext):
     if len(not_checked_labs) == 0:
         await call.message.answer("Лабораторных нет")
         return
-    labs_carousel = Carousel(not_checked_labs)
+    labs_carousel = Carousel(not_checked_labs, repeatable=True)
     await state.update_data(labs_carousel=labs_carousel)
 
     await states.TeacherState.check_students_labs.set()
