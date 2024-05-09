@@ -1,5 +1,8 @@
 from datetime import datetime
+
+from database import Selector
 from utils import Group, GroupMember, Status, LabWork, User
+from utils.enums import LabStatus
 
 
 class Updater:
@@ -9,18 +12,15 @@ class Updater:
             .where(GroupMember.id == member_id).execute()
 
     @staticmethod
-    def update_lab_status(lab_id: int, status: str):
-        status_id_subquery = (Status
-                              .select(Status.id)
-                              .where(Status.status_name == status)
-                              .limit(1))
+    def update_lab_status(lab: LabWork, status: LabStatus):
+        new_status: Status = Selector.get_status(status)
 
         query = (LabWork
                  .update({
-            LabWork.status_id: status_id_subquery,
-            LabWork.updated_at: datetime.datetime.now()
+            LabWork.status_id: new_status.id,
+            LabWork.updated_at: datetime.now()
         })
-                 .where(LabWork.id == lab_id))
+                 .where(LabWork.id == lab.id))
 
         query.execute()
 
