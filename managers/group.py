@@ -4,7 +4,7 @@ from io import BytesIO
 from loguru import logger
 
 import utils.mailer as mailing
-from utils import Group
+from utils.models import *
 from utils.enums import LabStatus
 from utils.group_info import GroupInfo
 from utils.stat_generator import StatsGenerator
@@ -177,14 +177,18 @@ class GroupManager:
     def post_lab_from_student(group_name: str, telegram_id: int, lab_number: int, lab_file: BytesIO,
                               file_extension: str) -> None:
         group = DatabaseManager.get_group_by_name(group_name)
-        student_credentials = DatabaseManager.get_group_member_by_telegram_and_group(telegram_id=telegram_id,
+        student: GroupMember = DatabaseManager.get_group_member_by_telegram_and_group(telegram_id=telegram_id,
                                                                                      group_id=group.id)
-        lab_name, lab_id = DatabaseManager.get_lab_by_id(group_name=group_name,
-                                                                            lab_number=lab_number)
-        lab_name = f'{lab_name}.{file_extension}'
+
+        #lab_name, lab_id
+        lab = DatabaseManager.get_group_lab_by_number(group=group,
+                                                       lab_number=lab_number)
+        lab_name = f'{lab.name}.{file_extension}'
 
         cloud_path = CloudManager.add_lab_from_student(
-            group_name=group_name, student_name=student_credentials, lab_path_or_file=lab_file, lab_name=lab_name)
+            group_name=group_name, student_name=student.name, lab_path_or_file=lab_file, lab_name=lab_name)
 
-        DatabaseManager.insert_new_lab_from_student(lab_id=lab_id, member_credentials=student_credentials,
-                                                    status='Не проверено', cloud_link=cloud_path)
+        status: Status = DatabaseManager.get_status(LabStatus.NOTCHECKED)
+
+        DatabaseManager.insert_new_lab_from_student(lab_id=lab.id, member=student,
+                                                    status=status, cloud_link=cloud_path)
