@@ -201,7 +201,8 @@ class Selector:
     def select_undone_group_labs_for_student(student: GroupMember):
         user = Selector.get_user_by_telegram_id(student.user)
         group = Selector.get_group_by_id(student.group)
-        labs = Selector.select_students_labs_with_status_in_group(group, user).select(LabWork.lab)
+        labs = Selector.select_students_labs_with_status_in_group(group, user)
+        labs = list(labs)
         query = LabRegistry.select().where(~(LabRegistry.id.not_in(labs)))
         return query
 
