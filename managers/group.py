@@ -162,18 +162,6 @@ class GroupManager:
             return False
 
     @staticmethod
-    def get_first_not_checked_lab_in_group(group_id: int):
-        return DatabaseManager.select_first_unchecked_lab_in_group(group_id=group_id)
-
-    @staticmethod
-    def get_next_not_checked_lab_in_group(group_id: int, current_lab_id: int):
-        return DatabaseManager.select_next_unchecked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
-
-    @staticmethod
-    def get_previous_not_checked_lab_in_group(group_id: int, current_lab_id: int):
-        return DatabaseManager.select_previous_unchecked_lab_in_group(group_id=group_id, current_lab_id=current_lab_id)
-
-    @staticmethod
     def post_lab_from_student(group_name: str, telegram_id: int, lab_number: int, lab_file: BytesIO,
                               file_extension: str) -> None:
         group = DatabaseManager.get_group_by_name(group_name)
