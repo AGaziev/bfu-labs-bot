@@ -71,6 +71,8 @@ class LabWork(RegisterDateModel):
     member = ForeignKeyField(GroupMember, on_delete='NO ACTION')
     lab = ForeignKeyField(LabRegistry, on_delete='NO ACTION')
     status = ForeignKeyField(Status, on_delete='NO ACTION')
+    cloud_link = CharField()
+    updated_at = DateTimeField(default=None, null=True)
 
     class Meta:
         db_table = 'LabWork'
