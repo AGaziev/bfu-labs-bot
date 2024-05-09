@@ -2,6 +2,8 @@ from loguru import logger
 
 from _legacy.laboratory_work import LaboratoryWork
 from _legacy.students_labs import StudentsLabs
+from utils import LabWork, GroupMember
+from utils.LabInfo import LabInfo
 from utils.enums import LabStatus
 from .cloud import CloudManager
 from loader import bot
@@ -39,9 +41,6 @@ class LabManager:
             number=lab.number
         ) for lab in accepted_labs]
 
-        #accepted_labs = list(sorted(accepted_labs, key=lambda x: x.number))
-        #not_done_labs = list(sorted(not_done_labs, key=lambda x: x.number))
-
         return StudentsLabs(accepted_labs, undone_labs)
 
     @staticmethod
@@ -57,27 +56,28 @@ class LabManager:
         return CloudManager.get_public_link_by_destination_path(path)
 
     @staticmethod
-    def accept_laboratory_work(lab_id: int) -> [int, str]:
-        DatabaseManager.update_lab_status(lab_id=lab_id, status='Сдано')
-        lab, student_telegram_id = DatabaseManager.select_lab_and_owner_telegram_id_by_lab_id(lab_id)
+    def accept_laboratory_work(lab: LabWork) -> [GroupMember, str]:
+        DatabaseManager.update_lab_status(lab, LabStatus.ACCEPTED)
+        student = DatabaseManager.get_lab_owner(lab.id)
+        group_lab = DatabaseManager.get_group_lab_by_id(lab.lab)
         lab_link = LabManager.get_lab_link_by_path(lab.cloud_link)
-        message = f"✅✅✅\nВаша лабораторная работа №{lab.number} была проверена и принята преподавателем\n" \
+        message = f"✅✅✅\nВаша лабораторная работа №{group_lab.number} была проверена и принята преподавателем\n" \
                   f"Данные по работе:\n" \
-                  f"Название: {lab.description}\n" \
+                  f"Название: {group_lab.name}\n" \
                   f"{hlink('Ссылка', lab_link)} на работу\n"
-        return student_telegram_id, message
+        return student, message
 
     @staticmethod
-    def reject_laboratory_work(lab_id: int):
-        DatabaseManager.update_lab_status(lab_id=lab_id, status='Отклонено')
-        lab = DatabaseManager.get_lab_by_id(lab_id)
+    def reject_laboratory_work(lab: LabWork):
+        DatabaseManager.update_lab_status(lab, LabStatus.REJECTED)
+        group_lab = DatabaseManager.get_group_lab_by_id(lab.lab)
         student = DatabaseManager.get_group_member_by_id(lab.member)
         lab_link = LabManager.get_lab_link_by_path(lab.cloud_link)
         message = f"❌❌❌\nВаша лабораторная работа №{lab.number} была проверена и отклонена преподавателем\n" \
                   f"Данные по работе:\n" \
                   f"Название: {lab.description}\n" \
                   f"{hlink('Ссылка', lab_link)} на работу\n"
-        return student.user, message
+        return student, message
 
     @staticmethod
     def get_all_labs_for_group(group_id):
@@ -87,7 +87,7 @@ class LabManager:
     @staticmethod
     def get_not_checked_labs_for_teacher(group_id):
         group = DatabaseManager.get_group_by_id(group_id)
-        return DatabaseManager.select_labs_with_status_for_group(group, LabStatus.NOTCHECKED)
+        return list(DatabaseManager.select_labs_with_status_for_group(group, LabStatus.NOTCHECKED).objects())
 
     @staticmethod
     def select_lab_condition_files_count_from_group(group_id: int):
@@ -95,5 +95,8 @@ class LabManager:
         files = DatabaseManager.select_labs_for_group(group)
         return len(files)
 
-
-        return student_telegram_id, message
+    @staticmethod
+    def get_lab_info_for_teacher(lab_work: LabWork) -> LabInfo:
+        member = DatabaseManager.get_group_member_by_id(lab_work.member)
+        lab = DatabaseManager.get_group_lab_by_id(lab_work.lab)
+        return LabInfo(member, lab_work, lab)
