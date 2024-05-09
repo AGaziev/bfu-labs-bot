@@ -6,6 +6,7 @@ from loguru import logger
 import keyboards as kb
 from data import configuration
 from managers.db import DatabaseManager
+from managers.user import UserManager
 from middlewares import rate_limit
 from utils import states
 
@@ -29,7 +30,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         #                     reply_markup=await kb.student_menu_kb(telegram_id=message.from_user.id),
         #                     parse_mode=types.ParseMode.HTML)
 
-        if DatabaseManager.check_is_user_teacher(user_id=user_id):
+        if UserManager.get_teacher(telegram_id=user_id) is not None:
             await message.reply(f"С возвращением, {hbold(message.from_user.full_name)}",
                                 reply_markup=await kb.teacher_menu_kb(),
                                 parse_mode=types.ParseMode.HTML)

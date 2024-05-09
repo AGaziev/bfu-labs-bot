@@ -79,7 +79,7 @@ class Selector:
     # region Getters For Teacher
     @staticmethod
     def get_teacher_by_telegram_id(telegram_id):
-        return Teacher.get(Teacher.user == telegram_id)
+        return Teacher.get_or_none(Teacher.user == telegram_id)
 
     @staticmethod
     def get_teacher_by_group_id(group_id):
@@ -110,10 +110,11 @@ class Selector:
     @staticmethod
     def select_user_groups_names_with_id(user: User) -> list[Group]:
         student_registers = GroupMember.select(GroupMember.group) \
-            .where(GroupMember.user == user.id)
+            .where(GroupMember.user == user.telegram_id)
 
-        return Group.select() \
-            .where(Group.id << student_registers)
+        query = Group.select() \
+            .where(Group.id.in_(student_registers))
+        return query
 
     @staticmethod
     def select_labs_for_group(group: Group) -> list[LabRegistry]:
