@@ -39,33 +39,15 @@ class Inserter:
         return True
 
     @staticmethod
-    def insert_new_lab_from_student(lab_id, member_credentials, status, cloud_link):
-        try:
-            member_id_subquery = (GroupMember
-                                  .select(GroupMember.member_id)
-                                  .where(GroupMember.credentials == member_credentials)
-                                  .limit(1))
-
-            # Определение status_id через подзапрос
-            status_id_subquery = (Status
-                                  .select(Status.id)
-                                  .where(Status.status_name == status)
-                                  .limit(1))
-
-            # Выполнение операции вставки
-            insert_query = (LabWork
-            .insert({
-                LabWork.lab_id: lab_id,
-                LabWork.member_id: member_id_subquery,
-                LabWork.status_id: status_id_subquery,
-                LabWork.cloud_link: cloud_link
-            }))
-            insert_query.execute()
-            return True
-
-        except Exception as e:
-            print("Ошибка при вставке в таблицу lab_tracker" + str(e))
-            return False
+    def insert_new_lab_from_student(lab_id: LabRegistry, member: GroupMember, status: Status, cloud_link):
+        insert_query = (LabWork
+        .insert({
+            LabWork.lab_id: lab_id,
+            LabWork.member_id: member.id,
+            LabWork.status_id: status.id,
+            LabWork.cloud_link: cloud_link
+        }))
+        insert_query.execute()
 
     @staticmethod
     def insert_new_user(user_id, username):
