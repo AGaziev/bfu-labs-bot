@@ -17,6 +17,11 @@ class Selector:
         member = GroupMember.get_by_id(member_id)
         return member
 
+    @staticmethod
+    def get_group_member_by_id(member_id) -> GroupMember:
+        member = GroupMember.get_by_id(member_id)
+        return member
+
     # endregion
     # region Getters For Group
     @staticmethod
@@ -42,6 +47,10 @@ class Selector:
                  .where((LabRegistry.lab_number == lab_number) &
                         (LabRegistry.group_id == group.id)))
         return query
+
+    @staticmethod
+    def get_group_lab_by_id(lab_id) -> LabRegistry:
+        return LabRegistry.get_by_id(lab_id)
 
     # endregion
     # region Getters For LabWork
@@ -78,6 +87,16 @@ class Selector:
     def get_teacher_by_group_id(group_id):
         teacher_id = Group.get_by_id(group_id).teacher
         return Teacher.get(Teacher.id == teacher_id)
+
+    # endregion
+    # region Getters For Status
+    @staticmethod
+    def get_status_by_title(title: str):
+        return Status.get(Status.title == title)
+
+    @staticmethod
+    def get_status(status: LabStatus):
+        return Selector.get_status_by_title(status.value)
 
     # endregion
     @staticmethod
@@ -150,7 +169,7 @@ class Selector:
 
     @staticmethod
     def select_students_labs_with_status_in_group(group: Group, user: User, status_filter=LabStatus.ALL) \
-        -> list[LabRegistry]:
+            -> list[LabRegistry]:
         member = Selector.get_group_member_by_telegram_and_group(group.id, user.telegram_id)
 
         student_lab_works = Selector.select_all_student_lab_works(member)
