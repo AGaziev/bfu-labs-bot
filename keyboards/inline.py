@@ -285,23 +285,19 @@ async def teacher_check_students_labs_kb(lab_id: int, show_rate_buttons: bool = 
     else:
         rate_buttons = []
 
-    if await database_manager.is_exist_previous_unchecked_lab_in_group(lab_id):
-        rate_buttons.append(InlineKeyboardButton(
-            text='⬅️',
-            callback_data=check_lab_callback.new(
-                lab_id=lab_id, status='previous'
-            )
+    rate_buttons.append(InlineKeyboardButton(
+        text='⬅️',
+        callback_data=check_lab_callback.new(
+            lab_id=lab_id, status='previous'
         )
-        )
+    ))
 
-    if await database_manager.is_exist_next_unchecked_lab_in_group(lab_id):
-        rate_buttons.append(InlineKeyboardButton(
-            text='➡️',
-            callback_data=check_lab_callback.new(
-                lab_id=lab_id, status='next'
-            )
+    rate_buttons.append(InlineKeyboardButton(
+        text='➡️',
+        callback_data=check_lab_callback.new(
+            lab_id=lab_id, status='next'
         )
-        )
+    ))
 
     for button in rate_buttons:
         kb.insert(button)
