@@ -10,7 +10,7 @@ from .register import register_as_teacher, confirm_teacher_credentials, confirm_
 from .show_my_groups import show_my_groups
 from .group_menu import teacher_group_menu, send_stats_of_group
 from .add_new_lab import wait_for_lab_conditions_file, ask_for_filename_to_change, wait_for_new_filename, upload_file_to_cloud_drive, change_filename
-from .check_students_labs import show_not_checked_labs, show_next_not_checked_lab, show_previous_not_checked_lab, accept_laboratory_work, reject_laboratory_work
+from .check_students_labs import navigate_labs, show_not_checked_labs, accept_laboratory_work, reject_laboratory_work
 
 
 def setup_teacher_handlers(dp: Dispatcher):
