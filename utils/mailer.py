@@ -74,10 +74,9 @@ class Mailer:
         group_name = DatabaseManager.get_group_by_id(group_id=group_id).name
         teacher_credentials_part = f'''Преподаватель {hitalic(teacher.first_name)} {hitalic(teacher.last_name)} {hitalic(teacher.patronymic if teacher.patronymic else '')}\n'''
         description_part = f'''добавил новую лабораторную работу "{hcode(description)}"\n'''
-        group_name_part = f'''для группы "{hbold(group_name)}"\n\n'''
+        group_name_part = f'''для группы {hbold(group_name)}\n\n'''
 
-        message = teacher_credentials_part + \
-                  description_part + group_name_part
+        message = teacher_credentials_part + description_part + group_name_part
         return message
 
     async def _start_mailing(self, users_to_send_notification, message: str,
