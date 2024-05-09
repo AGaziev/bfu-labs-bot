@@ -1,4 +1,4 @@
-from loguru import logger
+from aiogram.utils.markdown import hlink
 
 from _legacy.laboratory_work import LaboratoryWork
 from _legacy.students_labs import StudentsLabs
@@ -6,11 +6,6 @@ from utils import LabWork, GroupMember
 from utils.LabInfo import LabInfo
 from utils.enums import LabStatus
 from .cloud import CloudManager
-from loader import bot
-
-from aiogram import types
-from aiogram.utils.markdown import hlink
-
 from .db import DatabaseManager
 
 
@@ -21,10 +16,7 @@ class LabManager:
         group = DatabaseManager.get_group_by_id(group_id)
         lab_statistic_of_student = DatabaseManager.select_students_labs_with_status_in_group(group, user)
 
-        current_lab: LaboratoryWork
-
-
-        accepted_labs = filter(lambda  lab: lab.status == LabStatus.ACCEPTED.value, lab_statistic_of_student)
+        accepted_labs = filter(lambda lab: lab.status == LabStatus.ACCEPTED.value, lab_statistic_of_student)
         undone_labs = filter(lambda lab: lab.status == LabStatus.NOTHANDOVER.value, lab_statistic_of_student)
         # TODO: выпилить это г**
         undone_labs = [LaboratoryWork(

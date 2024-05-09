@@ -1,16 +1,18 @@
-from aiogram.types import ContentType
 from aiogram import Dispatcher
-
+from aiogram.types import ContentType
 from loguru import logger
 
 from utils import states, callbacks
-from .add_group import set_new_group_name, set_new_group_students, correcting_students_list, change_stundents_list_to_new_file, end_group_add, send_file_sample
+from .add_group import set_new_group_name, set_new_group_students, correcting_students_list, \
+    change_stundents_list_to_new_file, end_group_add, send_file_sample
+from .add_new_lab import wait_for_lab_conditions_file, ask_for_filename_to_change, wait_for_new_filename, \
+    upload_file_to_cloud_drive, change_filename
 from .cancel_operation import cancel_operation
-from .register import register_as_teacher, confirm_teacher_credentials, confirm_credentials_and_write_to_database, change_teacher_credentials
-from .show_my_groups import show_my_groups
-from .group_menu import teacher_group_menu, send_stats_of_group
-from .add_new_lab import wait_for_lab_conditions_file, ask_for_filename_to_change, wait_for_new_filename, upload_file_to_cloud_drive, change_filename
 from .check_students_labs import navigate_labs, show_not_checked_labs, accept_laboratory_work, reject_laboratory_work
+from .group_menu import teacher_group_menu, send_stats_of_group
+from .register import register_as_teacher, confirm_teacher_credentials, confirm_credentials_and_write_to_database, \
+    change_teacher_credentials
+from .show_my_groups import show_my_groups
 
 
 def setup_teacher_handlers(dp: Dispatcher):

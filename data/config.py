@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 from loguru import logger
 
@@ -10,9 +11,10 @@ class Config:
         self.bot_token = os.getenv('BOT_TOKEN')
         self.cloud_drive_token = os.getenv('YANDEX_DISK_TOKEN')
         self.admins = self._get_admins()
-        self.database_connection_parameters : DBCreds = DBCreds()
+        self.database_connection_parameters: DBCreds = DBCreds()
 
-    def _get_admins(self) -> tuple:
+    @staticmethod
+    def _get_admins() -> tuple:
         try:
             admins = tuple(map(int, [telegram_id for telegram_id in os.getenv(
                 'ADMINS').split(',') if telegram_id != '']))

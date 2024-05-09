@@ -1,14 +1,12 @@
-from loguru import logger
-
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils.markdown import hbold
+from loguru import logger
 
+import keyboards as kb
+from data import configuration
 from managers.db import DatabaseManager
 from middlewares import rate_limit
-import keyboards as kb
-
-from data import configuration
 from utils import states
 
 
@@ -17,11 +15,11 @@ async def cmd_start(message: types.Message, state: FSMContext):
     if state:
         await state.finish()
     DatabaseManager.update_user_is_blocked_field_by_user_id(user_id=message.from_user.id,
-                                                                   is_blocked=False)
+                                                            is_blocked=False)
     user_id = message.from_user.id
     if not DatabaseManager.is_user_exist(user_id):
         DatabaseManager.insert_new_user(user_id=user_id,
-                                               username=message.from_user.username)
+                                        username=message.from_user.username)
         logger.info(
             f"New user {message.from_user.full_name} with id {user_id} was added to database")
 

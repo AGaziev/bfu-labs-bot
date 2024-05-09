@@ -6,11 +6,10 @@ from aiogram.utils.markdown import hbold, hitalic, hlink
 from yadisk.exceptions import DirectoryExistsError
 
 import keyboards as kb
-from managers.db import DatabaseManager
+from managers import GroupManager
 from managers.user import UserManager
 from middlewares import rate_limit
 from utils import states
-from managers import GroupManager
 from utils.parsers import TxtParser
 from utils.samples_gerenator import SamplesGenerator
 
@@ -36,7 +35,8 @@ async def set_new_group_students(message: types.Message, state: FSMContext, user
     else:
         await message.answer(f"Название вашей группы: {hbold(repository_name)}\n\n"
                              f"Прикрепите txt файл со списком студентов в этой группе",
-                             reply_markup=await kb.sample_files_with_cancel_button_kb(), parse_mode=types.ParseMode.HTML)
+                             reply_markup=await kb.sample_files_with_cancel_button_kb(),
+                             parse_mode=types.ParseMode.HTML)
         async with state.proxy() as group_data:
             group_data["name"] = repository_name
         await states.TeacherState.add_group.students.set()
@@ -103,7 +103,8 @@ async def end_group_add(call: types.CallbackQuery, state: FSMContext):
             group_data["cloud_drive_url"], group_id = GroupManager.create_group(
                 group_data["name"], group_data["students"], call.from_user.id)
         except DirectoryExistsError:
-            await call.message.answer("Такое название уже есть на облаке, попробуйте другое или обратитесь к администратору")
+            await call.message.answer(
+                "Такое название уже есть на облаке, попробуйте другое или обратитесь к администратору")
             await states.TeacherState.add_group.name.set()
             return
         group_name = group_data['name']
@@ -114,4 +115,4 @@ async def end_group_add(call: types.CallbackQuery, state: FSMContext):
                                   reply_markup=kb.teacher_group_menu_kb(group_id),
                                   parse_mode="HTML")
         await state.finish()
-        await states.TeacherState.group_menu.set() #FIXME ??
+        await states.TeacherState.group_menu.set()  # FIXME ??

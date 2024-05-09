@@ -3,10 +3,10 @@ from aiogram.dispatcher import FSMContext
 from aiogram.utils.markdown import hbold
 
 import keyboards as kb
+from loader import bot
+from managers import CloudManager, LabManager
 from middlewares import rate_limit
 from utils import states, LabWork
-from managers import GroupManager, CloudManager, LabManager
-from loader import bot
 from utils.LabInfo import LabInfo
 from utils.carousel import Carousel
 
@@ -81,6 +81,7 @@ def get_input_media_from_lab(lab: LabWork, group_name: str):
     input_file = types.InputFile(document, filename=filename)
     return types.InputMediaDocument(input_file, caption=message, parse_mode=types.ParseMode.HTML)
 
+
 async def update_unchecked_labs(group_id, call, state):
     not_checked_labs = LabManager.get_not_checked_labs_for_teacher(group_id)
     if len(not_checked_labs) == 0:
@@ -89,6 +90,7 @@ async def update_unchecked_labs(group_id, call, state):
     labs_carousel = Carousel(not_checked_labs)
     await state.update_data(labs_carousel=labs_carousel)
     return True
+
 
 # TODO: UNION THIS TWO METHODS BY CALLBACKS (like mark:accept/reject:lab_id)
 async def accept_laboratory_work(call: types.CallbackQuery, state: FSMContext):

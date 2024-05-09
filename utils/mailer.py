@@ -1,13 +1,13 @@
-from loguru import logger
-from loader import bot
-from aiogram.utils.exceptions import BotBlocked
-
-from managers.db import DatabaseManager
-from utils import GroupMember
-from utils.models import Teacher
-from aiogram.utils.markdown import hitalic, hbold, hcode
-import keyboards as kb
 import asyncio
+
+from aiogram.utils.exceptions import BotBlocked
+from aiogram.utils.markdown import hitalic, hbold, hcode
+from loguru import logger
+
+import keyboards as kb
+from loader import bot
+from managers.db import DatabaseManager
+from utils.models import Teacher
 
 
 class Mailer:
@@ -55,11 +55,12 @@ class Mailer:
         message = self._create_notification_message(teacher=teacher, description=description,
                                                     link_to_lab=link_to_lab, group_id=group_id)
 
-        await self._start_mailing(users_to_send_notification=active_students, message=message,
+        await self._start_mailing(users_to_send_notification=list(active_students), message=message,
                                   url_to_lab=link_to_lab)
         return True
 
-    def _create_notification_message(self, teacher: Teacher, description: str, link_to_lab: str, group_id: int) -> str:
+    @staticmethod
+    def _create_notification_message(teacher: Teacher, description: str, link_to_lab: str, group_id: int) -> str:
         """Creates notification message for user
 
         Args:

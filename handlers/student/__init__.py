@@ -2,16 +2,16 @@ from aiogram import Dispatcher
 from aiogram import types
 from loguru import logger
 
-from .connect_to_group import set_connecting_group_name, show_student_list_of_group, choosing_student, end_connecting_to_group
-from .show_my_groups import show_my_groups
+from utils import callbacks
+from utils import states
+from .connect_to_group import set_connecting_group_name, show_student_list_of_group, choosing_student, \
+    end_connecting_to_group
 from .group_menu import student_group_menu, show_not_done_labs_files
 from .post_lab import show_undone_labs_for_post, choose_lab, wait_for_lab_file, end_posting_lab
-from utils import states
-from utils import callbacks
+from .show_my_groups import show_my_groups
 
 
 def setup_student_handlers(dp: Dispatcher):
-
     dp.register_callback_query_handler(
         set_connecting_group_name,
         text="connect_to_group",

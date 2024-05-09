@@ -1,14 +1,14 @@
 from datetime import datetime
 
 from database import Selector
-from utils import Group, GroupMember, Status, LabWork, User
+from utils import GroupMember, Status, LabWork, User
 from utils.enums import LabStatus
 
 
 class Updater:
     @staticmethod
     def connect_user_to_group(member_id: int, telegram_id: int):
-        return GroupMember.update(user=telegram_id)\
+        return GroupMember.update(user=telegram_id) \
             .where(GroupMember.id == member_id).execute()
 
     @staticmethod

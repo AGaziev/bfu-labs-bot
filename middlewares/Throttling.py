@@ -35,7 +35,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         self.prefix = key_prefix
         super(ThrottlingMiddleware, self).__init__()
 
-    async def on_process_message(self, message: types.Message, data: dict):
+    async def on_process_message(self, message: types.Message):
         """
         This handler is called when dispatcher receives a message
 

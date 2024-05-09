@@ -4,9 +4,9 @@ from io import BytesIO
 from loguru import logger
 
 import utils.mailer as mailing
-from utils.models import *
 from utils.enums import LabStatus
 from utils.group_info import GroupInfo
+from utils.models import *
 from utils.stat_generator import StatsGenerator
 from .cloud import CloudManager
 from .db import DatabaseManager
@@ -136,10 +136,10 @@ class GroupManager:
         group_info = GroupInfo()
         group_info.registered_members_count = GroupManager.get_count_of_type_members_from_group(group_id, True)
         group_info.unregistered_members_count = GroupManager.get_count_of_type_members_from_group(group_id, False)
-        group_info.students_at_all = group_info.registered_members_count + \
-                                     group_info.unregistered_members_count
+        group_info.students_at_all = group_info.registered_members_count + group_info.unregistered_members_count
         group_info.lab_condition_files_count = len(DatabaseManager.select_labs_for_group(group))
-        group_info.passed_labs_count, group_info.rejected_labs_count, group_info.not_checked_labs_count, group_info.labs_at_all = \
+        group_info.passed_labs_count, group_info.rejected_labs_count, group_info.not_checked_labs_count, \
+        group_info.labs_at_all = \
             GroupManager.select_students_labs_statuses_count_from_group(group_id)
         return group_info
 
@@ -166,11 +166,11 @@ class GroupManager:
                               file_extension: str) -> None:
         group = DatabaseManager.get_group_by_name(group_name)
         student: GroupMember = DatabaseManager.get_group_member_by_telegram_and_group(telegram_id=telegram_id,
-                                                                                     group_id=group.id)
+                                                                                      group_id=group.id)
 
-        #lab_name, lab_id
+        # lab_name, lab_id
         lab = DatabaseManager.get_group_lab_by_number(group=group,
-                                                       lab_number=lab_number)
+                                                      lab_number=lab_number)
         lab_name = f'{lab.name}.{file_extension}'
 
         cloud_path = CloudManager.add_lab_from_student(
