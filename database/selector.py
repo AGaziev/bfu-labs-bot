@@ -42,10 +42,8 @@ class Selector:
     # region Getters For LabRegistry
     @staticmethod
     def get_group_lab_by_number(group: Group, lab_number) -> LabRegistry:
-        query = (LabRegistry
-                 .select()
-                 .where((LabRegistry.lab_number == lab_number) &
-                        (LabRegistry.group_id == group.id)))
+        query = LabRegistry.get((LabRegistry.number == lab_number) &
+                                (LabRegistry.group == group.id))
         return query
 
     @staticmethod
