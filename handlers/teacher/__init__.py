@@ -93,7 +93,7 @@ def setup_teacher_handlers(dp: Dispatcher):
 
     dp.register_callback_query_handler(
         teacher_group_menu,
-        lambda call: call.data.startswith('group:'),
+        callbacks.group_callback.filter(role="teacher"),
         state=states.TeacherState.show_my_groups
     )
 
@@ -146,13 +146,13 @@ def setup_teacher_handlers(dp: Dispatcher):
     )
 
     dp.register_callback_query_handler(
-        show_previous_not_checked_lab,
+        navigate_labs,
         callbacks.check_lab_callback.filter(status="previous"),
         state=states.TeacherState.check_students_labs
     )
 
     dp.register_callback_query_handler(
-        show_next_not_checked_lab,
+        navigate_labs,
         callbacks.check_lab_callback.filter(status="next"),
         state=states.TeacherState.check_students_labs
     )
