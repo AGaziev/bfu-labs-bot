@@ -63,11 +63,11 @@ class LabManager:
     def reject_laboratory_work(lab: LabWork):
         DatabaseManager.update_lab_status(lab, LabStatus.REJECTED)
         group_lab = DatabaseManager.get_group_lab_by_id(lab.lab)
-        student = DatabaseManager.get_group_member_by_id(lab.member)
+        student = DatabaseManager.get_lab_owner(lab.id)
         lab_link = LabManager.get_lab_link_by_path(lab.cloud_link)
-        message = f"❌❌❌\nВаша лабораторная работа №{lab.number} была проверена и отклонена преподавателем\n" \
+        message = f"❌❌❌\nВаша лабораторная работа №{group_lab.number} была проверена и отклонена преподавателем\n" \
                   f"Данные по работе:\n" \
-                  f"Название: {lab.description}\n" \
+                  f"Название: {group_lab.name}\n" \
                   f"{hlink('Ссылка', lab_link)} на работу\n"
         return student, message
 
