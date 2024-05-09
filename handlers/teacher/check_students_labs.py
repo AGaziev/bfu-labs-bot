@@ -11,10 +11,11 @@ from utils.LabInfo import LabInfo
 from utils.carousel import Carousel
 
 
-def create_message_by_lab_work(lab_work: LaboratoryWork) -> str:
-    message = f"Лабораторная работа №{hbold(lab_work.number)}\n" \
-              f"Студент: {hbold(lab_work.member_credentials)}\n" \
-              f"Лабораторная работа: {hbold(lab_work.description)}\n\n"
+def create_message_by_lab_work(lab_work: LabWork) -> str:
+    lab_info: LabInfo = LabManager.get_lab_info_for_teacher(lab_work)
+    message = f"Лабораторная работа №{hbold(lab_info.lab.number)}\n" \
+              f"Студент: {hbold(lab_info.owner.name)}\n" \
+              f"Лабораторная работа: {hbold(lab_info.lab.name)}\n\n"
 
     return message
 
