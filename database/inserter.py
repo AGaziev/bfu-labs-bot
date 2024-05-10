@@ -1,6 +1,3 @@
-from peewee import fn
-
-from handlers.error import error_handling
 from utils import Group, GroupMember, LabWork, LabRegistry, Status, User, Teacher
 
 

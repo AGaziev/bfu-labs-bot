@@ -4,6 +4,7 @@ from .user import cmd_start
 from .admin import setup_admin_handlers
 from .teacher import setup_teacher_handlers
 from .student import setup_student_handlers
+from .error import error_handler
 # DON'T TOUCH THIS IMPORT
 from utils import states
 
@@ -25,3 +26,6 @@ def setup(dp: Dispatcher):
         state='*')
 
     """admin handlers"""
+    dp.register_errors_handler(
+        error_handler
+    )

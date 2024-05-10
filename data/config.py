@@ -11,6 +11,7 @@ class Config:
         self.bot_token = os.getenv('BOT_TOKEN')
         self.cloud_drive_token = os.getenv('YANDEX_DISK_TOKEN')
         self.admins = self._get_admins()
+        self.admin_log_errors_to = os.getenv("ADMINLOGTO")
         self.database_connection_parameters: DBCreds = DBCreds()
 
     @staticmethod
