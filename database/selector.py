@@ -155,7 +155,7 @@ class Selector:
                  .join(LabWork, JOIN.FULL, on=(GroupMember.id == LabWork.member))
                  .join(LabRegistry, on=(LabWork.lab == LabRegistry.id))
                  .where(GroupMember.group == group.id)
-                 )
+                 ).objects()
         return query
 
     @staticmethod

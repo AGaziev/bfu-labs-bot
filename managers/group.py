@@ -153,9 +153,10 @@ class GroupManager:
         info_for_generator = {}
         for name, labs in itertools.groupby(stats, key=lambda x: x.name):
             labs = list(labs)
+            lab_stats = [[lab.number, lab.date, lab.status] for lab in labs if lab.number is not None]
             info_for_generator[name] = [bool(labs[0].is_registered),
                                         # bc any of elements in "labs" will have equal "is_registered"
-                                        [[lab.number, lab.date, lab.status] for lab in labs if lab.number is not None]]
+                                        lab_stats]
         if info_for_generator:
             return StatsGenerator.generate_stats(group_name, info_for_generator, lab_number)
         else:

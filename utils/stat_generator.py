@@ -14,8 +14,8 @@ class StatsGenerator:
     lightBlue = '0099CCFF'
     lab_status_fill = {
         1: PatternFill(patternType='solid', fgColor=lightGreen),
-        2: PatternFill(patternType='solid', fgColor=lightRed),
-        3: PatternFill(patternType='solid', fgColor=lightBlue)
+        2: PatternFill(patternType='solid', fgColor=lightBlue),
+        3: PatternFill(patternType='solid', fgColor=lightRed),
     }
 
     font_bold = Font(bold=True)
@@ -48,7 +48,7 @@ class StatsGenerator:
         yield name_cell
         for lab in labs_info:
             lab_cell = Cell(sheet, column=get_column_letter(lab[0] + 1), row=row_num + 1, value=lab[1])
-            print(lab)
+            #print(lab)
             lab_cell.fill = cls.lab_status_fill[lab[2]]
             yield lab_cell
 
