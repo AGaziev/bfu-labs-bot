@@ -19,8 +19,8 @@ def configure_and_fill_database_tables() -> None:
         {"title": LabStatus.REJECTED.value},
     ]
     utils.models.Status.insert_many(lab_statuses).execute()
-    utils.models.User(telegram_id="292667494", username="vcdddk").save()
-    utils.models.Teacher(first_name="Alan", last_name="Gazziev", patronymic="gazievich", user="292667494").save()
+    # utils.models.User(telegram_id="292667494", username="vcdddk").save()
+    # utils.models.Teacher(first_name="Alan", last_name="Gazziev", patronymic="gazievich", user="292667494").save()
 
 
 if __name__ == '__main__':
