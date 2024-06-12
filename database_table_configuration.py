@@ -1,3 +1,4 @@
+from data import configuration
 from utils.enums import LabStatus
 
 
@@ -11,7 +12,7 @@ def configure_and_fill_database_tables() -> None:
                  utils.models.LabRegistry,
                  utils.models.Status,
                  utils.models.LabWork]
-    # db.drop_tables(alltables, safe=False)
+    #db.drop_tables(alltables, safe=False)
     db.create_tables(alltables)
     lab_statuses = [
         {"title": LabStatus.ACCEPTED.value},
@@ -19,8 +20,8 @@ def configure_and_fill_database_tables() -> None:
         {"title": LabStatus.REJECTED.value},
     ]
     utils.models.Status.insert_many(lab_statuses).execute()
-    # utils.models.User(telegram_id="292667494", username="vcdddk").save()
-    # utils.models.Teacher(first_name="Alan", last_name="Gazziev", patronymic="gazievich", user="292667494").save()
+    user, is_exists = utils.models.User.get_or_create(telegram_id=configuration.admins[0], username="vcdddk")
+    utils.models.Teacher.get_or_create(first_name="admin", last_name="adminov", patronymic="adminovich", user=user)
 
 
 if __name__ == '__main__':
