@@ -5,3 +5,4 @@ chardet~=5.2.0
 openpyxl~=3.1.2
 peewee~=3.17.0
 yadisk~=2.1.0
+requests
